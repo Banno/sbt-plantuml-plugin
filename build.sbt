@@ -15,10 +15,7 @@ crossScalaVersions := Seq("2.10.5", "2.11.6")
 scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked")
 
 resolvers ++= Seq(
-  "Sonatype Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
-  "Sonatype Releases" at "https://oss.sonatype.org/content/repositories/releases",
-  "spray.io" at "http://repo.spray.io/",
-  "Typesafe Releases" at "http://repo.typesafe.com/typesafe/releases/"
+  "Scalaz Bintray Repo" at "https://dl.bintray.com/scalaz/releases"
 )
 
 publishTo <<= (version) { v =>
