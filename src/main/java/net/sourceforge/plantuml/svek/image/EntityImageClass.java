@@ -1,0 +1,184 @@
+/* ========================================================================
+ * PlantUML : a free UML diagram generator
+ * ========================================================================
+ *
+ * (C) Copyright 2009-2014, Arnaud Roques
+ *
+ * Project Info:  http://plantuml.sourceforge.net
+ * 
+ * This file is part of PlantUML.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ *
+ * Original Author:  Arnaud Roques
+ */
+package net.sourceforge.plantuml.svek.image;
+
+import java.awt.geom.Dimension2D;
+import java.awt.geom.Rectangle2D;
+
+import net.sourceforge.plantuml.ColorParam;
+import net.sourceforge.plantuml.Dimension2DDouble;
+import net.sourceforge.plantuml.FontParam;
+import net.sourceforge.plantuml.ISkinParam;
+import net.sourceforge.plantuml.LineConfigurable;
+import net.sourceforge.plantuml.LineParam;
+import net.sourceforge.plantuml.SkinParamUtils;
+import net.sourceforge.plantuml.Url;
+import net.sourceforge.plantuml.creole.Stencil;
+import net.sourceforge.plantuml.cucadiagram.EntityPortion;
+import net.sourceforge.plantuml.cucadiagram.ILeaf;
+import net.sourceforge.plantuml.cucadiagram.PortionShower;
+import net.sourceforge.plantuml.cucadiagram.dot.GraphvizVersion;
+import net.sourceforge.plantuml.graphic.HtmlColor;
+import net.sourceforge.plantuml.graphic.StringBounder;
+import net.sourceforge.plantuml.graphic.TextBlock;
+import net.sourceforge.plantuml.svek.AbstractEntityImage;
+import net.sourceforge.plantuml.svek.ShapeType;
+import net.sourceforge.plantuml.ugraphic.Shadowable;
+import net.sourceforge.plantuml.ugraphic.UChangeBackColor;
+import net.sourceforge.plantuml.ugraphic.UChangeColor;
+import net.sourceforge.plantuml.ugraphic.UGraphic;
+import net.sourceforge.plantuml.ugraphic.UGraphicStencil;
+import net.sourceforge.plantuml.ugraphic.URectangle;
+import net.sourceforge.plantuml.ugraphic.UStroke;
+import net.sourceforge.plantuml.ugraphic.UTranslate;
+
+public class EntityImageClass extends AbstractEntityImage implements Stencil {
+
+	final private TextBlock body;
+	final private int shield;
+	final private EntityImageClassHeader2 header;
+	final private Url url;
+	final private double roundCorner;
+
+	final private LineConfigurable lineConfig;
+
+	public EntityImageClass(GraphvizVersion version, ILeaf entity, ISkinParam skinParam, PortionShower portionShower) {
+		super(entity, skinParam);
+		this.lineConfig = entity;
+		this.roundCorner = skinParam.getRoundCorner();
+		this.shield = version != null && version.useShield() && entity.hasNearDecoration() ? 16 : 0;
+		final boolean showMethods = portionShower.showPortion(EntityPortion.METHOD, entity);
+		final boolean showFields = portionShower.showPortion(EntityPortion.FIELD, entity);
+		this.body = entity.getBodier().getBody(FontParam.CLASS_ATTRIBUTE, skinParam, showMethods, showFields);
+
+		header = new EntityImageClassHeader2(entity, skinParam, portionShower);
+		this.url = entity.getUrl99();
+	}
+
+	// private int marginEmptyFieldsOrMethod = 13;
+
+	public Dimension2D calculateDimension(StringBounder stringBounder) {
+		final Dimension2D dimHeader = header.calculateDimension(stringBounder);
+		final Dimension2D dimBody = body == null ? new Dimension2DDouble(0, 0) : body.calculateDimension(stringBounder);
+		double width = Math.max(dimBody.getWidth(), dimHeader.getWidth());
+		if (width < getSkinParam().minClassWidth()) {
+			width = getSkinParam().minClassWidth();
+		}
+		final double height = dimBody.getHeight() + dimHeader.getHeight();
+		return new Dimension2DDouble(width, height);
+	}
+
+	@Override
+	public Rectangle2D getInnerPosition(String member, StringBounder stringBounder) {
+		final Rectangle2D result = body.getInnerPosition(member, stringBounder);
+		if (result == null) {
+			return result;
+		}
+		final Dimension2D dimHeader = header.calculateDimension(stringBounder);
+		final UTranslate translate = new UTranslate(0, dimHeader.getHeight());
+		return translate.apply(result);
+	}
+
+	final public void drawU(UGraphic ug) {
+		if (url != null) {
+			ug.startUrl(url);
+		}
+		drawInternal(ug);
+
+		if (url != null) {
+			ug.closeAction();
+		}
+	}
+
+	private void drawInternal(UGraphic ug) {
+		final StringBounder stringBounder = ug.getStringBounder();
+		final Dimension2D dimTotal = calculateDimension(stringBounder);
+		final Dimension2D dimHeader = header.calculateDimension(stringBounder);
+
+		final double widthTotal = dimTotal.getWidth();
+		final double heightTotal = dimTotal.getHeight();
+		final Shadowable rect = new URectangle(widthTotal, heightTotal, roundCorner, roundCorner);
+		if (getSkinParam().shadowing()) {
+			rect.setDeltaShadow(4);
+		}
+
+		HtmlColor classBorder = lineConfig.getSpecificLineColor();
+		if (classBorder == null) {
+			classBorder = SkinParamUtils.getColor(getSkinParam(), ColorParam.classBorder, getStereo());
+		}
+		ug = ug.apply(new UChangeColor(classBorder));
+		HtmlColor backcolor = getEntity().getSpecificBackColor();
+		if (backcolor == null) {
+			backcolor = SkinParamUtils.getColor(getSkinParam(), ColorParam.classBackground, getStereo());
+		}
+		ug = ug.apply(new UChangeBackColor(backcolor));
+
+		final UStroke stroke = getStroke();
+		ug.apply(stroke).draw(rect);
+
+		final HtmlColor headerBackcolor = getSkinParam().getHtmlColor(ColorParam.classHeaderBackground, getStereo(),
+				false);
+		if (headerBackcolor != null) {
+			final Shadowable rect2 = new URectangle(widthTotal, dimHeader.getHeight());
+			ug.apply(new UChangeBackColor(headerBackcolor)).apply(stroke).draw(rect2);
+		}
+		header.drawU(ug, dimTotal.getWidth(), dimHeader.getHeight());
+
+		if (body != null) {
+			final UGraphic ug2 = new UGraphicStencil(ug, this, stroke);
+			final UTranslate translate = new UTranslate(0, dimHeader.getHeight());
+			body.drawU(ug2.apply(translate));
+		}
+	}
+
+	private UStroke getStroke() {
+		UStroke stroke = lineConfig.getSpecificLineStroke();
+		if (stroke == null) {
+			stroke = getSkinParam().getThickness(LineParam.classBorder, getStereo());
+		}
+		if (stroke == null) {
+			stroke = new UStroke(1.5);
+		}
+		return stroke;
+	}
+
+	public ShapeType getShapeType() {
+		return ShapeType.RECTANGLE;
+	}
+
+	public int getShield() {
+		return shield;
+	}
+
+	public double getStartingX(StringBounder stringBounder, double y) {
+		return 0;
+	}
+
+	public double getEndingX(StringBounder stringBounder, double y) {
+		return calculateDimension(stringBounder).getWidth();
+	}
+
+}

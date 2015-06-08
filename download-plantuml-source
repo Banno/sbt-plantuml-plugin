@@ -1,0 +1,9 @@
+#! /bin/bash
+curl http://tcpdiag.dl.sourceforge.net/project/plantuml/plantuml-asl-8026.tar.gz > plantuml-asl-8026.tar.gz
+rm -rf src/main/java/net
+mkdir -p src/main/java/net
+tar -xvzf /tmp/plantuml-asl-8026.tar.gz
+mv src/net src/main/java
+rm README
+rm build.xml
+rm plantuml-asl-8026.tar.gz
