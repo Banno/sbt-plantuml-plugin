@@ -1,5 +1,7 @@
 # sbt-plantuml-plugin
 
+> An sbt plugin to generate sequence diagrams from text files.
+
 ## Usage
 
 TODO
