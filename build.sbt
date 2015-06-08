@@ -6,9 +6,11 @@ organization := "com.banno"
 
 version := "1.0.0-SNAPSHOT"
 
-scalaVersion := "2.11.5"
+scalaVersion := "2.11.6"
 
-crossScalaVersions := Seq("2.10.4", "2.11.5")
+crossScalaVersions := Seq("2.10.5", "2.11.6")
+
+// javacOptions ++= Seq("-Xlint:deprecation", "-Xlint:unchecked")
 
 scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked")
 
@@ -29,7 +31,6 @@ publishTo <<= (version) { v =>
 
 credentials += Credentials(Path.userHome / ".ivy2" / ".banno_credentials")
 
-
 // bintray
 bintrayPublishSettings
 
@@ -37,13 +38,9 @@ bintrayOrganization in bintray := Some("com.banno")
 
 repository in bintray := "oss"
 
-licenses += ("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0.html"))
-
-
-// required deps
-libraryDependencies ++= Seq(
-  "net.sourceforge.plantuml" % "plantuml" % "8026" % "provided"
-)
+licenses ++= Seq(("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0.html")))
 
 // specs2 support
-libraryDependencies += "org.specs2" %% "specs2" % "2.4.2" % "provided"
+libraryDependencies ++= Seq(
+  "org.specs2" %% "specs2-core" % "3.6.1" % "test"
+)

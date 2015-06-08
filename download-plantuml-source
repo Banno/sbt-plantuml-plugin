@@ -1,9 +1,24 @@
-#! /bin/bash
-curl http://tcpdiag.dl.sourceforge.net/project/plantuml/plantuml-asl-8026.tar.gz > plantuml-asl-8026.tar.gz
+#!/bin/bash
+
+PLANTUML_VERSION=8026
+
+echo "Downloading sources"
+curl -s http://tcpdiag.dl.sourceforge.net/project/plantuml/plantuml-asl-$PLANTUML_VERSION.tar.gz > plantuml-asl-$PLANTUML_VERSION.tar.gz
+
+echo "Cleaning "
 rm -rf src/main/java/net
-mkdir -p src/main/java/net
-tar -xvzf /tmp/plantuml-asl-8026.tar.gz
+
+echo "Unpackaging the archive"
+tar -xzf plantuml-asl-$PLANTUML_VERSION.tar.gz
 mv src/net src/main/java
+
+echo "Removing unneeded files from archive."
 rm README
 rm build.xml
-rm plantuml-asl-8026.tar.gz
+rm plantuml-asl-$PLANTUML_VERSION.tar.gz
+rm src/main/java/net/sourceforge/plantuml/ant/PlantUmlTask.java
+
+echo "Converting dos line endings to linux"
+find src/main/java/net -name "*.java" | xargs dos2unix -q
+
+echo "All Done!"
