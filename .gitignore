@@ -1,2 +1,22 @@
+<<<<<<< HEAD
 target/
 project/target/
+=======
+*.class
+*.log
+
+# sbt specific
+.cache
+.history
+.lib/
+dist/*
+target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+
+# Scala-IDE specific
+.scala_dependencies
+.worksheet
+>>>>>>> 96a47354a75a5b9457c1ba0a0583f25d47bd7d7c
