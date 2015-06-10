@@ -16,4 +16,6 @@ project/plugins/project/
 .scala_dependencies
 .worksheet
 
+# Generated images
 /output.png
+/src/test/resources/example.png
