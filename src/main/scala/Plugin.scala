@@ -12,7 +12,7 @@ object PlantUMLPlugin extends AutoPlugin {
   lazy val generateSequenceDiagrams = TaskKey[Seq[File]]("generate-sequence-diagrams")
 
   override lazy val projectSettings = Seq(
-    sequenceDiagramExtension := ".diag",
+    sequenceDiagramExtension := ".diag", // todo: change me?
     sequenceDiagramsLocation := baseDirectory.value / "src/main/resources/sequence-diagrams/",
     sequenceDiagramsOutput := baseDirectory.value / "src/main/resources/sequence-diagrams/",
     generateSequenceDiagrams := {

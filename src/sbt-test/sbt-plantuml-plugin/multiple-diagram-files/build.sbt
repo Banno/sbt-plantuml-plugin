@@ -1,6 +1,6 @@
 import com.banno.plantuml.PlantUMLPlugin
 
-name := "sbt-plantuml-plugin-test"
+name := "sbt-plantuml-plugin-multiple-diagram-files"
 
 version := "0.1"
 
