@@ -1,4 +1,3 @@
 > compile
-$ exec ls -lR src/
-$ exec ls src/main/resources/sequence-diagrams
+> generate-sequence-diagrams
 $ exists src/main/resources/sequence-diagrams/simple.png

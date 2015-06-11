@@ -5,26 +5,20 @@ import org.apache.commons.io.FileUtils
 import net.sourceforge.plantuml.SourceStringReader
 
 object PlantUMLPlugin extends AutoPlugin {
+  lazy val sequenceDiagramExtension = SettingKey[String]("sequence-diagram-extension")
   lazy val sequenceDiagramsLocation = SettingKey[File]("sequence-diagrams-locations")
   lazy val sequenceDiagramsOutput = SettingKey[File]("sequence-diagrams-output")
 
   lazy val generateSequenceDiagrams = TaskKey[Seq[File]]("generate-sequence-diagrams")
 
   override lazy val projectSettings = Seq(
-    resourceGenerators in Compile += task[Seq[File]] {
-      println("Hi2")
-      sequenceDiagramsLocation := baseDirectory.value / "src/main/resources/sequence-diagrams/"
-      sequenceDiagramsOutput := baseDirectory.value / "src/main/resources/sequence-diagrams/"
-
-      println("Hi3")
-
+    sequenceDiagramExtension := ".diag",
+    sequenceDiagramsLocation := baseDirectory.value / "src/main/resources/sequence-diagrams/",
+    sequenceDiagramsOutput := baseDirectory.value / "src/main/resources/sequence-diagrams/",
+    generateSequenceDiagrams := {
+      val diagramExtension = sequenceDiagramExtension.value
       val diagramsInputLocation = sequenceDiagramsLocation.value
       val diagramsOutputLocation = sequenceDiagramsOutput.value
-
-      println("input: " + diagramsInputLocation.getAbsolutePath)
-      println("output: " + diagramsOutputLocation.getAbsolutePath)
-
-      println("Hi4")
 
       if (diagramsInputLocation.exists) {
         if (!diagramsOutputLocation.exists) {
@@ -32,14 +26,24 @@ object PlantUMLPlugin extends AutoPlugin {
         }
 
         val sequenceDiagrams = diagramsInputLocation.listFiles().toList
-        sequenceDiagrams.filter(_.getName().endsWith(".diag")) map { sequenceDiagramFile =>
-          val output = new File(diagramsOutputLocation.getAbsolutePath + sequenceDiagramFile.getName + ".png")
+
+        sequenceDiagrams.filter(_.getName().endsWith(diagramExtension)) map { sequenceDiagramFile =>
+          val baseDirectory = ensurePathEndsInSlash(diagramsOutputLocation.getAbsolutePath)
+          val filename = dropDiagramFileExtension(diagramExtension, sequenceDiagramFile.getName) + ".png"
+          val output = new File(baseDirectory + filename)
+
           val diagramText = FileUtils.readFileToString(sequenceDiagramFile)
           val reader = new SourceStringReader(diagramText)
           reader.generateImage(output)
           output
         }
-      } else Seq.empty
-    }
+      } else {
+        Seq.empty
+      }
+    }// ,
+    // (compile in Compile) <<= (compile in Compile) dependsOn generateSequenceDiagrams
   )
+
+  private[this] def ensurePathEndsInSlash(path: String) = if (path.endsWith("/")) path else s"${path}/"
+  private[this] def dropDiagramFileExtension(extension: String, filename: String) = filename.replaceAll(extension, "")
 }
