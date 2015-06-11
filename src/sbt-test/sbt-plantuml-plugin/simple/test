@@ -1,3 +1,2 @@
 > compile
-> generate-sequence-diagrams
 $ exists src/main/resources/sequence-diagrams/simple.png

@@ -40,8 +40,8 @@ object PlantUMLPlugin extends AutoPlugin {
       } else {
         Seq.empty
       }
-    }// ,
-    // (compile in Compile) <<= (compile in Compile) dependsOn generateSequenceDiagrams
+    },
+    generateSequenceDiagrams <<= generateSequenceDiagrams triggeredBy (compile in Compile)
   )
 
   private[this] def ensurePathEndsInSlash(path: String) = if (path.endsWith("/")) path else s"${path}/"
