@@ -6,9 +6,12 @@ organization := "com.banno"
 
 version := "1.0.0-SNAPSHOT"
 
-scalaVersion := "2.11.6"
+scalaVersion := "2.10.5"
 
-crossScalaVersions := Seq("2.10.5", "2.11.6")
+// Waiting on can't expand macros compiled by previous versions of Scala
+// crossScalaVersions := Seq("2.10.5", "2.11.6")
+
+sbtPlugin := true
 
 // javacOptions ++= Seq("-Xlint:deprecation", "-Xlint:unchecked")
 
@@ -39,5 +42,18 @@ licenses ++= Seq(("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0.
 
 // specs2 support
 libraryDependencies ++= Seq(
+  "commons-io" % "commons-io" % "2.4",
   "org.specs2" %% "specs2-core" % "3.6.1" % "test"
 )
+
+// sbt scripted
+ScriptedPlugin.scriptedSettings
+
+scriptedBufferLog := false
+
+scriptedLaunchOpts <+= version { "-Dplugin.version=" + _ }
+
+// Don't publish sources or scaladoc jars.
+publishArtifact in (Compile, packageSrc) := false
+
+publishArtifact in (Compile, packageDoc) := false
