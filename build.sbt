@@ -34,7 +34,7 @@ credentials += Credentials(Path.userHome / ".ivy2" / ".banno_credentials")
 // bintray
 bintrayPublishSettings
 
-bintrayOrganization in bintray := Some("com.banno")
+bintrayOrganization in bintray := Some("banno")
 
 repository in bintray := "oss"
 
