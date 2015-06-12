@@ -4,16 +4,11 @@ name := "sbt-plantuml-plugin"
 
 organization := "com.banno"
 
-version := "1.0.0-SNAPSHOT"
+version := "1.0.0"
 
 scalaVersion := "2.10.5"
 
-// Waiting on can't expand macros compiled by previous versions of Scala
-// crossScalaVersions := Seq("2.10.5", "2.11.6")
-
 sbtPlugin := true
-
-// javacOptions ++= Seq("-Xlint:deprecation", "-Xlint:unchecked")
 
 scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked")
 
