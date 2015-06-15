@@ -4,7 +4,7 @@
 
 ## Usage
 
-Add the following to your project definition, below is an example in a `build.sbt` file.
+Add the following to your project definition, below is an example in a `build.sbt` file. They are generated from the `*.diag` files under the default of `src/main/resources/sequence-diagrams/` and outputted to the same directory.
 
 ```scala
 import com.banno.plantuml.PlantUMLPlugin
@@ -12,6 +12,22 @@ import com.banno.plantuml.PlantUMLPlugin
 name := "your-awesome-project-name"
 
 enablePlugins(PlantUMLPlugin)
+```
+
+#### Custom input/output directories and file extension
+
+```scala
+import com.banno.plantuml.PlantUMLPlugin
+
+name := "your-awesome-project-name"
+
+enablePlugins(PlantUMLPlugin)
+
+PlantUMLPlugin.sequenceDiagramExtension := "*.seq"
+
+PlantUMLPlugin.sequenceDiagramsLocation := file("./other/path/sequence-diagrams/")
+
+PlantUMLPlugin.sequenceDiagramsOutput := file("./other/path/sequence-diagrams/")
 ```
 
 ## Upgrading plantuml
