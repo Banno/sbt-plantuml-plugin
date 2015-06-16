@@ -6,7 +6,7 @@ import java.io.File
 
 class SeqDiagramGeneratorSpec extends Specification {
   "Should be able to generate a png" in {
-    var output = new File("output.png")
+    val output = new File("output.png")
     val src = """@startuml
 Bob -> Alice : hello
 @enduml"""

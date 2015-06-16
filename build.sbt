@@ -4,13 +4,11 @@ name := "sbt-plantuml-plugin"
 
 organization := "com.banno"
 
-version := "1.0.0-SNAPSHOT"
+version := "1.1.0-SNAPSHOT"
 
-scalaVersion := "2.11.6"
+scalaVersion := "2.10.5"
 
-crossScalaVersions := Seq("2.10.5", "2.11.6")
-
-// javacOptions ++= Seq("-Xlint:deprecation", "-Xlint:unchecked")
+sbtPlugin := true
 
 scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked")
 
@@ -31,7 +29,7 @@ credentials += Credentials(Path.userHome / ".ivy2" / ".banno_credentials")
 // bintray
 bintrayPublishSettings
 
-bintrayOrganization in bintray := Some("com.banno")
+bintrayOrganization in bintray := Some("banno")
 
 repository in bintray := "oss"
 
@@ -39,5 +37,18 @@ licenses ++= Seq(("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0.
 
 // specs2 support
 libraryDependencies ++= Seq(
+  "commons-io" % "commons-io" % "2.4",
   "org.specs2" %% "specs2-core" % "3.6.1" % "test"
 )
+
+// sbt scripted
+ScriptedPlugin.scriptedSettings
+
+scriptedBufferLog := false
+
+scriptedLaunchOpts <+= version { "-Dplugin.version=" + _ }
+
+// Don't publish sources or scaladoc jars.
+publishArtifact in (Compile, packageSrc) := false
+
+publishArtifact in (Compile, packageDoc) := false
