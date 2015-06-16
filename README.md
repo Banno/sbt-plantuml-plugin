@@ -14,6 +14,14 @@ name := "your-awesome-project-name"
 enablePlugins(PlantUMLPlugin)
 ```
 
+With the following added to your `project/plugins.sbt`
+
+```scala
+resolvers += "bintray-banno-oss-releases" at "http://dl.bintray.com/banno/oss"
+
+addSbtPlugin("com.banno" %% "sbt-plantuml-plugin" % "1.1.0")
+```
+
 #### Custom input/output directories and file extension
 
 ```scala
