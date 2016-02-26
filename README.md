@@ -17,9 +17,9 @@ enablePlugins(PlantUMLPlugin)
 With the following added to your `project/plugins.sbt`
 
 ```scala
-resolvers += "bintray-banno-oss-releases" at "http://dl.bintray.com/banno/oss"
+resolvers += Resolver.url("bintray-banno-oss-releases", url("https://dl.bintray.com/banno/oss"))(Resolver.ivyStylePatterns)
 
-addSbtPlugin("com.banno" %% "sbt-plantuml-plugin" % "1.1.0")
+addSbtPlugin("com.banno" % "sbt-plantuml-plugin" % "1.1.0")
 ```
 
 #### Custom input/output directories and file extension
