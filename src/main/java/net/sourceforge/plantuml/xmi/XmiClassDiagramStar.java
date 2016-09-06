@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -113,14 +113,14 @@ public class XmiClassDiagramStar implements IXmiClassDiagram {
 		// }
 	}
 
-//	private boolean isStandalone(IEntity ent) {
-//		for (final Link link : classDiagram.getLinks()) {
-//			if (link.getEntity1() == ent || link.getEntity2() == ent) {
-//				return false;
-//			}
-//		}
-//		return true;
-//	}
+	// private boolean isStandalone(IEntity ent) {
+	// for (final Link link : classDiagram.getLinks()) {
+	// if (link.getEntity1() == ent || link.getEntity2() == ent) {
+	// return false;
+	// }
+	// }
+	// return true;
+	// }
 
 	public static String forXMI(String s) {
 		return s.replace(':', ' ');
@@ -139,7 +139,7 @@ public class XmiClassDiagramStar implements IXmiClassDiagram {
 		final Element association = document.createElement("UML:Association");
 		association.setAttribute("xmi.id", assId);
 		association.setAttribute("namespace", "model1");
-		if (link.getLabel() != null) {
+		if (Display.isNull(link.getLabel()) == false) {
 			association.setAttribute("name", forXMI(link.getLabel()));
 		}
 

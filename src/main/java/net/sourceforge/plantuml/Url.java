@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -48,7 +48,7 @@ public class Url implements EnsureVisible {
 		if (tooltip == null) {
 			this.tooltip = url;
 		} else {
-			this.tooltip = tooltip;
+			this.tooltip = StringUtils.manageNewLine(tooltip);
 		}
 		if (label == null) {
 			this.label = url;
@@ -56,6 +56,15 @@ public class Url implements EnsureVisible {
 			this.label = label;
 		}
 	}
+	
+	public static boolean isLatex(String pendingUrl) {
+		return pendingUrl.startsWith("latex://");
+	}
+	
+	public boolean isLatex() {
+		return isLatex(url);
+	}
+
 
 	public final String getUrl() {
 		return url;

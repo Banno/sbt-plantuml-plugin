@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -47,7 +47,7 @@ public class CommandStereotype extends SingleLineCommand<ClassDiagram> {
 		final String stereotype = arg.get(1);
 		final IEntity entity = diagram.getOrCreateLeaf(code, null, null);
 		entity.setStereotype(new Stereotype(stereotype, diagram.getSkinParam().getCircledCharacterRadius(), diagram
-				.getSkinParam().getFont(FontParam.CIRCLED_CHARACTER, null, false), diagram.getSkinParam().getIHtmlColorSet()));
+				.getSkinParam().getFont(null, false, FontParam.CIRCLED_CHARACTER), diagram.getSkinParam().getIHtmlColorSet()));
 		return CommandExecutionResult.ok();
 	}
 

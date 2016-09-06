@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -132,7 +132,7 @@ public class PSystemVersion extends AbstractPSystem {
 		final GraphicStrings result = getGraphicStrings();
 		final ImageBuilder imageBuilder = new ImageBuilder(new ColorMapperIdentity(), 1.0, result.getBackcolor(),
 				getMetadata(), null, 0, 0, null, false);
-		imageBuilder.addUDrawable(result);
+		imageBuilder.setUDrawable(result);
 		return imageBuilder.writeImageTOBEMOVED(fileFormat, os);
 	}
 
@@ -163,13 +163,14 @@ public class PSystemVersion extends AbstractPSystem {
 		strings.add("<u>Original idea</u>: Arnaud Roques");
 		strings.add("<u>Word Macro</u>: Alain Bertucat & Matthieu Sabatier");
 		strings.add("<u>Word Add-in</u>: Adriaan van den Brand");
+		strings.add("<u>J2V8 & viz.js integration</u>: Andreas Studer");
 		strings.add("<u>Eclipse Plugin</u>: Claude Durif & Anne Pecoil");
 		strings.add("<u>Servlet & XWiki</u>: Maxime Sinclair");
 		strings.add("<u>Site design</u>: Raphael Cotisson");
 		strings.add("<u>Logo</u>: Benjamin Croizet");
 
 		strings.add(" ");
-		strings.add("http://plantuml.sourceforge.net");
+		strings.add("http://plantuml.com");
 		strings.add(" ");
 		return new PSystemVersion(true, strings);
 	}
@@ -182,8 +183,8 @@ public class PSystemVersion extends AbstractPSystem {
 
 		int lim = 7;
 		if (lastversion == -1) {
-			strings.add("<b><color:red>Error</b>");
-			strings.add("<color:red>Cannot connect to http://plantuml.sourceforge.net/</b>");
+			strings.add("<b><color:red>Error");
+			strings.add("<color:red>Cannot connect to http://plantuml.com/");
 			strings.add("Maybe you should set your proxy ?");
 			strings.add("@startuml");
 			strings.add("checkversion(proxy=myproxy.com,port=8080)");
@@ -191,14 +192,14 @@ public class PSystemVersion extends AbstractPSystem {
 			lim = 9;
 		} else if (lastversion == 0) {
 			strings.add("<b><color:red>Error</b>");
-			strings.add("Cannot retrieve last version from http://plantuml.sourceforge.net/</b>");
+			strings.add("Cannot retrieve last version from http://plantuml.com/");
 		} else {
 			strings.add("<b>Last available version for download</b> : " + lastversion);
 			strings.add(" ");
 			if (Version.version() >= lastversion) {
-				strings.add("<b><color:green>Your version is up to date.</b>");
+				strings.add("<b><color:green>Your version is up to date.");
 			} else {
-				strings.add("<b><color:red>A newer version is available for download.</b>");
+				strings.add("<b><color:red>A newer version is available for download.");
 			}
 		}
 
@@ -216,7 +217,7 @@ public class PSystemVersion extends AbstractPSystem {
 		}
 
 		try {
-			final URL url = new URL("http://plantuml.sourceforge.net/download.html");
+			final URL url = new URL("http://plantuml.com/download.html");
 			final HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 			urlConnection.setUseCaches(false);
 			urlConnection.connect();

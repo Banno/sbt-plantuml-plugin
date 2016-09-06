@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -62,6 +62,10 @@ public class FtileGeometry extends Dimension2D {
 		this.outY = outY;
 		this.width = width;
 		this.height = height;
+	}
+
+	public FtileGeometry incHeight(double northHeight) {
+		return new FtileGeometry(width, height + northHeight, left, inY, outY);
 	}
 
 	public FtileGeometry(Dimension2D dim, double left, double inY, double outY) {
@@ -124,12 +128,32 @@ public class FtileGeometry extends Dimension2D {
 		return new FtileGeometry(width + 2 * marginx, height, left + marginx, inY, outY);
 	}
 
+	public FtileGeometry addMarginX(double margin1, double margin2) {
+		return new FtileGeometry(width + margin1 + margin2, height, left + margin1, inY, outY);
+	}
+
 	public FtileGeometry fixedHeight(double fixedHeight) {
 		return new FtileGeometry(width, fixedHeight, left, inY, outY);
 	}
 
 	public FtileGeometry appendBottom(FtileGeometry other) {
 		return new FtileGeometryMerger(this, other).getResult();
+	}
+
+	public FtileGeometry ensureHeight(double newHeight) {
+		if (this.height > newHeight) {
+			return this;
+		}
+		return fixedHeight(newHeight);
+	}
+
+	private FtileGeometry ensureRightStrange(double newRight) {
+		final double right = this.width - this.left;
+		if (right > newRight) {
+			return this;
+		}
+		// return addMarginX(0, newRight - right);
+		return addMarginX(0, newRight);
 	}
 
 }

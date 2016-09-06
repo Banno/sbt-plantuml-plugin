@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -29,6 +29,7 @@ import java.awt.geom.Dimension2D;
 import java.util.EnumSet;
 
 import net.sourceforge.plantuml.Dimension2DDouble;
+import net.sourceforge.plantuml.graphic.USymbol;
 import net.sourceforge.plantuml.ugraphic.UGraphic;
 import net.sourceforge.plantuml.ugraphic.ULine;
 import net.sourceforge.plantuml.ugraphic.UPath;
@@ -46,6 +47,31 @@ public enum PackageStyle {
 			if (p.toString().equalsIgnoreCase(value)) {
 				return p;
 			}
+		}
+		return null;
+	}
+
+	public USymbol toUSymbol() {
+		if (this == NODE) {
+			return USymbol.NODE;
+		}
+		if (this == CARD) {
+			return USymbol.CARD;
+		}
+		if (this == DATABASE) {
+			return USymbol.DATABASE;
+		}
+		if (this == CLOUD) {
+			return USymbol.CLOUD;
+		}
+		if (this == FRAME) {
+			return USymbol.FRAME;
+		}
+		if (this == RECT) {
+			return USymbol.RECTANGLE;
+		}
+		if (this == FOLDER) {
+			return USymbol.FOLDER;
 		}
 		return null;
 	}

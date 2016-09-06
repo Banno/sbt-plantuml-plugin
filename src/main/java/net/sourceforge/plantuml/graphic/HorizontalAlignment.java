@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -25,10 +25,12 @@
  */
 package net.sourceforge.plantuml.graphic;
 
+import net.sourceforge.plantuml.StringUtils;
+
 public enum HorizontalAlignment {
 
 	LEFT, CENTER, RIGHT;
-	
+
 	public static HorizontalAlignment fromString(String s) {
 		if (LEFT.name().equalsIgnoreCase(s)) {
 			return LEFT;
@@ -40,6 +42,21 @@ public enum HorizontalAlignment {
 			return RIGHT;
 		}
 		return null;
+	}
+
+	public static HorizontalAlignment fromString(String s, HorizontalAlignment defaultValue) {
+		if (defaultValue == null) {
+			throw new IllegalArgumentException();
+		}
+		if (s == null) {
+			return defaultValue;
+		}
+		s = StringUtils.goUpperCase(s);
+		final HorizontalAlignment result = fromString(s);
+		if (result == null) {
+			return defaultValue;
+		}
+		return result;
 	}
 
 }

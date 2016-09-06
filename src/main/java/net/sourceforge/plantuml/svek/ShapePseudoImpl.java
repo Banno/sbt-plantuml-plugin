@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -25,6 +25,8 @@
  */
 package net.sourceforge.plantuml.svek;
 
+import net.sourceforge.plantuml.graphic.StringBounder;
+
 public class ShapePseudoImpl implements IShapePseudo {
 
 	private final String uid;
@@ -41,7 +43,7 @@ public class ShapePseudoImpl implements IShapePseudo {
 		return uid;
 	}
 
-	public void appendShape(StringBuilder sb) {
+	public void appendShape(StringBuilder sb, StringBounder stringBounder) {
 		sb.append(uid + " [shape=rect,label=\"\"");
 		sb.append(",width=" + SvekUtils.pixelToInches(width));
 		sb.append(",height=" + SvekUtils.pixelToInches(height));

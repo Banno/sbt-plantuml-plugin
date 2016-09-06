@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -25,15 +25,13 @@
  */
 package net.sourceforge.plantuml.command;
 
-import java.util.List;
-
 import net.sourceforge.plantuml.core.Diagram;
 
 public interface Command<D extends Diagram> {
 
-	CommandExecutionResult execute(D diagram, List<String> lines);
+	CommandExecutionResult execute(D diagram, BlocLines lines);
 
-	CommandControl isValid(List<String> lines);
+	CommandControl isValid(BlocLines lines);
 
 	String[] getDescription();
 

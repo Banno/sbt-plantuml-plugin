@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -42,9 +42,25 @@ public class Code implements Comparable<Code> {
 		this.separator = separator;
 	}
 
-//	public String getNamespaceSeparator() {
-//		return separator;
-//	}
+	public Code removeMemberPart() {
+		final int x = fullName.lastIndexOf("::");
+		if (x == -1) {
+			return null;
+		}
+		return new Code(fullName.substring(0, x), separator);
+	}
+
+	public String getPortMember() {
+		final int x = fullName.lastIndexOf("::");
+		if (x == -1) {
+			return null;
+		}
+		return fullName.substring(x + 2);
+	}
+
+	// public String getNamespaceSeparator() {
+	// return separator;
+	// }
 
 	public Code withSeparator(String separator) {
 		if (separator == null) {

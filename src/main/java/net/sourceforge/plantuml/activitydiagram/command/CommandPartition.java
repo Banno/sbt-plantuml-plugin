@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -27,6 +27,7 @@ package net.sourceforge.plantuml.activitydiagram.command;
 
 import java.util.List;
 
+import net.sourceforge.plantuml.StringUtils;
 import net.sourceforge.plantuml.activitydiagram.ActivityDiagram;
 import net.sourceforge.plantuml.command.CommandExecutionResult;
 import net.sourceforge.plantuml.command.SingleLineCommand;
@@ -35,8 +36,7 @@ import net.sourceforge.plantuml.cucadiagram.Display;
 import net.sourceforge.plantuml.cucadiagram.GroupType;
 import net.sourceforge.plantuml.cucadiagram.IEntity;
 import net.sourceforge.plantuml.cucadiagram.IGroup;
-import net.sourceforge.plantuml.graphic.HtmlColorSet;
-import net.sourceforge.plantuml.StringUtils;
+import net.sourceforge.plantuml.graphic.color.ColorType;
 
 public class CommandPartition extends SingleLineCommand<ActivityDiagram> {
 
@@ -52,7 +52,7 @@ public class CommandPartition extends SingleLineCommand<ActivityDiagram> {
 				currentPackage);
 		final String color = arg.get(1);
 		if (color != null) {
-			p.setSpecificBackcolor(diagram.getSkinParam().getIHtmlColorSet().getColorIfValid(color));
+			p.setSpecificColorTOBEREMOVED(ColorType.BACK, diagram.getSkinParam().getIHtmlColorSet().getColorIfValid(color));
 		}
 		return CommandExecutionResult.ok();
 	}

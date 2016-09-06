@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -28,11 +28,10 @@ package net.sourceforge.plantuml.command.regex;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 public class RegexOr extends RegexComposed implements IRegex {
 
-	private final Pattern full;
+	private final Pattern2 full;
 	private final String name;
 
 	public RegexOr(IRegex... partial) {
@@ -56,7 +55,7 @@ public class RegexOr extends RegexComposed implements IRegex {
 	}
 
 	@Override
-	protected Pattern getFull() {
+	protected Pattern2 getFull() {
 		return full;
 	}
 

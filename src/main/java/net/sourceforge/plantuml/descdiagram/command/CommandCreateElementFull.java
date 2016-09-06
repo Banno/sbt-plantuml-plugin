@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -26,6 +26,7 @@
 package net.sourceforge.plantuml.descdiagram.command;
 
 import net.sourceforge.plantuml.FontParam;
+import net.sourceforge.plantuml.StringUtils;
 import net.sourceforge.plantuml.Url;
 import net.sourceforge.plantuml.UrlBuilder;
 import net.sourceforge.plantuml.UrlBuilder.ModeUrl;
@@ -41,11 +42,15 @@ import net.sourceforge.plantuml.cucadiagram.IEntity;
 import net.sourceforge.plantuml.cucadiagram.LeafType;
 import net.sourceforge.plantuml.cucadiagram.Stereotype;
 import net.sourceforge.plantuml.descdiagram.DescriptionDiagram;
-import net.sourceforge.plantuml.graphic.HtmlColorUtils;
+import net.sourceforge.plantuml.graphic.HtmlColor;
 import net.sourceforge.plantuml.graphic.USymbol;
-import net.sourceforge.plantuml.StringUtils;
+import net.sourceforge.plantuml.graphic.color.ColorParser;
+import net.sourceforge.plantuml.graphic.color.ColorType;
+import net.sourceforge.plantuml.graphic.color.Colors;
 
 public class CommandCreateElementFull extends SingleLineCommand2<DescriptionDiagram> {
+
+	public static final String ALL_TYPES = "artifact|actor|folder|package|rectangle|node|frame|cloud|database|queue|storage|agent|usecase|component|boundary|control|entity|interface";
 
 	public CommandCreateElementFull() {
 		super(getRegexConcat());
@@ -53,9 +58,7 @@ public class CommandCreateElementFull extends SingleLineCommand2<DescriptionDiag
 
 	private static RegexConcat getRegexConcat() {
 		return new RegexConcat(new RegexLeaf("^"), //
-				new RegexLeaf(
-						"SYMBOL",
-						"(?:(artifact|actor|folder|package|rectangle|node|frame|cloud|database|queue|storage|agent|usecase|component|boundary|control|entity|interface|\\(\\))[%s]+)?"), //
+				new RegexLeaf("SYMBOL", "(?:(" + ALL_TYPES + "|\\(\\))[%s]+)?"), //
 				new RegexLeaf("[%s]*"), //
 				new RegexOr(//
 						new RegexLeaf("CODE1", CODE_WITH_QUOTE), //
@@ -79,8 +82,12 @@ public class CommandCreateElementFull extends SingleLineCommand2<DescriptionDiag
 				new RegexLeaf("[%s]*"), //
 				new RegexLeaf("URL", "(" + UrlBuilder.getRegexp() + ")?"), //
 				new RegexLeaf("[%s]*"), //
-				new RegexLeaf("COLOR", "(" + HtmlColorUtils.COLOR_REGEXP + ")?"), //
+				color().getRegex(), //
 				new RegexLeaf("$"));
+	}
+
+	private static ColorParser color() {
+		return ColorParser.simpleColor(ColorType.BACK);
 	}
 
 	private static final String CODE_CORE = "[\\p{L}0-9_.]+|\\(\\)[%s]*[\\p{L}0-9_.]+|\\(\\)[%s]*[%g][^%g]+[%g]|:[^:]+:|\\([^()]+\\)|\\[[^\\[\\]]+\\]";
@@ -92,8 +99,8 @@ public class CommandCreateElementFull extends SingleLineCommand2<DescriptionDiag
 	private static final String DISPLAY_WITHOUT_QUOTE = "(" + DISPLAY_CORE + "|[\\p{L}0-9_.]+)";
 
 	@Override
-	final protected boolean isForbidden(String line) {
-		if (line.matches("^[\\p{L}0-9_.]+$")) {
+	final protected boolean isForbidden(CharSequence line) {
+		if (line.toString().matches("^[\\p{L}0-9_.]+$")) {
 			return true;
 		}
 		return false;
@@ -187,6 +194,9 @@ public class CommandCreateElementFull extends SingleLineCommand2<DescriptionDiag
 		}
 
 		final Code code = Code.of(StringUtils.eventuallyRemoveStartingAndEndingDoubleQuote(codeRaw));
+		if (diagram.isGroup(code)) {
+			return CommandExecutionResult.error("This element (" + code.getFullName() + ") is already defined");
+		}
 		String display = displayRaw;
 		if (display == null) {
 			display = code.getFullName();
@@ -198,7 +208,7 @@ public class CommandCreateElementFull extends SingleLineCommand2<DescriptionDiag
 		entity.setUSymbol(usymbol);
 		if (stereotype != null) {
 			entity.setStereotype(new Stereotype(stereotype, diagram.getSkinParam().getCircledCharacterRadius(), diagram
-					.getSkinParam().getFont(FontParam.CIRCLED_CHARACTER, null, false), diagram.getSkinParam()
+					.getSkinParam().getFont(null, false, FontParam.CIRCLED_CHARACTER), diagram.getSkinParam()
 					.getIHtmlColorSet()));
 		}
 
@@ -209,7 +219,16 @@ public class CommandCreateElementFull extends SingleLineCommand2<DescriptionDiag
 			entity.addUrl(url);
 		}
 
-		entity.setSpecificBackcolor(diagram.getSkinParam().getIHtmlColorSet().getColorIfValid(arg.get("COLOR", 0)));
+		Colors colors = color().getColor(arg, diagram.getSkinParam().getIHtmlColorSet());
+
+		final HtmlColor lineColor = diagram.getSkinParam().getIHtmlColorSet().getColorIfValid(arg.get("LINECOLOR", 1));
+		if (lineColor != null) {
+			colors = colors.add(ColorType.LINE, lineColor);
+		}
+		entity.setColors(colors);
+
+		// entity.setSpecificColorTOBEREMOVED(ColorType.BACK,
+		// diagram.getSkinParam().getIHtmlColorSet().getColorIfValid(arg.get("COLOR", 0)));
 		return CommandExecutionResult.ok();
 	}
 

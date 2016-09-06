@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -28,7 +28,7 @@ package net.sourceforge.plantuml.sequencediagram.command;
 import net.sourceforge.plantuml.UrlBuilder;
 import net.sourceforge.plantuml.command.regex.RegexConcat;
 import net.sourceforge.plantuml.command.regex.RegexLeaf;
-import net.sourceforge.plantuml.graphic.HtmlColorUtils;
+import net.sourceforge.plantuml.graphic.color.ColorParser;
 
 public class CommandParticipantA3 extends CommandParticipant {
 
@@ -47,7 +47,7 @@ public class CommandParticipantA3 extends CommandParticipant {
 				new RegexLeaf("[%s]*"), //
 				new RegexLeaf("URL", "(" + UrlBuilder.getRegexp() + ")?"), //
 				new RegexLeaf("[%s]*"), //
-				new RegexLeaf("COLOR", "(" + HtmlColorUtils.COLOR_REGEXP + ")?"), //
+				ColorParser.exp1(), //
 				new RegexLeaf("$"));
 	}
 

@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -29,25 +29,26 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
+import net.sourceforge.plantuml.CharSequence2;
+import net.sourceforge.plantuml.CharSequence2Impl;
 import net.sourceforge.plantuml.StringUtils;
+import net.sourceforge.plantuml.command.regex.Matcher2;
 import net.sourceforge.plantuml.command.regex.MyPattern;
+import net.sourceforge.plantuml.command.regex.Pattern2;
 import net.sourceforge.plantuml.utils.StartUtils;
 
 public class Preprocessor implements ReadLine {
 
 	private static final String ID = "[A-Za-z_][A-Za-z_0-9]*";
 	private static final String ARG = "(?:\\(" + ID + "(?:," + ID + ")*?\\))?";
-	private static final Pattern definePattern = MyPattern.cmpile("^[%s]*!define[%s]+(" + ID + ARG + ")"
+	private static final Pattern2 definePattern = MyPattern.cmpile("^[%s]*!define[%s]+(" + ID + ARG + ")"
 			+ "(?:[%s]+(.*))?$");
-	private static final Pattern undefPattern = MyPattern.cmpile("^[%s]*!undef[%s]+(" + ID + ")$");
-	private static final Pattern definelongPattern = MyPattern.cmpile("^[%s]*!definelong[%s]+(" + ID + ARG + ")");
-	private static final Pattern enddefinelongPattern = MyPattern.cmpile("^[%s]*!enddefinelong[%s]*$");
+	private static final Pattern2 undefPattern = MyPattern.cmpile("^[%s]*!undef[%s]+(" + ID + ")$");
+	private static final Pattern2 definelongPattern = MyPattern.cmpile("^[%s]*!definelong[%s]+(" + ID + ARG + ")");
+	private static final Pattern2 enddefinelongPattern = MyPattern.cmpile("^[%s]*!enddefinelong[%s]*$");
 
 	private final Defines defines;
 	private final PreprocessorInclude rawSource;
@@ -60,8 +61,8 @@ public class Preprocessor implements ReadLine {
 		this.source = new ReadLineInsertable(new IfManager(rawSource, defines));
 	}
 
-	public String readLine() throws IOException {
-		final String s = source.readLine();
+	public CharSequence2 readLine() throws IOException {
+		final CharSequence2 s = source.readLine();
 		if (s == null) {
 			return null;
 		}
@@ -69,7 +70,7 @@ public class Preprocessor implements ReadLine {
 			this.defines.restoreState();
 		}
 
-		Matcher m = definePattern.matcher(s);
+		Matcher2 m = definePattern.matcher(s);
 		if (m.find()) {
 			return manageDefine(m);
 		}
@@ -89,30 +90,30 @@ public class Preprocessor implements ReadLine {
 			return s;
 		}
 
-		final List<String> result = defines.applyDefines(s);
+		final List<String> result = defines.applyDefines(s.toString2());
 		if (result.size() > 1) {
 			ignoreDefineDuringSeveralLines = result.size() - 2;
-			source.insert(result.subList(1, result.size() - 1));
+			source.insert(result.subList(1, result.size() - 1), s.getLocation());
 		}
-		return result.get(0);
+		return new CharSequence2Impl(result.get(0), s.getLocation());
 	}
 
 	private int ignoreDefineDuringSeveralLines = 0;
 
-	private String manageUndef(Matcher m) throws IOException {
+	private CharSequence2 manageUndef(Matcher2 m) throws IOException {
 		defines.undefine(m.group(1));
 		return this.readLine();
 	}
 
-	private String manageDefineLong(Matcher m) throws IOException {
+	private CharSequence2 manageDefineLong(Matcher2 m) throws IOException {
 		final String group1 = m.group(1);
 		final List<String> def = new ArrayList<String>();
 		while (true) {
-			final String read = this.readLine();
+			final CharSequence2 read = this.readLine();
 			if (read == null) {
 				return null;
 			}
-			def.add(read);
+			def.add(read.toString2());
 			if (enddefinelongPattern.matcher(read).find()) {
 				defines.define(group1, def);
 				return this.readLine();
@@ -120,7 +121,7 @@ public class Preprocessor implements ReadLine {
 		}
 	}
 
-	private String manageDefine(Matcher m) throws IOException {
+	private CharSequence2 manageDefine(Matcher2 m) throws IOException {
 		final String group1 = m.group(1);
 		final String group2 = m.group(2);
 		if (group2 == null) {
@@ -128,17 +129,18 @@ public class Preprocessor implements ReadLine {
 		} else {
 			final List<String> strings = defines.applyDefines(group2);
 			if (strings.size() > 1) {
-				throw new UnsupportedOperationException();
+				defines.define(group1, strings);
+			} else {
+				final StringBuilder value = new StringBuilder(strings.get(0));
+				while (StringUtils.endsWithBackslash(value.toString())) {
+					value.setLength(value.length() - 1);
+					final CharSequence2 read = this.readLine();
+					value.append(read.toString2());
+				}
+				final List<String> li = new ArrayList<String>();
+				li.add(value.toString());
+				defines.define(group1, li);
 			}
-			final StringBuilder value = new StringBuilder(strings.get(0));
-			while (StringUtils.endsWithBackslash(value.toString())) {
-				value.setLength(value.length() - 1);
-				final String read = this.readLine();
-				value.append(read);
-			}
-			final List<String> li = new ArrayList<String>();
-			li.add(value.toString());
-			defines.define(group1, li);
 		}
 		return this.readLine();
 	}
@@ -151,7 +153,7 @@ public class Preprocessor implements ReadLine {
 		rawSource.close();
 	}
 
-	public Set<File> getFilesUsed() {
+	public Set<FileWithSuffix> getFilesUsed() {
 		return Collections.unmodifiableSet(rawSource.getFilesUsedGlobal());
 	}
 

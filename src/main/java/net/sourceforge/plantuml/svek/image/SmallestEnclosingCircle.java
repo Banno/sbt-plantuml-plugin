@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -35,7 +35,9 @@ public class SmallestEnclosingCircle {
 	private Circle lastSolution;
 
 	public void append(Point2D pt) {
-		all.add(pt);
+		if (all.contains(pt) == false) {
+			all.add(pt);
+		}
 		this.lastSolution = null;
 	}
 

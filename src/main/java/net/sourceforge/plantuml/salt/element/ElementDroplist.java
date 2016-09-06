@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -37,7 +37,6 @@ import net.sourceforge.plantuml.graphic.HorizontalAlignment;
 import net.sourceforge.plantuml.graphic.HtmlColorSet;
 import net.sourceforge.plantuml.graphic.StringBounder;
 import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.graphic.TextBlockUtils;
 import net.sourceforge.plantuml.ugraphic.UChangeBackColor;
 import net.sourceforge.plantuml.ugraphic.UFont;
 import net.sourceforge.plantuml.ugraphic.UGraphic;
@@ -64,8 +63,7 @@ public class ElementDroplist extends AbstractElementText implements Element {
 		if (drop.size() == 0) {
 			this.openDrop = null;
 		} else {
-			this.openDrop = TextBlockUtils.create(Display.create(drop), getConfig(), HorizontalAlignment.LEFT,
-					spriteContainer);
+			this.openDrop = Display.create(drop).create(getConfig(), HorizontalAlignment.LEFT, spriteContainer);
 		}
 	}
 

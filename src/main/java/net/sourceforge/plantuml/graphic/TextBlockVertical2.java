@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -31,10 +31,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sourceforge.plantuml.Dimension2DDouble;
+import net.sourceforge.plantuml.svek.Ports;
+import net.sourceforge.plantuml.svek.WithPorts;
 import net.sourceforge.plantuml.ugraphic.UGraphic;
 import net.sourceforge.plantuml.ugraphic.UTranslate;
 
-public class TextBlockVertical2 extends AbstractTextBlock implements TextBlock {
+public class TextBlockVertical2 extends AbstractTextBlock implements TextBlock, WithPorts {
 
 	private final List<TextBlock> blocks = new ArrayList<TextBlock>();
 	private final HorizontalAlignment horizontalAlignment;
@@ -71,11 +73,26 @@ public class TextBlockVertical2 extends AbstractTextBlock implements TextBlock {
 			} else if (horizontalAlignment == HorizontalAlignment.CENTER) {
 				final double dx = (dimtotal.getWidth() - dimb.getWidth()) / 2;
 				block.drawU(ug.apply(new UTranslate(dx, y)));
+			} else if (horizontalAlignment == HorizontalAlignment.RIGHT) {
+				final double dx = dimtotal.getWidth() - dimb.getWidth();
+				block.drawU(ug.apply(new UTranslate(dx, y)));
 			} else {
 				throw new UnsupportedOperationException();
 			}
 			y += dimb.getHeight();
 		}
+	}
+
+	public Ports getPorts(StringBounder stringBounder) {
+		double y = 0;
+		// final Dimension2D dimtotal = calculateDimension(stringBounder);
+		final Ports result = new Ports();
+		for (TextBlock block : blocks) {
+			final Dimension2D dimb = block.calculateDimension(stringBounder);
+			y += dimb.getHeight();
+			result.addThis(((WithPorts) block).getPorts(stringBounder));
+		}
+		return result;
 	}
 
 	@Override

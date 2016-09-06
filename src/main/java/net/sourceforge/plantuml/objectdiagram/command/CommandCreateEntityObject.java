@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -39,10 +39,11 @@ import net.sourceforge.plantuml.cucadiagram.Display;
 import net.sourceforge.plantuml.cucadiagram.IEntity;
 import net.sourceforge.plantuml.cucadiagram.LeafType;
 import net.sourceforge.plantuml.cucadiagram.Stereotype;
-import net.sourceforge.plantuml.graphic.HtmlColorUtils;
-import net.sourceforge.plantuml.objectdiagram.ObjectDiagram;
+import net.sourceforge.plantuml.graphic.color.ColorParser;
+import net.sourceforge.plantuml.graphic.color.ColorType;
+import net.sourceforge.plantuml.objectdiagram.AbstractClassOrObjectDiagram;
 
-public class CommandCreateEntityObject extends SingleLineCommand2<ObjectDiagram> {
+public class CommandCreateEntityObject extends SingleLineCommand2<AbstractClassOrObjectDiagram> {
 
 	public CommandCreateEntityObject() {
 		super(getRegexConcat());
@@ -57,12 +58,12 @@ public class CommandCreateEntityObject extends SingleLineCommand2<ObjectDiagram>
 				new RegexLeaf("[%s]*"), //
 				new RegexLeaf("URL", "(" + UrlBuilder.getRegexp() + ")?"), //
 				new RegexLeaf("[%s]*"), //
-				new RegexLeaf("COLOR", "(" + HtmlColorUtils.COLOR_REGEXP + ")?"), //
+				ColorParser.exp1(), //
 				new RegexLeaf("$"));
 	}
 
 	@Override
-	protected CommandExecutionResult executeArg(ObjectDiagram diagram, RegexResult arg) {
+	protected CommandExecutionResult executeArg(AbstractClassOrObjectDiagram diagram, RegexResult arg) {
 		final Code code = Code.of(arg.get("NAME", 1));
 		final String display = arg.get("NAME", 0);
 		final String stereotype = arg.get("STEREO", 0);
@@ -72,7 +73,7 @@ public class CommandCreateEntityObject extends SingleLineCommand2<ObjectDiagram>
 		final IEntity entity = diagram.createLeaf(code, Display.getWithNewlines(display), LeafType.OBJECT, null);
 		if (stereotype != null) {
 			entity.setStereotype(new Stereotype(stereotype, diagram.getSkinParam().getCircledCharacterRadius(), diagram
-					.getSkinParam().getFont(FontParam.CIRCLED_CHARACTER, null, false), diagram.getSkinParam()
+					.getSkinParam().getFont(null, false, FontParam.CIRCLED_CHARACTER), diagram.getSkinParam()
 					.getIHtmlColorSet()));
 		}
 		final String urlString = arg.get("URL", 0);
@@ -81,7 +82,7 @@ public class CommandCreateEntityObject extends SingleLineCommand2<ObjectDiagram>
 			final Url url = urlBuilder.getUrl(urlString);
 			entity.addUrl(url);
 		}
-		entity.setSpecificBackcolor(diagram.getSkinParam().getIHtmlColorSet().getColorIfValid(arg.get("COLOR", 0)));
+		entity.setSpecificColorTOBEREMOVED(ColorType.BACK, diagram.getSkinParam().getIHtmlColorSet().getColorIfValid(arg.get("COLOR", 0)));
 		return CommandExecutionResult.ok();
 	}
 

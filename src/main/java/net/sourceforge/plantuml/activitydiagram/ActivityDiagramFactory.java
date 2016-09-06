@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -33,7 +33,7 @@ import net.sourceforge.plantuml.activitydiagram.command.CommandEndPartition;
 import net.sourceforge.plantuml.activitydiagram.command.CommandEndif;
 import net.sourceforge.plantuml.activitydiagram.command.CommandIf;
 import net.sourceforge.plantuml.activitydiagram.command.CommandLinkActivity;
-import net.sourceforge.plantuml.activitydiagram.command.CommandLinkLongActivity2;
+import net.sourceforge.plantuml.activitydiagram.command.CommandLinkLongActivity;
 import net.sourceforge.plantuml.activitydiagram.command.CommandPartition;
 import net.sourceforge.plantuml.command.Command;
 import net.sourceforge.plantuml.command.CommandFootboxIgnored;
@@ -58,15 +58,15 @@ public class ActivityDiagramFactory extends UmlDiagramFactory {
 
 		cmds.add(new CommandPartition());
 		cmds.add(new CommandEndPartition());
-		cmds.add(new CommandLinkLongActivity2());
+		cmds.add(new CommandLinkLongActivity());
 
 		final FactoryNoteActivityCommand factoryNoteActivityCommand = new FactoryNoteActivityCommand();
 		cmds.add(factoryNoteActivityCommand.createSingleLine());
-		cmds.add(factoryNoteActivityCommand.createMultiLine());
+		cmds.add(factoryNoteActivityCommand.createMultiLine(false));
 
 		final FactoryNoteOnLinkCommand factoryNoteOnLinkCommand = new FactoryNoteOnLinkCommand();
 		cmds.add(factoryNoteOnLinkCommand.createSingleLine());
-		cmds.add(factoryNoteOnLinkCommand.createMultiLine());
+		cmds.add(factoryNoteOnLinkCommand.createMultiLine(false));
 
 		cmds.add(new CommandIf());
 		cmds.add(new CommandElse());

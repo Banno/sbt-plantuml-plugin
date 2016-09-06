@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -28,7 +28,6 @@ package net.sourceforge.plantuml.sequencediagram;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sourceforge.plantuml.AbstractPSystem;
 import net.sourceforge.plantuml.command.Command;
 import net.sourceforge.plantuml.command.UmlDiagramFactory;
 import net.sourceforge.plantuml.command.note.sequence.FactorySequenceNoteCommand;
@@ -40,6 +39,8 @@ import net.sourceforge.plantuml.sequencediagram.command.CommandArrow;
 import net.sourceforge.plantuml.sequencediagram.command.CommandAutoNewpage;
 import net.sourceforge.plantuml.sequencediagram.command.CommandAutoactivate;
 import net.sourceforge.plantuml.sequencediagram.command.CommandAutonumber;
+import net.sourceforge.plantuml.sequencediagram.command.CommandAutonumberResume;
+import net.sourceforge.plantuml.sequencediagram.command.CommandAutonumberStop;
 import net.sourceforge.plantuml.sequencediagram.command.CommandBoxEnd;
 import net.sourceforge.plantuml.sequencediagram.command.CommandBoxStart;
 import net.sourceforge.plantuml.sequencediagram.command.CommandDelay;
@@ -103,9 +104,9 @@ public class SequenceDiagramFactory extends UmlDiagramFactory {
 		final FactorySequenceNoteOnArrowCommand factorySequenceNoteOnArrowCommand = new FactorySequenceNoteOnArrowCommand();
 		cmds.add(factorySequenceNoteOnArrowCommand.createSingleLine());
 
-		cmds.add(factorySequenceNoteCommand.createMultiLine());
-		cmds.add(factorySequenceNoteOverSeveralCommand.createMultiLine());
-		cmds.add(factorySequenceNoteOnArrowCommand.createMultiLine());
+		cmds.add(factorySequenceNoteCommand.createMultiLine(false));
+		cmds.add(factorySequenceNoteOverSeveralCommand.createMultiLine(false));
+		cmds.add(factorySequenceNoteOnArrowCommand.createMultiLine(false));
 
 		cmds.add(new CommandNewpage());
 		cmds.add(new CommandIgnoreNewpage());
@@ -116,6 +117,8 @@ public class SequenceDiagramFactory extends UmlDiagramFactory {
 		cmds.add(new CommandReferenceMultilinesOverSeveral());
 		cmds.add(new CommandSkin());
 		cmds.add(new CommandAutonumber());
+		cmds.add(new CommandAutonumberStop());
+		cmds.add(new CommandAutonumberResume());
 		cmds.add(new CommandAutoactivate());
 		cmds.add(new CommandFootbox());
 		cmds.add(new CommandDelay());
@@ -123,15 +126,6 @@ public class SequenceDiagramFactory extends UmlDiagramFactory {
 		cmds.add(new CommandUrl());
 
 		return cmds;
-	}
-
-	@Override
-	public String checkFinalError(AbstractPSystem sys) {
-		final SequenceDiagram system = (SequenceDiagram) sys;
-		if (system.isHideUnlinkedData()) {
-			system.removeHiddenParticipants();
-		}
-		return super.checkFinalError(system);
 	}
 
 }

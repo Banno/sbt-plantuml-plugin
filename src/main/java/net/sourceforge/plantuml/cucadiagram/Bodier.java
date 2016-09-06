@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -35,6 +35,7 @@ import net.sourceforge.plantuml.ISkinParam;
 import net.sourceforge.plantuml.StringUtils;
 import net.sourceforge.plantuml.graphic.HorizontalAlignment;
 import net.sourceforge.plantuml.graphic.TextBlock;
+import net.sourceforge.plantuml.graphic.TextBlockUtils;
 import net.sourceforge.plantuml.graphic.TextBlockVertical2;
 import net.sourceforge.plantuml.skin.VisibilityModifier;
 
@@ -42,10 +43,16 @@ public class Bodier {
 
 	private final List<String> rawBody = new ArrayList<String>();
 	private final Set<VisibilityModifier> hides;
-	private final LeafType type;
+	private LeafType type;
 	private List<Member> methodsToDisplay;
 	private List<Member> fieldsToDisplay;
 	private final boolean manageModifier;
+
+	public void muteClassToObject() {
+		methodsToDisplay = null;
+		fieldsToDisplay = null;
+		type = LeafType.OBJECT;
+	}
 
 	public Bodier(LeafType type, Set<VisibilityModifier> hides) {
 		this.hides = hides;
@@ -72,7 +79,7 @@ public class Bodier {
 	private boolean isMethod(String s) {
 		if (type == LeafType.ANNOTATION || type == LeafType.ABSTRACT_CLASS || type == LeafType.CLASS
 				|| type == LeafType.INTERFACE || type == LeafType.ENUM) {
-			return StringUtils.isMethod(s);
+			return MemberImpl.isMethod(s);
 		}
 		return false;
 	}
@@ -147,27 +154,28 @@ public class Bodier {
 	}
 
 	public TextBlock getBody(final FontParam fontParam, final ISkinParam skinParam, final boolean showMethods,
-			final boolean showFields) {
+			final boolean showFields, Stereotype stereotype) {
 		if (type.isLikeClass() && isBodyEnhanced()) {
-			if (showMethods && showFields) {
-				return new BodyEnhanced(rawBody, fontParam, skinParam, manageModifier);
+			if (showMethods || showFields) {
+				return new BodyEnhanced(rawBody, fontParam, skinParam, manageModifier, stereotype);
 			}
 			return null;
 		}
-		final MethodsOrFieldsArea fields = new MethodsOrFieldsArea(getFieldsToDisplay(), fontParam, skinParam);
+		final MethodsOrFieldsArea fields = new MethodsOrFieldsArea(getFieldsToDisplay(), fontParam, skinParam, stereotype);
 		if (type == LeafType.OBJECT) {
 			return fields.asBlockMemberImpl();
 		}
 		if (type.isLikeClass() == false) {
 			throw new UnsupportedOperationException();
 		}
-		final MethodsOrFieldsArea methods = new MethodsOrFieldsArea(getMethodsToDisplay(), fontParam, skinParam);
+		final MethodsOrFieldsArea methods = new MethodsOrFieldsArea(getMethodsToDisplay(), fontParam, skinParam, stereotype);
 		if (showFields && showMethods == false) {
 			return fields.asBlockMemberImpl();
 		} else if (showMethods && showFields == false) {
 			return methods.asBlockMemberImpl();
+		} else if (showFields == false && showMethods == false) {
+			return TextBlockUtils.empty(0, 0);
 		}
-		assert showFields && showMethods;
 
 		final TextBlock bb1 = fields.asBlockMemberImpl();
 		final TextBlock bb2 = methods.asBlockMemberImpl();

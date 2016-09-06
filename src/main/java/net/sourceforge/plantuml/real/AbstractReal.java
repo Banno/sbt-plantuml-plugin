@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -32,6 +32,7 @@ abstract class AbstractReal implements Real {
 
 	AbstractReal(RealLine line) {
 		this.line = line;
+		this.line.register2(this);
 	}
 
 	final RealLine getLine() {

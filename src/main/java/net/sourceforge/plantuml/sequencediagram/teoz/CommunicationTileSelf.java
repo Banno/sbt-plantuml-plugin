@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -40,7 +40,6 @@ import net.sourceforge.plantuml.skin.ArrowConfiguration;
 import net.sourceforge.plantuml.skin.Component;
 import net.sourceforge.plantuml.skin.ComponentType;
 import net.sourceforge.plantuml.skin.Context2D;
-import net.sourceforge.plantuml.skin.SimpleContext2D;
 import net.sourceforge.plantuml.skin.Skin;
 import net.sourceforge.plantuml.ugraphic.UGraphic;
 import net.sourceforge.plantuml.ugraphic.UTranslate;
@@ -144,7 +143,7 @@ public class CommunicationTileSelf implements TileWithUpdateStairs {
 
 		final LivingSpace next = getNext();
 		if (next != null) {
-			next.getPosB().ensureBiggerThan(getMaxX(stringBounder));
+			next.getPosC(stringBounder).ensureBiggerThan(getMaxX(stringBounder));
 		}
 	}
 
@@ -174,7 +173,7 @@ public class CommunicationTileSelf implements TileWithUpdateStairs {
 		final Component comp = getComponent(stringBounder);
 		final Dimension2D dim = comp.getPreferredDimension(stringBounder);
 		final double width = dim.getWidth();
-		return livingSpace1.getPosC(stringBounder).addFixed(width);
+		return livingSpace1.getPosC2(stringBounder).addFixed(width);
 	}
 
 }

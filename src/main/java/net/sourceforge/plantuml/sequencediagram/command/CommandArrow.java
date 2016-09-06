@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -28,6 +28,7 @@ package net.sourceforge.plantuml.sequencediagram.command;
 import java.util.StringTokenizer;
 
 import net.sourceforge.plantuml.StringUtils;
+import net.sourceforge.plantuml.UrlBuilder;
 import net.sourceforge.plantuml.classdiagram.command.CommandLinkClass;
 import net.sourceforge.plantuml.command.CommandExecutionResult;
 import net.sourceforge.plantuml.command.SingleLineCommand2;
@@ -42,6 +43,7 @@ import net.sourceforge.plantuml.sequencediagram.LifeEventType;
 import net.sourceforge.plantuml.sequencediagram.Message;
 import net.sourceforge.plantuml.sequencediagram.Participant;
 import net.sourceforge.plantuml.sequencediagram.SequenceDiagram;
+import net.sourceforge.plantuml.skin.ArrowBody;
 import net.sourceforge.plantuml.skin.ArrowConfiguration;
 import net.sourceforge.plantuml.skin.ArrowDecoration;
 import net.sourceforge.plantuml.skin.ArrowHead;
@@ -54,7 +56,7 @@ public class CommandArrow extends SingleLineCommand2<SequenceDiagram> {
 	}
 
 	public static String getColorOrStylePattern() {
-		return "(?:\\[((?:#\\w+|dotted|dashed|bold|hidden)(?:,#\\w+|,dotted|,dashed|,bold|,hidden)*)\\])?";
+		return "(?:\\[((?:#\\w+|dotted|dashed|plain|bold|hidden)(?:,#\\w+|,dotted|,dashed|,plain|,bold|,hidden)*)\\])?";
 	}
 
 	static RegexConcat getRegexConcat() {
@@ -159,13 +161,14 @@ public class CommandArrow extends SingleLineCommand2<SequenceDiagram> {
 		if (arg.get("MESSAGE", 0) == null) {
 			labels = Display.create("");
 		} else {
-			labels = Display.getWithNewlines(arg.get("MESSAGE", 0));
+			final String message = UrlBuilder.multilineTooltip(arg.get("MESSAGE", 0));
+			labels = Display.getWithNewlines(message);
 		}
 
 		ArrowConfiguration config = hasDressing1 && hasDressing2 ? ArrowConfiguration.withDirectionBoth()
 				: ArrowConfiguration.withDirectionNormal();
 		if (dotted) {
-			config = config.withDotted();
+			config = config.withBody(ArrowBody.DOTTED);
 		}
 		if (sync) {
 			config = config.withHead(ArrowHead.ASYNC);
@@ -258,12 +261,15 @@ public class CommandArrow extends SingleLineCommand2<SequenceDiagram> {
 		while (st.hasMoreTokens()) {
 			final String s = st.nextToken();
 			if (s.equalsIgnoreCase("dashed")) {
+				config = config.withBody(ArrowBody.DOTTED);
 				// link.goDashed();
 			} else if (s.equalsIgnoreCase("bold")) {
 				// link.goBold();
 			} else if (s.equalsIgnoreCase("dotted")) {
+				config = config.withBody(ArrowBody.DOTTED);
 				// link.goDotted();
 			} else if (s.equalsIgnoreCase("hidden")) {
+				config = config.withBody(ArrowBody.HIDDEN);
 				// link.goHidden();
 			} else {
 				config = config.withColor(HtmlColorSet.getInstance().getColorIfValid(s));

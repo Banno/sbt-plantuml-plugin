@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -41,7 +41,6 @@ import net.sourceforge.plantuml.graphic.FontConfiguration;
 import net.sourceforge.plantuml.graphic.HorizontalAlignment;
 import net.sourceforge.plantuml.graphic.StringBounder;
 import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.graphic.TextBlockUtils;
 import net.sourceforge.plantuml.svek.AbstractEntityImage;
 import net.sourceforge.plantuml.svek.Bibliotekon;
 import net.sourceforge.plantuml.svek.Line;
@@ -64,11 +63,8 @@ public class EntityImageLollipopInterfaceEye1 extends AbstractEntityImage {
 		super(entity, skinParam);
 		this.bibliotekon = bibliotekon;
 		final Stereotype stereotype = entity.getStereotype();
-		this.desc = TextBlockUtils.create(
-				entity.getDisplay(),
-				new FontConfiguration(SkinParamUtils.getFont(getSkinParam(),
-						FontParam.CLASS, stereotype), SkinParamUtils.getFontColor(getSkinParam(), FontParam.CLASS,
-				stereotype), getSkinParam().getHyperlinkColor(), getSkinParam().useUnderlineForHyperlink()), HorizontalAlignment.CENTER, skinParam);
+		this.desc = entity.getDisplay().create(new FontConfiguration(getSkinParam(), FontParam.CLASS, stereotype),
+				HorizontalAlignment.CENTER, skinParam);
 		this.url = entity.getUrl99();
 
 	}

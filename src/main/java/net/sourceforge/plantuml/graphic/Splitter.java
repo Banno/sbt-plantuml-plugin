@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -30,11 +30,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sourceforge.plantuml.command.regex.MyPattern;
 import net.sourceforge.plantuml.StringUtils;
+import net.sourceforge.plantuml.command.regex.Matcher2;
+import net.sourceforge.plantuml.command.regex.MyPattern;
+import net.sourceforge.plantuml.command.regex.Pattern2;
+import net.sourceforge.plantuml.ugraphic.sprite.SpriteUtils;
 
 public class Splitter {
 
@@ -46,17 +48,19 @@ public class Splitter {
 	static final String fontSup = "\\<sup\\>";
 	static final String fontSub = "\\<sub\\>";
 	static final String imgPattern = "\\<img\\s+(src[%s]*=[%s]*[%q%g]?[^\\s%g>]+[%q%g]?[%s]*|vspace\\s*=\\s*[%q%g]?\\d+[%q%g]?\\s*|valign[%s]*=[%s]*[%q%g]?(top|middle|bottom)[%q%g]?[%s]*)+\\>";
-	public static final String imgPatternNoSrcColon = "\\<img[\\s:]+([^>]+)/?\\>";
+	public static final String imgPatternNoSrcColon = "\\<img[\\s:]+([^>{}]+)" + "(\\{scale=(?:[0-9.]+)\\})?" + "\\>";
 	public static final String fontFamilyPattern = "\\<font[\\s:]+([^>]+)/?\\>";
 	public static final String svgAttributePattern = "\\<text[\\s:]+([^>]+)/?\\>";
 	public static final String openiconPattern = "\\<&([-\\w]+)\\>";
-	public static final String spritePattern = "\\<\\$[\\p{L}0-9_]+\\>";
-	public static final String spritePattern2 = "\\<\\$([\\p{L}0-9_]+)\\>";
+	public static final String spritePattern = "\\<\\$" + SpriteUtils.SPRITE_NAME + "(?:\\{scale=(?:[0-9.]+)\\})?"
+			+ "\\>";
+	public static final String spritePattern2 = "\\<\\$(" + SpriteUtils.SPRITE_NAME + ")"
+			+ "(\\{scale=(?:[0-9.]+)\\})?" + "\\>";
 	static final String htmlTag;
 
 	static final String linkPattern = "\\[\\[([^\\[\\]]+)\\]\\]";
 
-	private static final Pattern tagOrText;
+	private static final Pattern2 tagOrText;
 
 	static {
 		final StringBuilder sb = new StringBuilder("(?i)");
@@ -103,7 +107,7 @@ public class Splitter {
 	private final List<String> splitted = new ArrayList<String>();
 
 	public Splitter(String s) {
-		final Matcher matcher = tagOrText.matcher(s);
+		final Matcher2 matcher = tagOrText.matcher(s);
 		while (matcher.find()) {
 			String part = matcher.group(0);
 			part = StringUtils.showComparatorCharacters(part);

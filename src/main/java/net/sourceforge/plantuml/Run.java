@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -56,8 +56,8 @@ import net.sourceforge.plantuml.preproc.Defines;
 import net.sourceforge.plantuml.sequencediagram.SequenceDiagramFactory;
 import net.sourceforge.plantuml.statediagram.StateDiagramFactory;
 import net.sourceforge.plantuml.swing.MainWindow2;
-import net.sourceforge.plantuml.ugraphic.SpriteGrayLevel;
-import net.sourceforge.plantuml.ugraphic.SpriteUtils;
+import net.sourceforge.plantuml.ugraphic.sprite.SpriteGrayLevel;
+import net.sourceforge.plantuml.ugraphic.sprite.SpriteUtils;
 import net.sourceforge.plantuml.version.Version;
 
 public class Run {
@@ -266,7 +266,16 @@ public class Run {
 				ps.println(system.getDescription());
 			}
 		} else if (option.isPipe()) {
-			sourceStringReader.generateImage(ps, 0, option.getFileFormatOption());
+			final String result = sourceStringReader.generateImage(ps, 0, option.getFileFormatOption());
+			if ("(error)".equalsIgnoreCase(result)) {
+				System.err.println("ERROR");
+				final Diagram system = sourceStringReader.getBlocks().get(0).getDiagram();
+				final PSystemError sys = (PSystemError) system;
+				System.err.println(sys.getHigherErrorPosition());
+				for (ErrorUml er : sys.getErrorsUml()) {
+					System.err.println(er.getError());
+				}
+			}
 		}
 	}
 

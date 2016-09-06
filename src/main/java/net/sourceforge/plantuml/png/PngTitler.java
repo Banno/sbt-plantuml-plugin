@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -35,7 +35,6 @@ import net.sourceforge.plantuml.graphic.HorizontalAlignment;
 import net.sourceforge.plantuml.graphic.HtmlColor;
 import net.sourceforge.plantuml.graphic.StringBounder;
 import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.graphic.TextBlockUtils;
 import net.sourceforge.plantuml.ugraphic.UFont;
 
 public class PngTitler {
@@ -69,12 +68,12 @@ public class PngTitler {
 	}
 
 	public TextBlock getTextBlock() {
-		if (text == null || text.size() == 0) {
+		if (Display.isNull(text) || text.size() == 0) {
 			return null;
 		}
 		final UFont normalFont = new UFont(fontFamily, Font.PLAIN, fontSize);
-		return TextBlockUtils.create(text, new FontConfiguration(normalFont, textColor, hyperlinkColor, useUnderlineForHyperlink), horizontalAlignment,
-				new SpriteContainerEmpty());
+		return text.create(new FontConfiguration(normalFont, textColor, hyperlinkColor, useUnderlineForHyperlink),
+				horizontalAlignment, new SpriteContainerEmpty());
 	}
 
 	private double getOffsetX(double imWidth, StringBounder stringBounder) {

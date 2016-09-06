@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -28,7 +28,9 @@ package net.sourceforge.plantuml.preproc;
 import java.io.Closeable;
 import java.io.IOException;
 
+import net.sourceforge.plantuml.CharSequence2;
+
 public interface ReadLine extends Closeable {
 
-	public String readLine() throws IOException;
+	public CharSequence2 readLine() throws IOException;
 }

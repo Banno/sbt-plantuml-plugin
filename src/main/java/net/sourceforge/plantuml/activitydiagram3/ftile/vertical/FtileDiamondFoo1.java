@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.Set;
 
 import net.sourceforge.plantuml.Dimension2DDouble;
+import net.sourceforge.plantuml.ISkinParam;
 import net.sourceforge.plantuml.activitydiagram3.ftile.AbstractFtile;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Diamond;
 import net.sourceforge.plantuml.activitydiagram3.ftile.FtileGeometry;
@@ -41,7 +42,6 @@ import net.sourceforge.plantuml.graphic.TextBlockUtils;
 import net.sourceforge.plantuml.ugraphic.UChangeBackColor;
 import net.sourceforge.plantuml.ugraphic.UChangeColor;
 import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UStroke;
 import net.sourceforge.plantuml.ugraphic.UTranslate;
 
 public class FtileDiamondFoo1 extends AbstractFtile {
@@ -54,27 +54,27 @@ public class FtileDiamondFoo1 extends AbstractFtile {
 	private final TextBlock east;
 	private final TextBlock north;
 
-	public FtileDiamondFoo1(boolean shadowing, HtmlColor backColor, HtmlColor borderColor, Swimlane swimlane,
+	public FtileDiamondFoo1(ISkinParam skinParam, HtmlColor backColor, HtmlColor borderColor, Swimlane swimlane,
 			TextBlock label) {
-		this(shadowing, backColor, borderColor, swimlane, label, TextBlockUtils.empty(0, 0),
+		this(skinParam, backColor, borderColor, swimlane, label, TextBlockUtils.empty(0, 0),
 				TextBlockUtils.empty(0, 0), TextBlockUtils.empty(0, 0));
 	}
 
 	public FtileDiamondFoo1 withNorth(TextBlock north) {
-		return new FtileDiamondFoo1(shadowing(), backColor, borderColor, swimlane, label, north, west, east);
+		return new FtileDiamondFoo1(skinParam(), backColor, borderColor, swimlane, label, north, west, east);
 	}
 
 	public FtileDiamondFoo1 withWest(TextBlock west) {
-		return new FtileDiamondFoo1(shadowing(), backColor, borderColor, swimlane, label, north, west, east);
+		return new FtileDiamondFoo1(skinParam(), backColor, borderColor, swimlane, label, north, west, east);
 	}
 
 	public FtileDiamondFoo1 withEast(TextBlock east) {
-		return new FtileDiamondFoo1(shadowing(), backColor, borderColor, swimlane, label, north, west, east);
+		return new FtileDiamondFoo1(skinParam(), backColor, borderColor, swimlane, label, north, west, east);
 	}
 
-	private FtileDiamondFoo1(boolean shadowing, HtmlColor backColor, HtmlColor borderColor, Swimlane swimlane,
+	private FtileDiamondFoo1(ISkinParam skinParam, HtmlColor backColor, HtmlColor borderColor, Swimlane swimlane,
 			TextBlock label, TextBlock north, TextBlock west, TextBlock east) {
-		super(shadowing);
+		super(skinParam);
 		this.backColor = backColor;
 		this.swimlane = swimlane;
 		this.borderColor = borderColor;
@@ -103,8 +103,8 @@ public class FtileDiamondFoo1 extends AbstractFtile {
 		final StringBounder stringBounder = ug.getStringBounder();
 		final Dimension2D dimLabel = label.calculateDimension(stringBounder);
 		final Dimension2D dimTotal = calculateDimensionInternal(stringBounder);
-		ug = ug.apply(new UChangeColor(borderColor)).apply(new UStroke(1.5)).apply(new UChangeBackColor(backColor));
-		ug.draw(Diamond.asPolygonFoo1(shadowing(), dimTotal.getWidth(), dimTotal.getHeight()));
+		ug = ug.apply(new UChangeColor(borderColor)).apply(getThickness()).apply(new UChangeBackColor(backColor));
+		ug.draw(Diamond.asPolygonFoo1(skinParam().shadowing(), dimTotal.getWidth(), dimTotal.getHeight()));
 
 		north.drawU(ug.apply(new UTranslate(4 + dimTotal.getWidth() / 2, dimTotal.getHeight())));
 

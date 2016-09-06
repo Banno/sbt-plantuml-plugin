@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -31,6 +31,7 @@ import net.sourceforge.plantuml.classdiagram.ClassDiagram;
 import net.sourceforge.plantuml.command.CommandExecutionResult;
 import net.sourceforge.plantuml.command.SingleLineCommand;
 import net.sourceforge.plantuml.cucadiagram.Code;
+import net.sourceforge.plantuml.cucadiagram.Display;
 import net.sourceforge.plantuml.cucadiagram.LeafType;
 
 public class CommandDiamondAssociation extends SingleLineCommand<ClassDiagram> {
@@ -45,7 +46,7 @@ public class CommandDiamondAssociation extends SingleLineCommand<ClassDiagram> {
 		if (diagram.leafExist(code)) {
 			return CommandExecutionResult.error("Already existing : "+code.getFullName());
 		}
-		diagram.createLeaf(code, null, LeafType.ASSOCIATION, null);
+		diagram.createLeaf(code, Display.NULL, LeafType.ASSOCIATION, null);
 
 		return CommandExecutionResult.ok();
 	}

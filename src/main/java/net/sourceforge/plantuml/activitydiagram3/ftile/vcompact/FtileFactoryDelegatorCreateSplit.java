@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -31,9 +31,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import net.sourceforge.plantuml.ColorParam;
-import net.sourceforge.plantuml.FontParam;
-import net.sourceforge.plantuml.ISkinParam;
 import net.sourceforge.plantuml.OptionFlags;
 import net.sourceforge.plantuml.activitydiagram3.LinkRendering;
 import net.sourceforge.plantuml.activitydiagram3.ftile.AbstractConnection;
@@ -46,20 +43,17 @@ import net.sourceforge.plantuml.activitydiagram3.ftile.FtileFactoryDelegator;
 import net.sourceforge.plantuml.activitydiagram3.ftile.FtileGeometry;
 import net.sourceforge.plantuml.activitydiagram3.ftile.FtileHeightFixed;
 import net.sourceforge.plantuml.activitydiagram3.ftile.FtileKilled;
-import net.sourceforge.plantuml.activitydiagram3.ftile.FtileMarged;
 import net.sourceforge.plantuml.activitydiagram3.ftile.FtileUtils;
+import net.sourceforge.plantuml.activitydiagram3.ftile.MergeStrategy;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Snake;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Swimlane;
 import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.graphic.FontConfiguration;
-import net.sourceforge.plantuml.graphic.HorizontalAlignment;
-import net.sourceforge.plantuml.graphic.HtmlColor;
+import net.sourceforge.plantuml.graphic.HtmlColorAndStyle;
 import net.sourceforge.plantuml.graphic.HtmlColorUtils;
+import net.sourceforge.plantuml.graphic.Rainbow;
 import net.sourceforge.plantuml.graphic.StringBounder;
 import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.graphic.TextBlockUtils;
 import net.sourceforge.plantuml.skin.rose.Rose;
-import net.sourceforge.plantuml.ugraphic.UFont;
 import net.sourceforge.plantuml.ugraphic.UGraphic;
 import net.sourceforge.plantuml.ugraphic.UTranslate;
 
@@ -71,8 +65,8 @@ public class FtileFactoryDelegatorCreateSplit extends FtileFactoryDelegator {
 
 	private final Rose rose = new Rose();
 
-	public FtileFactoryDelegatorCreateSplit(FtileFactory factory, ISkinParam skinParam) {
-		super(factory, skinParam);
+	public FtileFactoryDelegatorCreateSplit(FtileFactory factory) {
+		super(factory);
 	}
 
 	static private boolean isSimpleSwimlanes(List<Ftile> all) {
@@ -119,14 +113,14 @@ public class FtileFactoryDelegatorCreateSplit extends FtileFactoryDelegator {
 		// // } else if (isSeveralSwimlanes(all)) {
 		// // return severalSwimlanes(all);
 		// }
-		final HtmlColor arrowColor = rose.getHtmlColor(getSkinParam(), ColorParam.activityArrow);
+		final Rainbow arrowColor = HtmlColorAndStyle.build(skinParam());
 
 		final Dimension2D dimSuper = super.createSplit(all).calculateDimension(getStringBounder());
 		final double height1 = dimSuper.getHeight() + 2 * spaceArroundBlackBar;
 
 		final List<Ftile> list = new ArrayList<Ftile>();
 		for (Ftile tmp : all) {
-			list.add(new FtileHeightFixed(new FtileMarged(tmp, xMargin), height1));
+			list.add(new FtileHeightFixed(FtileUtils.addHorizontalMargin(tmp, xMargin), height1));
 		}
 
 		Ftile inner = super.createSplit(list);
@@ -137,19 +131,22 @@ public class FtileFactoryDelegatorCreateSplit extends FtileFactoryDelegator {
 		boolean hasOut = false;
 		for (Ftile tmp : list) {
 			final Dimension2D dim = tmp.calculateDimension(getStringBounder());
-			conns.add(new ConnectionIn(tmp, x, arrowColor, getTextBlock(tmp.getInLinkRendering())));
+			conns.add(new ConnectionIn(tmp, x, tmp.getInLinkRendering().getRainbow(arrowColor), getTextBlock(tmp
+					.getInLinkRendering())));
 			final boolean hasOutTmp = tmp.calculateDimension(getStringBounder()).hasPointOut();
 			if (hasOutTmp) {
-				conns.add(new ConnectionOut(tmp, x, arrowColor, height1, getTextBlock(tmp.getOutLinkRendering())));
+				conns.add(new ConnectionOut(tmp, x, tmp.getOutLinkRendering().getRainbow(arrowColor), height1,
+						getTextBlock(tmp.getOutLinkRendering())));
 				hasOut = true;
 			}
 			x += dim.getWidth();
 		}
 		final double totalWidth = inner.calculateDimension(getStringBounder()).getWidth();
-		conns.add(new ConnectionHline2(inner, OptionFlags.SWI2 ? HtmlColorUtils.BLUE : arrowColor, 0, list, totalWidth));
+		conns.add(new ConnectionHline2(inner, OptionFlags.SWI2 ? HtmlColorAndStyle.fromColor(HtmlColorUtils.BLUE)
+				: arrowColor, 0, list, totalWidth));
 		if (hasOut) {
-			conns.add(new ConnectionHline2(inner, OptionFlags.SWI2 ? HtmlColorUtils.GREEN : arrowColor, height1, list,
-					totalWidth));
+			conns.add(new ConnectionHline2(inner, OptionFlags.SWI2 ? HtmlColorAndStyle.fromColor(HtmlColorUtils.GREEN)
+					: arrowColor, height1, list, totalWidth));
 		}
 
 		inner = FtileUtils.addConnection(inner, conns);
@@ -200,27 +197,19 @@ public class FtileFactoryDelegatorCreateSplit extends FtileFactoryDelegator {
 
 	private TextBlock getTextBlock(LinkRendering linkRendering) {
 		// DUP1433
-		final Display display = LinkRendering.getDisplay(linkRendering);
-		if (display == null) {
-			return null;
-		}
-		final ISkinParam skinParam = getSkinParam();
-		final UFont font = skinParam.getFont(FontParam.ACTIVITY_ARROW, null, false);
-		final HtmlColor color = rose.getFontColor(skinParam, FontParam.ACTIVITY_ARROW);
-		final FontConfiguration fontConfiguration = new FontConfiguration(font, color, skinParam.getHyperlinkColor(),
-				skinParam.useUnderlineForHyperlink());
-		return TextBlockUtils.create(display, fontConfiguration, HorizontalAlignment.LEFT, null, true);
+		final Display display = linkRendering.getDisplay();
+		return getTextBlock(display);
 	}
 
 	private Ftile simpleSwimlanes(List<Ftile> all) {
-		final HtmlColor arrowColor = rose.getHtmlColor(getSkinParam(), ColorParam.activityArrow);
+		final Rainbow arrowColor = HtmlColorAndStyle.build(skinParam());
 
 		final Dimension2D dimSuper = new FtileSplit1(all).calculateDimension(getStringBounder());
 		final double height1 = dimSuper.getHeight() + 2 * spaceArroundBlackBar;
 
 		final List<Ftile> list = new ArrayList<Ftile>();
 		for (Ftile tmp : all) {
-			list.add(new FtileHeightFixed(new FtileMarged(tmp, xMargin), height1));
+			list.add(new FtileHeightFixed(FtileUtils.addHorizontalMargin(tmp, xMargin), height1));
 		}
 
 		Ftile inner = new FtileSplit1(list);
@@ -257,11 +246,11 @@ public class FtileFactoryDelegatorCreateSplit extends FtileFactoryDelegator {
 
 		private final Ftile inner;
 		private final double y;
-		private final HtmlColor arrowColor;
+		private final Rainbow arrowColor;
 		private final List<Ftile> list;
 		private final double totalWidth;
 
-		public ConnectionHline2(Ftile inner, HtmlColor arrowColor, double y, List<Ftile> list, double totalWidth) {
+		public ConnectionHline2(Ftile inner, Rainbow arrowColor, double y, List<Ftile> list, double totalWidth) {
 			super(null, null);
 			this.inner = inner;
 			this.y = y;
@@ -306,7 +295,7 @@ public class FtileFactoryDelegatorCreateSplit extends FtileFactoryDelegator {
 			}
 
 			final Snake s = new Snake(arrowColor);
-			s.goUnmergeable();
+			s.goUnmergeable(MergeStrategy.NONE);
 			s.addPoint(minX, y);
 			s.addPoint(maxX, y);
 			ug.draw(s);
@@ -317,11 +306,11 @@ public class FtileFactoryDelegatorCreateSplit extends FtileFactoryDelegator {
 
 		private final Ftile inner;
 		private final double y;
-		private final HtmlColor arrowColor;
+		private final Rainbow arrowColor;
 		private final List<Ftile> list;
 		private final double totalWidth;
 
-		public ConnectionHline3(Ftile inner, HtmlColor arrowColor, double y, List<Ftile> list, double totalWidth) {
+		public ConnectionHline3(Ftile inner, Rainbow arrowColor, double y, List<Ftile> list, double totalWidth) {
 			super(null, null);
 			this.inner = inner;
 			this.y = y;
@@ -353,7 +342,7 @@ public class FtileFactoryDelegatorCreateSplit extends FtileFactoryDelegator {
 
 			final Snake s = new Snake(arrowColor);
 			// final Snake s = new Snake(HtmlColorUtils.GREEN);
-			s.goUnmergeable();
+			s.goUnmergeable(MergeStrategy.LIMITED);
 			s.addPoint(minX, y);
 			s.addPoint(maxX, y);
 			ug.draw(s);
@@ -363,10 +352,10 @@ public class FtileFactoryDelegatorCreateSplit extends FtileFactoryDelegator {
 	static class ConnectionIn extends AbstractConnection {
 
 		private final double x;
-		private final HtmlColor arrowColor;
+		private final Rainbow arrowColor;
 		private final TextBlock text;
 
-		public ConnectionIn(Ftile tmp, double x, HtmlColor arrowColor, TextBlock text) {
+		public ConnectionIn(Ftile tmp, double x, Rainbow arrowColor, TextBlock text) {
 			super(null, tmp);
 			this.x = x;
 			this.arrowColor = arrowColor;
@@ -388,11 +377,11 @@ public class FtileFactoryDelegatorCreateSplit extends FtileFactoryDelegator {
 	static class ConnectionOut extends AbstractConnection {
 
 		private final double x;
-		private final HtmlColor arrowColor;
+		private final Rainbow arrowColor;
 		private final double height;
 		private final TextBlock text;
 
-		public ConnectionOut(Ftile tmp, double x, HtmlColor arrowColor, double height, TextBlock text) {
+		public ConnectionOut(Ftile tmp, double x, Rainbow arrowColor, double height, TextBlock text) {
 			super(tmp, null);
 			this.x = x;
 			this.arrowColor = arrowColor;
@@ -409,7 +398,7 @@ public class FtileFactoryDelegatorCreateSplit extends FtileFactoryDelegator {
 			}
 			final Snake s = new Snake(arrowColor, Arrows.asToDown());
 			s.setLabel(text);
-			s.goUnmergeable();
+			s.goUnmergeable(MergeStrategy.NONE);
 			s.addPoint(geo.getLeft(), geo.getOutY());
 			s.addPoint(geo.getLeft(), height);
 			ug.draw(s);

@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -37,9 +37,6 @@ import net.sourceforge.plantuml.asciiart.TextStringBounder;
 import net.sourceforge.plantuml.core.ImageData;
 import net.sourceforge.plantuml.graphic.StringBounder;
 import net.sourceforge.plantuml.sequencediagram.Event;
-import net.sourceforge.plantuml.sequencediagram.LifeEvent;
-import net.sourceforge.plantuml.sequencediagram.LifeEventType;
-import net.sourceforge.plantuml.sequencediagram.Message;
 import net.sourceforge.plantuml.sequencediagram.Participant;
 import net.sourceforge.plantuml.sequencediagram.SequenceDiagram;
 import net.sourceforge.plantuml.skin.Skin;

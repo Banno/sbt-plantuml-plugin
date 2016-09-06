@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -40,20 +40,12 @@ import net.sourceforge.plantuml.Log;
 
 public class SvekUtils {
 
-	static public void traceSvgString(String svg) throws IOException {
-		traceString(new File("svek.svg"), svg);
-	}
-
-	static public void traceDotString(String dot) throws IOException {
-		traceString(new File("svek.dot"), dot);
-	}
-
-	static private void traceString(final File f, String svg) throws IOException {
+	static public void traceString(final File f, String text) throws IOException {
 		PrintWriter pw = null;
 		try {
+			Log.info("Creating intermediate file " + f.getAbsolutePath());
 			pw = new PrintWriter(new FileWriter(f));
-			pw.print(svg);
-			Log.info("Creating file " + f);
+			pw.print(text);
 		} finally {
 			if (pw != null) {
 				pw.close();

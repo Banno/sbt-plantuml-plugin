@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -43,8 +43,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 import net.sourceforge.plantuml.Log;
-import net.sourceforge.plantuml.ugraphic.SpriteGrayLevel;
-import net.sourceforge.plantuml.ugraphic.SpriteUtils;
+import net.sourceforge.plantuml.ugraphic.sprite.SpriteGrayLevel;
+import net.sourceforge.plantuml.ugraphic.sprite.SpriteUtils;
 import net.sourceforge.plantuml.version.PSystemVersion;
 
 public class SpriteWindow extends JFrame {

@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -25,33 +25,39 @@
  */
 package net.sourceforge.plantuml.activitydiagram3.ftile.vcompact;
 
+import java.util.Collection;
+
 import net.sourceforge.plantuml.ISkinParam;
+import net.sourceforge.plantuml.activitydiagram3.PositionedNote;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Ftile;
 import net.sourceforge.plantuml.activitydiagram3.ftile.FtileFactory;
 import net.sourceforge.plantuml.activitydiagram3.ftile.FtileFactoryDelegator;
-import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.sequencediagram.NotePosition;
+import net.sourceforge.plantuml.activitydiagram3.ftile.Swimlane;
+import net.sourceforge.plantuml.sequencediagram.NoteType;
 
 public class FtileFactoryDelegatorAddNote extends FtileFactoryDelegator {
 
-	// private final Rose rose = new Rose();
-
-	public FtileFactoryDelegatorAddNote(FtileFactory factory, ISkinParam skinParam) {
-		super(factory, skinParam);
+	public FtileFactoryDelegatorAddNote(FtileFactory factory) {
+		super(factory);
 	}
 
 	@Override
-	public Ftile addNote(Ftile ftile, Display note, NotePosition notePosition) {
-		if (note == null) {
+	public Ftile addNote(Ftile ftile, Swimlane swimlane, Collection<PositionedNote> notes) {
+		if (notes.size() == 0) {
 			throw new IllegalArgumentException();
 		}
-		// final HtmlColor colorlink;
-		// final LinkRendering inlinkRendering = ftile.getInLinkRendering();
-		// if (inlinkRendering == null || inlinkRendering.getColor() == null) {
-		// colorlink = rose.getHtmlColor(getSkinParam(), ColorParam.activityArrow);
-		// } else {
-		// colorlink = inlinkRendering.getColor();
-		// }
-		return new FtileWithNoteOpale(ftile, note, notePosition, getSkinParam(), true);
+		if (notes.size() > 1) {
+			throw new IllegalArgumentException();
+		}
+		ISkinParam skinParam = skinParam();
+		final PositionedNote note = notes.iterator().next();
+		if (note.getColors() != null) {
+			skinParam = note.getColors().mute(skinParam);
+		}
+		if (ftile == null) {
+			return new FtileNoteAlone(skinParam.shadowing(), note.getDisplay(), skinParam,
+					note.getType() == NoteType.NOTE, swimlane);
+		}
+		return FtileWithNoteOpale.create(ftile, notes, skinParam, true);
 	}
 }

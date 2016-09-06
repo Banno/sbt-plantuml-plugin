@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -27,12 +27,12 @@ package net.sourceforge.plantuml.sequencediagram.graphic;
 
 import net.sourceforge.plantuml.ISkinParam;
 import net.sourceforge.plantuml.OptionFlags;
-import net.sourceforge.plantuml.SkinParamBackcolored;
 import net.sourceforge.plantuml.cucadiagram.Display;
 import net.sourceforge.plantuml.graphic.StringBounder;
 import net.sourceforge.plantuml.sequencediagram.InGroupable;
 import net.sourceforge.plantuml.sequencediagram.Message;
 import net.sourceforge.plantuml.sequencediagram.NotePosition;
+import net.sourceforge.plantuml.skin.ArrowBody;
 import net.sourceforge.plantuml.skin.ArrowConfiguration;
 import net.sourceforge.plantuml.skin.ArrowHead;
 import net.sourceforge.plantuml.skin.Component;
@@ -65,7 +65,8 @@ class Step1Message extends Step1Abstract {
 
 		if (message.getNote() != null) {
 			final ISkinParam skinParam = message.getSkinParamNoteBackcolored(drawingSet.getSkinParam());
-			setNote(drawingSet.getSkin().createComponent(ComponentType.NOTE, null, skinParam, message.getNote()));
+			setNote(drawingSet.getSkin().createComponent(message.getNoteStyle().getNoteComponentType(), null,
+					skinParam, message.getNote()));
 		}
 
 	}
@@ -214,7 +215,10 @@ class Step1Message extends Step1Abstract {
 		// return m.getArrowConfiguration().self();
 		ArrowConfiguration result = ArrowConfiguration.withDirectionSelf();
 		if (m.getArrowConfiguration().isDotted()) {
-			result = result.withDotted();
+			result = result.withBody(ArrowBody.DOTTED);
+		}
+		if (m.getArrowConfiguration().isHidden()) {
+			result = result.withBody(ArrowBody.HIDDEN);
 		}
 		if (m.getArrowConfiguration().isAsync()) {
 			result = result.withHead(ArrowHead.ASYNC);

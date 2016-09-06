@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import net.sourceforge.plantuml.ISkinParam;
 import net.sourceforge.plantuml.StringUtils;
 
 class GraphvizWindows extends AbstractGraphviz {
@@ -78,8 +79,8 @@ class GraphvizWindows extends AbstractGraphviz {
 		return dots.get(0);
 	}
 
-	GraphvizWindows(String dotString, String... type) {
-		super(dotString, type);
+	GraphvizWindows(ISkinParam skinParam, String dotString, String... type) {
+		super(skinParam, dotString, type);
 	}
 
 }

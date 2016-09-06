@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -26,17 +26,13 @@
 package net.sourceforge.plantuml.svek;
 
 import java.awt.geom.Dimension2D;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import net.sourceforge.plantuml.ColorParam;
 import net.sourceforge.plantuml.Dimension2DDouble;
 import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.cucadiagram.ILeaf;
 import net.sourceforge.plantuml.graphic.AbstractTextBlock;
 import net.sourceforge.plantuml.graphic.HtmlColor;
-import net.sourceforge.plantuml.graphic.HtmlColorUtils;
 import net.sourceforge.plantuml.graphic.StringBounder;
 import net.sourceforge.plantuml.skin.rose.Rose;
 import net.sourceforge.plantuml.ugraphic.UChangeColor;
@@ -47,10 +43,9 @@ import net.sourceforge.plantuml.ugraphic.UTranslate;
 
 public final class CucaDiagramFileMakerSvek2InternalImage extends AbstractTextBlock implements IEntityImage {
 
-	private final List<IEntityImage> inners = new ArrayList<IEntityImage>();
+	private final List<IEntityImage> inners;
 	private final Separator separator;
 	private final ISkinParam skinParam;
-	private final HtmlColor backColor;
 
 	static enum Separator {
 		VERTICAL, HORIZONTAL;
@@ -98,14 +93,11 @@ public final class CucaDiagramFileMakerSvek2InternalImage extends AbstractTextBl
 		return new Rose().getHtmlColor(skinParam, colorParam);
 	}
 
-	public CucaDiagramFileMakerSvek2InternalImage(Collection<ILeaf> leafs, char concurrentSeparator,
-			ISkinParam skinParam, HtmlColor backColor) {
+	public CucaDiagramFileMakerSvek2InternalImage(List<IEntityImage> inners, char concurrentSeparator,
+			ISkinParam skinParam) {
 		this.separator = Separator.fromChar(concurrentSeparator);
 		this.skinParam = skinParam;
-		this.backColor = backColor;
-		for (ILeaf inner : leafs) {
-			inners.add(inner.getSvekImage());
-		}
+		this.inners = inners;
 	}
 
 	public void drawU(UGraphic ug) {
@@ -135,7 +127,7 @@ public final class CucaDiagramFileMakerSvek2InternalImage extends AbstractTextBl
 	}
 
 	public HtmlColor getBackcolor() {
-		return backColor;
+		return skinParam.getBackgroundColor();
 	}
 
 	public boolean isHidden() {

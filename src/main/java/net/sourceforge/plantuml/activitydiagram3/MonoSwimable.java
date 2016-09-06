@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -31,7 +31,7 @@ import java.util.Set;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Swimable;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Swimlane;
 
-public class MonoSwimable implements Swimable {
+public class MonoSwimable extends WithNote implements Swimable {
 
 	private final Swimlane swimlane;
 

@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -41,7 +41,7 @@ import net.sourceforge.plantuml.ugraphic.UFont;
 import net.sourceforge.plantuml.ugraphic.UGraphic;
 import net.sourceforge.plantuml.ugraphic.UTranslate;
 
-class TextBlockSimple extends AbstractTextBlock implements TextBlock {
+public class TextBlockSimple extends AbstractTextBlock implements TextBlock {
 
 	private List<Line> lines2;
 
@@ -58,9 +58,9 @@ class TextBlockSimple extends AbstractTextBlock implements TextBlock {
 		this(texts, fontConfiguration, horizontalAlignment, spriteContainer, maxMessageSize, null, null);
 	}
 
-	protected TextBlockSimple(Display texts, FontConfiguration fontConfiguration,
-			HorizontalAlignment horizontalAlignment, SpriteContainer spriteContainer, double maxMessageSize,
-			UFont fontForStereotype, HtmlColor htmlColorForStereotype) {
+	public TextBlockSimple(Display texts, FontConfiguration fontConfiguration, HorizontalAlignment horizontalAlignment,
+			SpriteContainer spriteContainer, double maxMessageSize, UFont fontForStereotype,
+			HtmlColor htmlColorForStereotype) {
 		this.texts = texts;
 		this.fontConfiguration = fontConfiguration;
 		this.horizontalAlignment = horizontalAlignment;
@@ -151,7 +151,6 @@ class TextBlockSimple extends AbstractTextBlock implements TextBlock {
 		assert s.getLabel(false) != null;
 		final List<SingleLine> result = new ArrayList<SingleLine>();
 		for (String st : s.getLabels(spriteContainer.useGuillemet())) {
-//			st = Stereotype.manageGuillemet(st);
 			result.add(new SingleLine(st, fontConfiguration, horizontalAlignment, spriteContainer));
 		}
 		return Collections.unmodifiableList(result);

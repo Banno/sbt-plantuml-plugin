@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -42,7 +42,7 @@ public class EntityImageGroup extends AbstractEntityImage {
 
 	public EntityImageGroup(ILeaf entity, ISkinParam skinParam) {
 		super(entity, skinParam);
-		// this.desc = TextBlockUtils.create(StringUtils.getWithNewlines(entity.getDisplay()), new FontConfiguration(
+		// this.desc = Display.create(StringUtils.getWithNewlines(entity.getDisplay()), new FontConfiguration(
 		// getFont(FontParam.ACTIVITY), HtmlColorUtils.BLACK), HorizontalAlignment.CENTER);
 	}
 

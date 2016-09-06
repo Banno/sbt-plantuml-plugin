@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -29,9 +29,11 @@ import java.awt.geom.Dimension2D;
 
 import net.sourceforge.plantuml.Dimension2DDouble;
 import net.sourceforge.plantuml.ugraphic.UGraphic;
+import net.sourceforge.plantuml.ugraphic.UGraphicStencil;
 import net.sourceforge.plantuml.ugraphic.ULine;
 import net.sourceforge.plantuml.ugraphic.UPolygon;
 import net.sourceforge.plantuml.ugraphic.URectangle;
+import net.sourceforge.plantuml.ugraphic.UStroke;
 import net.sourceforge.plantuml.ugraphic.UTranslate;
 
 class USymbolArtifact extends USymbol {
@@ -40,7 +42,6 @@ class USymbolArtifact extends USymbol {
 	public SkinParameter getSkinParameter() {
 		return SkinParameter.ARTIFACT;
 	}
-
 
 	private void drawArtifact(UGraphic ug, double widthTotal, double heightTotal, boolean shadowing) {
 
@@ -77,12 +78,18 @@ class USymbolArtifact extends USymbol {
 	private Margin getMargin() {
 		return new Margin(10, 10 + 10, 10 + 3, 10);
 	}
+	
+	public boolean manageHorizontalLine() {
+		return true;
+	}
 
-	public TextBlock asSmall(final TextBlock label, final TextBlock stereotype, final SymbolContext symbolContext) {
+
+	public TextBlock asSmall(TextBlock name, final TextBlock label, final TextBlock stereotype, final SymbolContext symbolContext) {
 		return new AbstractTextBlock() {
 
 			public void drawU(UGraphic ug) {
 				final Dimension2D dim = calculateDimension(ug.getStringBounder());
+				ug = new UGraphicStencil(ug, getRectangleStencil(dim), new UStroke());
 				ug = symbolContext.apply(ug);
 				drawArtifact(ug, dim.getWidth(), dim.getHeight(), symbolContext.isShadowing());
 				final Margin margin = getMargin();

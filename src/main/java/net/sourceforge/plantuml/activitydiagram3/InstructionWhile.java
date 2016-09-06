@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -30,32 +30,50 @@ import java.util.Set;
 import net.sourceforge.plantuml.ISkinParam;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Ftile;
 import net.sourceforge.plantuml.activitydiagram3.ftile.FtileFactory;
+import net.sourceforge.plantuml.activitydiagram3.ftile.FtileKilled;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Swimlane;
 import net.sourceforge.plantuml.activitydiagram3.ftile.vcompact.FtileWithNoteOpale;
 import net.sourceforge.plantuml.cucadiagram.Display;
 import net.sourceforge.plantuml.graphic.HtmlColor;
+import net.sourceforge.plantuml.graphic.color.Colors;
 import net.sourceforge.plantuml.sequencediagram.NotePosition;
+import net.sourceforge.plantuml.sequencediagram.NoteType;
 
-public class InstructionWhile implements Instruction {
+public class InstructionWhile extends WithNote implements Instruction, InstructionCollection {
 
 	private final InstructionList repeatList = new InstructionList();
 	private final Instruction parent;
 	private final LinkRendering nextLinkRenderer;
 	private final HtmlColor color;
+	private boolean killed = false;
 
 	private final Display test;
-	private final Display yes;
-	private Display out;
-	private LinkRendering endInlinkRendering;
-	private LinkRendering afterEndwhile;
+	private Display yes;
+	private Display out = Display.NULL;
+	private boolean testCalled = false;
+	private LinkRendering endInlinkRendering = LinkRendering.none();
+	private LinkRendering afterEndwhile = LinkRendering.none();
 	private final Swimlane swimlane;
 	private final ISkinParam skinParam;
 
+	public void overwriteYes(Display yes) {
+		this.yes = yes;
+	}
+
 	public InstructionWhile(Swimlane swimlane, Instruction parent, Display test, LinkRendering nextLinkRenderer,
 			Display yes, HtmlColor color, ISkinParam skinParam) {
+		if (test == null) {
+			throw new IllegalArgumentException();
+		}
+		if (yes == null) {
+			throw new IllegalArgumentException();
+		}
 		this.parent = parent;
 		this.test = test;
 		this.nextLinkRenderer = nextLinkRenderer;
+		if (nextLinkRenderer == null) {
+			throw new IllegalArgumentException();
+		}
 		this.yes = yes;
 		this.swimlane = swimlane;
 		this.color = color;
@@ -66,16 +84,15 @@ public class InstructionWhile implements Instruction {
 		repeatList.add(ins);
 	}
 
-	private Display note;
-	private NotePosition position;
-
 	public Ftile createFtile(FtileFactory factory) {
 		Ftile tmp = factory.decorateOut(repeatList.createFtile(factory), endInlinkRendering);
 		tmp = factory.createWhile(swimlane, tmp, test, yes, out, afterEndwhile, color);
-		if (note != null) {
-			tmp = new FtileWithNoteOpale(tmp, note, position, skinParam, false);
+		if (getPositionedNotes().size() > 0) {
+			tmp = FtileWithNoteOpale.create(tmp, getPositionedNotes(), skinParam, false);
 		}
-		// tmp = factory.decorateOut(tmp, afterEndwhile);
+		if (killed) {
+			return new FtileKilled(tmp);
+		}
 		return tmp;
 	}
 
@@ -84,6 +101,10 @@ public class InstructionWhile implements Instruction {
 	}
 
 	final public boolean kill() {
+		if (testCalled) {
+			this.killed = true;
+			return true;
+		}
 		return repeatList.kill();
 	}
 
@@ -94,18 +115,22 @@ public class InstructionWhile implements Instruction {
 	public void endwhile(LinkRendering nextLinkRenderer, Display out) {
 		this.endInlinkRendering = nextLinkRenderer;
 		this.out = out;
+		if (out == null) {
+			throw new IllegalArgumentException();
+		}
+		this.testCalled = true;
 	}
 
 	public void afterEndwhile(LinkRendering linkRenderer) {
 		this.afterEndwhile = linkRenderer;
 	}
 
-	public void addNote(Display note, NotePosition position) {
+	@Override
+	public boolean addNote(Display note, NotePosition position, NoteType type, Colors colors) {
 		if (repeatList.isEmpty()) {
-			this.note = note;
-			this.position = position;
+			return super.addNote(note, position, type, colors);
 		} else {
-			repeatList.addNote(note, position);
+			return repeatList.addNote(note, position, type, colors);
 		}
 	}
 
@@ -114,11 +139,15 @@ public class InstructionWhile implements Instruction {
 	}
 
 	public Swimlane getSwimlaneIn() {
-		return parent.getSwimlaneOut();
+		return parent.getSwimlaneIn();
 	}
 
 	public Swimlane getSwimlaneOut() {
-		return getSwimlaneIn();
+		return parent.getSwimlaneOut();
+	}
+
+	public Instruction getLast() {
+		return repeatList.getLast();
 	}
 
 }

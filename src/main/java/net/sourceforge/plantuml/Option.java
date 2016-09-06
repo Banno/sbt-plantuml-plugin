@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -35,10 +35,11 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
+import net.sourceforge.plantuml.command.regex.Matcher2;
 import net.sourceforge.plantuml.command.regex.MyPattern;
+import net.sourceforge.plantuml.command.regex.Pattern2;
+import net.sourceforge.plantuml.cucadiagram.dot.GraphvizUtils;
 import net.sourceforge.plantuml.preproc.Defines;
 
 public class Option {
@@ -56,6 +57,7 @@ public class Option {
 	private boolean failfast2 = false;
 	private boolean pattern = false;
 	private boolean duration = false;
+	private boolean debugsvek = false;
 	private int nbThreads = 0;
 	private int ftpPort = -1;
 
@@ -87,6 +89,8 @@ public class Option {
 				setFileFormat(FileFormat.SVG);
 			} else if (s.equalsIgnoreCase("-thtml") || s.equalsIgnoreCase("-html")) {
 				setFileFormat(FileFormat.HTML);
+			} else if (s.equalsIgnoreCase("-tscxml") || s.equalsIgnoreCase("-scxml")) {
+				setFileFormat(FileFormat.SCXML);
 			} else if (s.equalsIgnoreCase("-txmi") || s.equalsIgnoreCase("-xmi")) {
 				setFileFormat(FileFormat.XMI_STANDARD);
 			} else if (s.equalsIgnoreCase("-txmi:argo") || s.equalsIgnoreCase("-xmi:argo")) {
@@ -101,12 +105,16 @@ public class Option {
 				setFileFormat(FileFormat.ATXT);
 			} else if (s.equalsIgnoreCase("-tutxt") || s.equalsIgnoreCase("-utxt")) {
 				setFileFormat(FileFormat.UTXT);
+			} else if (s.equalsIgnoreCase("-braille") || s.equalsIgnoreCase("-tbraille")) {
+				setFileFormat(FileFormat.BRAILLE_PNG);
 			} else if (s.equalsIgnoreCase("-png") || s.equalsIgnoreCase("-tpng")) {
 				setFileFormat(FileFormat.PNG);
 			} else if (s.equalsIgnoreCase("-vdx") || s.equalsIgnoreCase("-tvdx")) {
 				setFileFormat(FileFormat.VDX);
 			} else if (s.equalsIgnoreCase("-latex") || s.equalsIgnoreCase("-tlatex")) {
 				setFileFormat(FileFormat.LATEX);
+			} else if (s.equalsIgnoreCase("-latex:nopreamble") || s.equalsIgnoreCase("-tlatex:nopreamble")) {
+				setFileFormat(FileFormat.LATEX_NO_PREAMBLE);
 			} else if (s.equalsIgnoreCase("-base64") || s.equalsIgnoreCase("-tbase64")) {
 				setFileFormat(FileFormat.BASE64);
 			} else if (s.equalsIgnoreCase("-pdf") || s.equalsIgnoreCase("-tpdf")) {
@@ -130,8 +138,7 @@ public class Option {
 				if (i == arg.length) {
 					continue;
 				}
-				OptionFlags.getInstance().setDotExecutable(
-						StringUtils.eventuallyRemoveStartingAndEndingDoubleQuote(arg[i]));
+				GraphvizUtils.setDotExecutable(StringUtils.eventuallyRemoveStartingAndEndingDoubleQuote(arg[i]));
 			} else if (s.equalsIgnoreCase("-charset")) {
 				i++;
 				if (i == arg.length) {
@@ -188,8 +195,10 @@ public class Option {
 				OptionFlags.getInstance().setQuiet(true);
 			} else if (s.equalsIgnoreCase("-duration")) {
 				duration = true;
+			} else if (s.equalsIgnoreCase("-debugsvek") || s.equalsIgnoreCase("-debug_svek")) {
+				debugsvek = true;
 			} else if (s.equalsIgnoreCase("-keepfiles") || s.equalsIgnoreCase("-keepfile")) {
-				OptionFlags.getInstance().setKeepTmpFiles(true);
+				System.err.println("-keepfiles option has been removed. Please consider -debugsvek instead");
 			} else if (s.equalsIgnoreCase("-metadata")) {
 				OptionFlags.getInstance().setMetadata(true);
 			} else if (s.equalsIgnoreCase("-logdata")) {
@@ -268,16 +277,16 @@ public class Option {
 	}
 
 	private void manageDefine(String s) {
-		final Pattern p = MyPattern.cmpile("^(\\w+)(?:=(.*))?$");
-		final Matcher m = p.matcher(s);
+		final Pattern2 p = MyPattern.cmpile("^(\\w+)(?:=(.*))?$");
+		final Matcher2 m = p.matcher(s);
 		if (m.find()) {
 			define(m.group(1), m.group(2));
 		}
 	}
 
 	private void manageSkinParam(String s) {
-		final Pattern p = MyPattern.cmpile("^(\\w+)(?:=(.*))?$");
-		final Matcher m = p.matcher(s);
+		final Pattern2 p = MyPattern.cmpile("^(\\w+)(?:=(.*))?$");
+		final Matcher2 m = p.matcher(s);
 		if (m.find()) {
 			skinParam(m.group(1), m.group(2));
 		}
@@ -357,7 +366,11 @@ public class Option {
 	}
 
 	public FileFormatOption getFileFormatOption() {
-		return new FileFormatOption(getFileFormat());
+		final FileFormatOption fileFormatOption = new FileFormatOption(getFileFormat());
+		if (debugsvek) {
+			fileFormatOption.setDebugSvek(true);
+		}
+		return fileFormatOption;
 	}
 
 	public final boolean isDuration() {
@@ -402,6 +415,14 @@ public class Option {
 
 	public final File getOutputFile() {
 		return outputFile;
+	}
+
+	public final void setDebugSvek(boolean debugsvek) {
+		this.debugsvek = debugsvek;
+	}
+
+	boolean isDebugSvek() {
+		return debugsvek;
 	}
 
 }

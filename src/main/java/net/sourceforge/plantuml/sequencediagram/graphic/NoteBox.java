@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -66,6 +66,13 @@ final class NoteBox extends GraphicalElement implements InGroupable {
 		this.comp = comp;
 	}
 
+	public double getRightShift(double y) {
+		if (p1 == null) {
+			return 0;
+		}
+		return p1.getLifeLine().getRightShift(y) + 5;
+	}
+
 	@Override
 	final public double getPreferredWidth(StringBounder stringBounder) {
 		final double preferredWidth = comp.getPreferredWidth(stringBounder);
@@ -90,8 +97,8 @@ final class NoteBox extends GraphicalElement implements InGroupable {
 		final StringBounder stringBounder = ug.getStringBounder();
 		final double xStart = getStartingX(stringBounder);
 		ug = ug.apply(new UTranslate(xStart, getStartingY()));
-		final Dimension2D dimensionToUse = new Dimension2DDouble(getPreferredWidth(stringBounder), comp
-				.getPreferredHeight(stringBounder));
+		final Dimension2D dimensionToUse = new Dimension2DDouble(getPreferredWidth(stringBounder),
+				comp.getPreferredHeight(stringBounder));
 		if (url != null) {
 			ug.startUrl(url);
 		}
@@ -123,8 +130,8 @@ final class NoteBox extends GraphicalElement implements InGroupable {
 
 	private SegmentColored getSegment(StringBounder stringBounder) {
 		final SegmentColored segment = p1.getLiveThicknessAt(stringBounder, getStartingY());
-		final SegmentColored segment2 = p1.getLiveThicknessAt(stringBounder, getStartingY()
-				+ comp.getPreferredHeight(stringBounder));
+		final SegmentColored segment2 = p1.getLiveThicknessAt(stringBounder,
+				getStartingY() + comp.getPreferredHeight(stringBounder));
 		return segment.merge(segment2);
 	}
 
@@ -146,6 +153,10 @@ final class NoteBox extends GraphicalElement implements InGroupable {
 
 	public final Url getUrl() {
 		return url;
+	}
+
+	public NotePosition getNotePosition() {
+		return position;
 	}
 
 }

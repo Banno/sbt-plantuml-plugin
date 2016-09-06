@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -28,10 +28,10 @@ package net.sourceforge.plantuml.ugraphic.tikz;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import net.sourceforge.plantuml.FileFormat;
 import net.sourceforge.plantuml.Url;
 import net.sourceforge.plantuml.creole.AtomText;
 import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.graphic.TextBlockUtils;
 import net.sourceforge.plantuml.posimo.DotPath;
 import net.sourceforge.plantuml.tikz.TikzGraphics;
 import net.sourceforge.plantuml.ugraphic.AbstractCommonUGraphic;
@@ -55,13 +55,13 @@ public class UGraphicTikz extends AbstractUGraphic<TikzGraphics> implements Clip
 
 	private UGraphicTikz(ColorMapper colorMapper, TikzGraphics tikz) {
 		super(colorMapper, tikz);
-		this.stringBounder = TextBlockUtils.getDummyStringBounder();
+		this.stringBounder = FileFormat.PNG.getDefaultStringBounder();
 		register();
 
 	}
 
-	public UGraphicTikz(ColorMapper colorMapper) {
-		this(colorMapper, new TikzGraphics());
+	public UGraphicTikz(ColorMapper colorMapper, boolean withPreamble) {
+		this(colorMapper, new TikzGraphics(withPreamble));
 
 	}
 
@@ -95,9 +95,11 @@ public class UGraphicTikz extends AbstractUGraphic<TikzGraphics> implements Clip
 	}
 
 	public void startUrl(Url url) {
+		getGraphicObject().openLink(url.getUrl(), url.getTooltip());
 	}
 
 	public void closeAction() {
+		getGraphicObject().closeLink();
 	}
 
 	public void writeImageTOBEMOVED(OutputStream os, String metadata, int dpi) throws IOException {

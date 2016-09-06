@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -27,12 +27,12 @@ package net.sourceforge.plantuml.command;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import net.sourceforge.plantuml.UmlDiagram;
-import net.sourceforge.plantuml.command.regex.MyPattern;
 import net.sourceforge.plantuml.StringUtils;
+import net.sourceforge.plantuml.UmlDiagram;
+import net.sourceforge.plantuml.command.regex.Matcher2;
+import net.sourceforge.plantuml.command.regex.MyPattern;
+import net.sourceforge.plantuml.command.regex.Pattern2;
 
 public class CommandSkinParamMultilines extends CommandMultilinesBracket<UmlDiagram> {
 
@@ -56,7 +56,7 @@ public class CommandSkinParamMultilines extends CommandMultilinesBracket<UmlDiag
 		}
 	}
 
-	private final static Pattern p1 = MyPattern
+	private final static Pattern2 p1 = MyPattern
 			.cmpile("^([\\w.]*(?:\\<\\<.*\\>\\>)?[\\w.]*)[%s]+(?:(\\{)|(.*))$|^\\}?$");
 
 	public CommandSkinParamMultilines() {
@@ -72,13 +72,14 @@ public class CommandSkinParamMultilines extends CommandMultilinesBracket<UmlDiag
 		return p1.matcher(line).matches();
 	}
 
-	private boolean hasStartingQuote(String line) {
-		return MyPattern.mtches(line, "[%s]*[%q].*");
+	private boolean hasStartingQuote(CharSequence line) {
+		// return MyPattern.mtches(line, "[%s]*[%q].*");
+		return MyPattern.mtches(line, CommandMultilinesComment.COMMENT_SINGLE_LINE);
 	}
 
-	public CommandExecutionResult execute(UmlDiagram diagram, List<String> lines) {
+	public CommandExecutionResult execute(UmlDiagram diagram, BlocLines lines) {
 		final Context context = new Context();
-		final Matcher mStart = getStartingPattern().matcher(StringUtils.trin(lines.get(0)));
+		final Matcher2 mStart = getStartingPattern().matcher(StringUtils.trin(lines.getFirst499()));
 		if (mStart.find() == false) {
 			throw new IllegalStateException();
 		}
@@ -86,19 +87,20 @@ public class CommandSkinParamMultilines extends CommandMultilinesBracket<UmlDiag
 			context.push(mStart.group(1));
 		}
 
-		lines = new ArrayList<String>(lines.subList(1, lines.size() - 1));
-		StringUtils.trim(lines, true);
+		lines = lines.subExtract(1, 1);
+		lines = lines.removeComments();
+		lines = lines.trim(true);
 
-		for (String s : lines) {
+		for (CharSequence s : lines) {
 			assert s.length() > 0;
-			if (hasStartingQuote(s)) {
-				continue;
-			}
-			if (s.equals("}")) {
+//			if (hasStartingQuote(s)) {
+//				continue;
+//			}
+			if (s.toString().equals("}")) {
 				context.pop();
 				continue;
 			}
-			final Matcher m = p1.matcher(s);
+			final Matcher2 m = p1.matcher(s);
 			if (m.find() == false) {
 				throw new IllegalStateException();
 			}
@@ -108,7 +110,7 @@ public class CommandSkinParamMultilines extends CommandMultilinesBracket<UmlDiag
 				final String key = context.getFullParam() + m.group(1);
 				diagram.setParam(key, m.group(3));
 			} else {
-				throw new IllegalStateException();
+				throw new IllegalStateException("." + s.toString() + ".");
 			}
 		}
 

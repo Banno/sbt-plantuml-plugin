@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -32,9 +32,14 @@ import net.sourceforge.plantuml.svek.AbstractExtremityFactory;
 
 public class ExtremityFactoryPlus extends AbstractExtremityFactory implements ExtremityFactory {
 
+	@Override
+	public UDrawable createUDrawable(Point2D center, double angle) {
+		return ExtremityPlus.create(center, angle - Math.PI / 2);
+	}
+
 	public UDrawable createUDrawable(Point2D p0, Point2D p1, Point2D p2) {
 		final double ortho = atan2(p0, p2);
-		return new ExtremityPlus(p1, ortho);
+		return ExtremityPlus.create(p1, ortho);
 	}
 
 }

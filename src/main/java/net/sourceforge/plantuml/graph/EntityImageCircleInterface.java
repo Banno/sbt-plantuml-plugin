@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -33,10 +33,8 @@ import net.sourceforge.plantuml.SpriteContainerEmpty;
 import net.sourceforge.plantuml.cucadiagram.IEntity;
 import net.sourceforge.plantuml.graphic.FontConfiguration;
 import net.sourceforge.plantuml.graphic.HorizontalAlignment;
-import net.sourceforge.plantuml.graphic.HtmlColorUtils;
 import net.sourceforge.plantuml.graphic.StringBounder;
 import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.graphic.TextBlockUtils;
 import net.sourceforge.plantuml.skin.CircleInterface;
 import net.sourceforge.plantuml.ugraphic.ColorMapper;
 
@@ -47,8 +45,8 @@ class EntityImageCircleInterface extends AbstractEntityImage {
 
 	public EntityImageCircleInterface(IEntity entity) {
 		super(entity);
-		this.name = TextBlockUtils.create(entity.getDisplay(), new FontConfiguration(getFont14(), 
-				HtmlColorUtils.BLACK, HtmlColorUtils.BLUE, true), HorizontalAlignment.CENTER, new SpriteContainerEmpty());
+		this.name = entity.getDisplay().create(FontConfiguration.blackBlueTrue(getFont14()),
+				HorizontalAlignment.CENTER, new SpriteContainerEmpty());
 		this.circleInterface = new CircleInterface(getYellow(), getRed());
 	}
 

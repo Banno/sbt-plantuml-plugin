@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -34,6 +34,7 @@ import net.sourceforge.plantuml.graphic.HtmlColor;
 import net.sourceforge.plantuml.graphic.StringBounder;
 import net.sourceforge.plantuml.skin.AbstractTextualComponent;
 import net.sourceforge.plantuml.skin.Area;
+import net.sourceforge.plantuml.skin.ArrowConfiguration;
 import net.sourceforge.plantuml.ugraphic.UChangeBackColor;
 import net.sourceforge.plantuml.ugraphic.UChangeColor;
 import net.sourceforge.plantuml.ugraphic.UGraphic;
@@ -68,7 +69,7 @@ public class ComponentRoseGroupingElse extends AbstractTextualComponent {
 	@Override
 	protected void drawInternalU(UGraphic ug, Area area) {
 		final Dimension2D dimensionToUse = area.getDimensionToUse();
-		ug = stroke(ug, 2, 2).apply(new UChangeColor(groupBorder));
+		ug = ArrowConfiguration.stroke(ug, 2, 2, 1).apply(new UChangeColor(groupBorder));
 		ug.apply(new UTranslate(0, 1)).draw(new ULine(dimensionToUse.getWidth(), 0));
 		ug = ug.apply(new UStroke());
 		getTextBlock().drawU(ug.apply(new UTranslate(getMarginX1(), getMarginY())));

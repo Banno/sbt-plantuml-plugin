@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -136,7 +136,7 @@ public class CommunicationTile implements TileWithUpdateStairs, TileWithCallback
 			area = new Area(x1 - x2, dim.getHeight());
 			ug = ug.apply(new UTranslate(x2, 0));
 			if (isCreate()) {
-				livingSpace2.drawHead(ug, (Context2D) ug, VerticalAlignment.CENTER, HorizontalAlignment.RIGHT);
+				livingSpace2.drawHead(ug, (Context2D) ug, VerticalAlignment.TOP, HorizontalAlignment.RIGHT);
 			}
 		} else {
 			final int level1 = livingSpace1.getLevelAt(this, EventsHistoryMode.IGNORE_FUTURE_DEACTIVATE);
@@ -150,7 +150,7 @@ public class CommunicationTile implements TileWithUpdateStairs, TileWithCallback
 			ug = ug.apply(new UTranslate(x1, 0));
 			if (isCreate()) {
 				livingSpace2.drawHead(ug.apply(new UTranslate(area.getDimensionToUse().getWidth(), 0)), (Context2D) ug,
-						VerticalAlignment.CENTER, HorizontalAlignment.LEFT);
+						VerticalAlignment.TOP, HorizontalAlignment.LEFT);
 			}
 		}
 		comp.drawU(ug, area, (Context2D) ug);
@@ -161,7 +161,11 @@ public class CommunicationTile implements TileWithUpdateStairs, TileWithCallback
 	public double getPreferredHeight(StringBounder stringBounder) {
 		final Component comp = getComponent(stringBounder);
 		final Dimension2D dim = comp.getPreferredDimension(stringBounder);
-		return dim.getHeight();
+		double height = dim.getHeight();
+		if (isCreate()) {
+			height = Math.max(height, livingSpace2.getHeadPreferredDimension(stringBounder).getHeight());
+		}
+		return height;
 	}
 
 	public void addConstraints(StringBounder stringBounder) {
@@ -169,25 +173,24 @@ public class CommunicationTile implements TileWithUpdateStairs, TileWithCallback
 		final Dimension2D dim = comp.getPreferredDimension(stringBounder);
 		final double width = dim.getWidth();
 
-		// if (isSelf()) {
-		// final LivingSpace next = livingSpace1.getNext();
-		// if (next != null) {
-		// next.getPosB().ensureBiggerThan(getMaxX(stringBounder));
-		// }
-		// } else {
-		final Real point1 = getPoint1(stringBounder);
-		final Real point2 = getPoint2(stringBounder);
-		if (point1.getCurrentValue() < point2.getCurrentValue()) {
-			point2.ensureBiggerThan(point1.addFixed(width));
-		} else {
+		Real point1 = getPoint1(stringBounder);
+		Real point2 = getPoint2(stringBounder);
+		if (isReverse(stringBounder)) {
+			final int level1 = livingSpace1.getLevelAt(this, EventsHistoryMode.IGNORE_FUTURE_DEACTIVATE);
+			final int level2 = livingSpace2.getLevelAt(this, EventsHistoryMode.IGNORE_FUTURE_DEACTIVATE);
+			if (level1 > 0) {
+				point1 = point1.addFixed(-LIVE_DELTA_SIZE);
+			}
+			point2 = point2.addFixed(level2 * LIVE_DELTA_SIZE);
 			point1.ensureBiggerThan(point2.addFixed(width));
-			// }
+		} else {
+			final int level2 = livingSpace2.getLevelAt(this, EventsHistoryMode.IGNORE_FUTURE_DEACTIVATE);
+			if (level2 > 0) {
+				point2 = point2.addFixed(-LIVE_DELTA_SIZE);
+			}
+			point2.ensureBiggerThan(point1.addFixed(width));
 		}
 	}
-
-	// private boolean isSelf() {
-	// return livingSpace1 == livingSpace2;
-	// }
 
 	private Real getPoint1(final StringBounder stringBounder) {
 		return livingSpace1.getPosC(stringBounder);
@@ -211,12 +214,6 @@ public class CommunicationTile implements TileWithUpdateStairs, TileWithCallback
 	}
 
 	public Real getMaxX(StringBounder stringBounder) {
-		// if (isSelf()) {
-		// final Component comp = getComponent(stringBounder);
-		// final Dimension2D dim = comp.getPreferredDimension(stringBounder);
-		// final double width = dim.getWidth();
-		// return livingSpace1.getPosC(stringBounder).addFixed(width);
-		// }
 		if (isReverse(stringBounder)) {
 			return getPoint1(stringBounder);
 		}

@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -32,7 +32,6 @@ import java.util.Map;
 
 import net.sourceforge.plantuml.ColorParam;
 import net.sourceforge.plantuml.Dimension2DDouble;
-import net.sourceforge.plantuml.Direction;
 import net.sourceforge.plantuml.FontParam;
 import net.sourceforge.plantuml.ISkinParam;
 import net.sourceforge.plantuml.command.Position;
@@ -40,18 +39,17 @@ import net.sourceforge.plantuml.cucadiagram.BodyEnhanced2;
 import net.sourceforge.plantuml.cucadiagram.Display;
 import net.sourceforge.plantuml.cucadiagram.IEntity;
 import net.sourceforge.plantuml.cucadiagram.ILeaf;
-import net.sourceforge.plantuml.cucadiagram.PortionShower;
 import net.sourceforge.plantuml.graphic.FontConfiguration;
 import net.sourceforge.plantuml.graphic.HorizontalAlignment;
 import net.sourceforge.plantuml.graphic.HtmlColor;
 import net.sourceforge.plantuml.graphic.StringBounder;
 import net.sourceforge.plantuml.graphic.TextBlock;
+import net.sourceforge.plantuml.graphic.color.ColorType;
 import net.sourceforge.plantuml.skin.rose.Rose;
 import net.sourceforge.plantuml.svek.AbstractEntityImage;
 import net.sourceforge.plantuml.svek.Bibliotekon;
 import net.sourceforge.plantuml.svek.Shape;
 import net.sourceforge.plantuml.svek.ShapeType;
-import net.sourceforge.plantuml.ugraphic.UFont;
 import net.sourceforge.plantuml.ugraphic.UGraphic;
 import net.sourceforge.plantuml.ugraphic.UTranslate;
 
@@ -72,10 +70,10 @@ public class EntityImageTips extends AbstractEntityImage {
 		this.skinParam = skinParam;
 		this.bibliotekon = bibliotekon;
 
-		if (entity.getSpecificBackColor() == null) {
+		if (entity.getColors(skinParam).getColor(ColorType.BACK) == null) {
 			noteBackgroundColor = rose.getHtmlColor(skinParam, ColorParam.noteBackground);
 		} else {
-			noteBackgroundColor = entity.getSpecificBackColor();
+			noteBackgroundColor = entity.getColors(skinParam).getColor(ColorType.BACK);
 		}
 		this.borderColor = rose.getHtmlColor(skinParam, ColorParam.noteBorder);
 	}
@@ -123,6 +121,9 @@ public class EntityImageTips extends AbstractEntityImage {
 		for (Map.Entry<String, Display> ent : getEntity().getTips().entrySet()) {
 			final Display display = ent.getValue();
 			final Rectangle2D memberPosition = shapeOther.getImage().getInnerPosition(ent.getKey(), stringBounder);
+			if (memberPosition == null) {
+				return;
+			}
 			final Opale opale = getOpale(display);
 			final Dimension2D dim = opale.calculateDimension(stringBounder);
 			final Point2D pp1 = new Point2D.Double(0, dim.getHeight() / 2);
@@ -144,12 +145,10 @@ public class EntityImageTips extends AbstractEntityImage {
 	}
 
 	private Opale getOpale(final Display display) {
-		final HtmlColor fontColor = rose.getFontColor(skinParam, FontParam.NOTE);
-		final UFont fontNote = skinParam.getFont(FontParam.NOTE, null, false);
-
+		// final HtmlColor fontColor = rose.getFontColor(skinParam, FontParam.NOTE);
+		// final UFont fontNote = skinParam.getFont(FontParam.NOTE, null, false);
 		final TextBlock textBlock = new BodyEnhanced2(display, FontParam.NOTE, skinParam, HorizontalAlignment.LEFT,
-				new FontConfiguration(fontNote, fontColor, skinParam.getHyperlinkColor(),
-						skinParam.useUnderlineForHyperlink()));
+				new FontConfiguration(skinParam, FontParam.NOTE, null));
 		final Opale opale = new Opale(borderColor, noteBackgroundColor, textBlock, skinParam.shadowing(), true);
 		return opale;
 	}

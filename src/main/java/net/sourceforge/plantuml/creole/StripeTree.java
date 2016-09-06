@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -55,7 +55,7 @@ public class StripeTree implements Stripe {
 		final List<String> lines = StripeTable.getWithNewlinesInternal(line);
 		for (String s : lines) {
 			final StripeSimple cell = new StripeSimple(fontConfiguration, stripeStyle, new CreoleContext(), skinParam,
-					false);
+					CreoleMode.FULL);
 			// EMTEC
 			final String text = s.replaceFirst("^\\s*\\|_", "");
 			final int level = (s.length() - text.length()) / 2;

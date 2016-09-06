@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -43,7 +43,7 @@ public class ParticipantBox implements Pushable {
 
 	private static int CPT = 0;
 
-	private final int outMargin = 5;
+	private final int outMargin;
 
 	private double startingX;
 
@@ -54,7 +54,8 @@ public class ParticipantBox implements Pushable {
 
 	private int cpt = CPT++;
 
-	public ParticipantBox(Component head, Component line, Component tail, Component delayLine, double startingX) {
+	public ParticipantBox(Component head, Component line, Component tail, Component delayLine, double startingX, int outMargin) {
+		this.outMargin = outMargin;
 		this.startingX = startingX;
 		this.head = head;
 		this.line = line;

@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -25,17 +25,15 @@
  */
 package net.sourceforge.plantuml.command;
 
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import net.sourceforge.plantuml.StringUtils;
+import net.sourceforge.plantuml.command.regex.Matcher2;
 import net.sourceforge.plantuml.command.regex.MyPattern;
+import net.sourceforge.plantuml.command.regex.Pattern2;
 import net.sourceforge.plantuml.core.Diagram;
 
 public abstract class CommandMultilines<S extends Diagram> implements Command<S> {
 
-	private final Pattern starting;
+	private final Pattern2 starting;
 
 	public CommandMultilines(String patternStart) {
 		if (patternStart.startsWith("(?i)^") == false || patternStart.endsWith("$") == false) {
@@ -50,11 +48,11 @@ public abstract class CommandMultilines<S extends Diagram> implements Command<S>
 		return new String[] { "START: " + starting.pattern(), "END: " + getPatternEnd() };
 	}
 
-	final public CommandControl isValid(List<String> lines) {
+	final public CommandControl isValid(BlocLines lines) {
 		if (isCommandForbidden()) {
 			return CommandControl.NOT_OK;
 		}
-		Matcher m1 = starting.matcher(StringUtils.trin(lines.get(0)));
+		Matcher2 m1 = starting.matcher(StringUtils.trin(lines.getFirst499()));
 		if (m1.matches() == false) {
 			return CommandControl.NOT_OK;
 		}
@@ -62,7 +60,7 @@ public abstract class CommandMultilines<S extends Diagram> implements Command<S>
 			return CommandControl.OK_PARTIAL;
 		}
 
-		m1 = MyPattern.cmpile(getPatternEnd()).matcher(StringUtils.trin(lines.get(lines.size() - 1)));
+		m1 = MyPattern.cmpile(getPatternEnd()).matcher(StringUtils.trin(lines.getLast499()));
 		if (m1.matches() == false) {
 			return CommandControl.OK_PARTIAL;
 		}
@@ -78,7 +76,7 @@ public abstract class CommandMultilines<S extends Diagram> implements Command<S>
 	protected void actionIfCommandValid() {
 	}
 
-	protected final Pattern getStartingPattern() {
+	protected final Pattern2 getStartingPattern() {
 		return starting;
 	}
 

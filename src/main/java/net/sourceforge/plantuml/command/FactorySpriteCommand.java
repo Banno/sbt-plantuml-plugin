@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -29,14 +29,14 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import net.sourceforge.plantuml.StringUtils;
 import net.sourceforge.plantuml.UmlDiagram;
 import net.sourceforge.plantuml.command.note.SingleMultiFactoryCommand;
 import net.sourceforge.plantuml.command.regex.RegexConcat;
 import net.sourceforge.plantuml.command.regex.RegexLeaf;
 import net.sourceforge.plantuml.command.regex.RegexResult;
-import net.sourceforge.plantuml.ugraphic.Sprite;
-import net.sourceforge.plantuml.ugraphic.SpriteGrayLevel;
-import net.sourceforge.plantuml.StringUtils;
+import net.sourceforge.plantuml.ugraphic.sprite.Sprite;
+import net.sourceforge.plantuml.ugraphic.sprite.SpriteGrayLevel;
 
 public final class FactorySpriteCommand implements SingleMultiFactoryCommand<UmlDiagram> {
 
@@ -64,13 +64,13 @@ public final class FactorySpriteCommand implements SingleMultiFactoryCommand<Uml
 
 			@Override
 			protected CommandExecutionResult executeArg(final UmlDiagram system, RegexResult arg) {
-				return executeInternal(system, arg, Arrays.asList(arg.get("DATA", 0)));
+				return executeInternal(system, arg, Arrays.asList((CharSequence) arg.get("DATA", 0)));
 			}
 
 		};
 	}
 
-	public Command<UmlDiagram> createMultiLine() {
+	public Command<UmlDiagram> createMultiLine(boolean withBracket) {
 		return new CommandMultilines2<UmlDiagram>(getRegexConcatMultiLine(), MultilinesStrategy.REMOVE_STARTING_QUOTE) {
 
 			@Override
@@ -78,22 +78,23 @@ public final class FactorySpriteCommand implements SingleMultiFactoryCommand<Uml
 				return "(?i)^end[%s]?sprite|\\}$";
 			}
 
-			public CommandExecutionResult executeNow(final UmlDiagram system, List<String> lines) {
-				StringUtils.trim(lines, true);
-				final RegexResult line0 = getStartingPattern().matcher(StringUtils.trin(lines.get(0)));
+			public CommandExecutionResult executeNow(final UmlDiagram system, BlocLines lines) {
+				lines = lines.trim(true);
+				final RegexResult line0 = getStartingPattern().matcher(StringUtils.trin(lines.getFirst499()));
 
-				final List<String> strings = StringUtils.removeEmptyColumns(lines.subList(1, lines.size() - 1));
-				if (strings.size() == 0) {
+				lines = lines.subExtract(1, 1);
+				lines = lines.removeEmptyColumns();
+				if (lines.size() == 0) {
 					return CommandExecutionResult.error("No sprite defined.");
 				}
-				return executeInternal(system, line0, strings);
+				return executeInternal(system, line0, lines.getLines());
 			}
 
 		};
 	}
 
 	private CommandExecutionResult executeInternal(UmlDiagram system, RegexResult line0,
-			final List<String> strings) {
+			final List<CharSequence> strings) {
 		try {
 			final Sprite sprite;
 			if (line0.get("DIM", 0) == null) {
@@ -119,9 +120,9 @@ public final class FactorySpriteCommand implements SingleMultiFactoryCommand<Uml
 		}
 	}
 
-	private String concat(final List<String> strings) {
+	private String concat(final List<? extends CharSequence> strings) {
 		final StringBuilder sb = new StringBuilder();
-		for (String s : strings) {
+		for (CharSequence s : strings) {
 			sb.append(StringUtils.trin(s));
 		}
 		return sb.toString();

@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -80,6 +80,9 @@ public class EpsGraphicsMacro extends EpsGraphics {
 
 	@Override
 	public void fill(int windingRule) {
+		if (macroInProgress != null) {
+			closeMacro();
+		}
 		if (windingRule == PathIterator.WIND_EVEN_ODD) {
 			append("eofill", true);
 		} else if (windingRule == PathIterator.WIND_NON_ZERO) {

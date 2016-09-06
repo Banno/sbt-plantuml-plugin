@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -43,7 +43,6 @@ import net.sourceforge.plantuml.core.DiagramDescription;
 import net.sourceforge.plantuml.core.DiagramDescriptionImpl;
 import net.sourceforge.plantuml.core.ImageData;
 import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.graphic.TextBlockUtils;
 import net.sourceforge.plantuml.png.PngIO;
 import net.sourceforge.plantuml.ugraphic.ColorMapperIdentity;
 import net.sourceforge.plantuml.ugraphic.UGraphic;
@@ -63,7 +62,8 @@ public class PostItDiagram extends UmlDiagram {
 	}
 
 	@Override
-	final protected ImageData exportDiagramInternal(OutputStream os, int index, FileFormatOption fileFormatOption) throws IOException {
+	final protected ImageData exportDiagramInternal(OutputStream os, int index, FileFormatOption fileFormatOption)
+			throws IOException {
 		final UGraphic ug = createImage(fileFormatOption);
 		drawU(ug);
 		if (ug instanceof UGraphicG2d) {
@@ -110,7 +110,7 @@ public class PostItDiagram extends UmlDiagram {
 				.getMappedColor(this.getSkinParam().getBackgroundColor());
 		final FileFormat fileFormat = fileFormatOption.getFileFormat();
 		if (fileFormat == FileFormat.PNG) {
-			final double height = getDefaultArea().heightWhenWidthIs(width, TextBlockUtils.getDummyStringBounder());
+			final double height = getDefaultArea().heightWhenWidthIs(width, fileFormat.getDefaultStringBounder());
 			final EmptyImageBuilder builder = new EmptyImageBuilder(width, height, backColor);
 
 			final Graphics2D graphics2D = builder.getGraphics2D();

@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -40,18 +40,21 @@ public class CreoleParser {
 	private final FontConfiguration fontConfiguration;
 	private final ISkinSimple skinParam;
 	private final HorizontalAlignment horizontalAlignment;
-	private final boolean modeSimpleLine;
+	private final CreoleMode modeSimpleLine;
 
 	public CreoleParser(FontConfiguration fontConfiguration, HorizontalAlignment horizontalAlignment,
-			ISkinSimple skinParam, boolean modeSimpleLine) {
+			ISkinSimple skinParam, CreoleMode modeSimpleLine) {
 		this.modeSimpleLine = modeSimpleLine;
 		this.fontConfiguration = fontConfiguration;
 		this.skinParam = skinParam;
+		if (skinParam == null) {
+			throw new IllegalArgumentException();
+		}
 		this.horizontalAlignment = horizontalAlignment;
 	}
 
 	private Stripe createStripe(String line, CreoleContext context, Stripe lastStripe) {
-		if (lastStripe instanceof StripeTable && line.startsWith("|") && line.endsWith("|")) {
+		if (lastStripe instanceof StripeTable && isTableLine(line)) {
 			final StripeTable table = (StripeTable) lastStripe;
 			table.analyzeAndAddNormal(line);
 			return null;
@@ -59,13 +62,21 @@ public class CreoleParser {
 			final StripeTree tree = (StripeTree) lastStripe;
 			tree.analyzeAndAdd(line);
 			return null;
-		} else if (line.startsWith("|=") && line.endsWith("|")) {
+		} else if (isTableLine(line)) {
 			return new StripeTable(fontConfiguration, skinParam, line);
 		} else if (isTreeStart(line)) {
 			return new StripeTree(fontConfiguration, skinParam, line);
 		}
 		return new CreoleStripeSimpleParser(line, context, fontConfiguration, skinParam, modeSimpleLine)
 				.createStripe(context);
+	}
+
+	private static boolean isTableLine(String line) {
+		return line.matches("^(\\<#\\w+\\>)?\\|(\\=)?.*\\|$");
+	}
+
+	public static boolean doesStartByColor(String line) {
+		return line.matches("^(\\<#\\w+\\>).*");
 	}
 
 	public static boolean isTreeStart(String line) {
@@ -75,7 +86,7 @@ public class CreoleParser {
 
 	public Sheet createSheet(Display display) {
 		final Sheet sheet = new Sheet(horizontalAlignment);
-		if (display != null) {
+		if (Display.isNull(display) == false) {
 			final CreoleContext context = new CreoleContext();
 			for (CharSequence cs : display) {
 				final Stripe stripe;

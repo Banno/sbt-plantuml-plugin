@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -32,6 +32,7 @@ import net.sourceforge.plantuml.command.regex.RegexConcat;
 import net.sourceforge.plantuml.command.regex.RegexLeaf;
 import net.sourceforge.plantuml.command.regex.RegexResult;
 import net.sourceforge.plantuml.graphic.HtmlColor;
+import net.sourceforge.plantuml.graphic.HtmlColorAndStyle;
 
 public class CommandLink3 extends SingleLineCommand2<ActivityDiagram3> {
 
@@ -51,7 +52,7 @@ public class CommandLink3 extends SingleLineCommand2<ActivityDiagram3> {
 	protected CommandExecutionResult executeArg(ActivityDiagram3 diagram, RegexResult arg) {
 		final HtmlColor color = diagram.getSkinParam().getIHtmlColorSet().getColorIfValid(arg.get("COLOR", 0));
 		if (color != null) {
-			diagram.setColorNextArrow(color);
+			diagram.setColorNextArrow(HtmlColorAndStyle.fromColor(color));
 		}
 		return CommandExecutionResult.ok();
 	}

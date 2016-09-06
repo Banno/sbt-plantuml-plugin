@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -35,6 +35,7 @@ public enum ComponentType {
 	CONTROL_HEAD, CONTROL_TAIL,
 	ENTITY_HEAD, ENTITY_TAIL,
 	DATABASE_HEAD, DATABASE_TAIL,
+	COLLECTIONS_HEAD, COLLECTIONS_TAIL,
 
 	//
 	ALIVE_BOX_CLOSE_CLOSE, ALIVE_BOX_CLOSE_OPEN, ALIVE_BOX_OPEN_CLOSE, ALIVE_BOX_OPEN_OPEN,

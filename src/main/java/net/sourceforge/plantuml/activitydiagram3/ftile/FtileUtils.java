@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -52,11 +52,29 @@ public class FtileUtils {
 		return new FtileMargedVertically(ftile, marginTop, marginBottom);
 	}
 
-	private static Ftile neverNull(Ftile ftile) {
-		if (ftile == null) {
-			return new FtileEmpty(false);
+	public static Ftile addHorizontalMargin(Ftile ftile, double margin1, double margin2) {
+		if (margin1 == 0 && margin2 == 0) {
+			return ftile;
 		}
-		return ftile;
+		return new FtileMarged(ftile, margin1, margin2);
 	}
+
+	public static Ftile addHorizontalMargin(Ftile ftile, double margin) {
+		if (margin == 0) {
+			return ftile;
+		}
+		return new FtileMarged(ftile, margin, margin);
+	}
+
+	// public static Ftile addHorizontalMargin(Ftile ftile, double margin) {
+	// return new FtileMarged(ftile, margin);
+	// }
+
+	// private static Ftile neverNull(Ftile ftile, ISkinParam skinParam) {
+	// if (ftile == null) {
+	// return new FtileEmpty(skinParam);
+	// }
+	// return ftile;
+	// }
 
 }

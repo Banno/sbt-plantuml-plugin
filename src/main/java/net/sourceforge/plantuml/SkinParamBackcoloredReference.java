@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -40,6 +40,7 @@ public class SkinParamBackcoloredReference extends SkinParamDelegator {
 		this.sequenceReferenceHeaderBackground = sequenceReferenceHeaderBackground;
 	}
 
+	@Override
 	public HtmlColor getHtmlColor(ColorParam param, Stereotype stereotype, boolean clickable) {
 		if (param == ColorParam.sequenceReferenceHeaderBackground && sequenceReferenceHeaderBackground != null) {
 			return sequenceReferenceHeaderBackground;

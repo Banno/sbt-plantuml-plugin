@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -25,8 +25,7 @@
  */
 package net.sourceforge.plantuml.ugraphic.svg;
 
-import java.awt.geom.Point2D;
-
+import net.sourceforge.plantuml.StringUtils;
 import net.sourceforge.plantuml.graphic.HtmlColor;
 import net.sourceforge.plantuml.graphic.HtmlColorGradient;
 import net.sourceforge.plantuml.svg.SvgGraphics;
@@ -37,7 +36,6 @@ import net.sourceforge.plantuml.ugraphic.UDriver;
 import net.sourceforge.plantuml.ugraphic.UParam;
 import net.sourceforge.plantuml.ugraphic.UPolygon;
 import net.sourceforge.plantuml.ugraphic.UShape;
-import net.sourceforge.plantuml.StringUtils;
 
 public class DriverPolygonSvg implements UDriver<SvgGraphics> {
 

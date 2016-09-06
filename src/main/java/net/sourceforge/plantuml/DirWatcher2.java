@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -28,7 +28,6 @@ package net.sourceforge.plantuml;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -41,6 +40,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import net.sourceforge.plantuml.preproc.Defines;
+import net.sourceforge.plantuml.preproc.FileWithSuffix;
 
 public class DirWatcher2 {
 
@@ -82,7 +82,7 @@ public class DirWatcher2 {
 									try {
 										final List<GeneratedImage> generatedImages = sourceFileReader
 												.getGeneratedImages();
-										final Set<File> files = new HashSet<File>(sourceFileReader.getIncludedFiles());
+										final Set<File> files = FileWithSuffix.convert(sourceFileReader.getIncludedFiles());
 										files.add(f);
 										modifieds.put(f, new FileWatcher(files));
 										return Collections.unmodifiableList(generatedImages);

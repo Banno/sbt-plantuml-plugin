@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -27,30 +27,22 @@ package net.sourceforge.plantuml.activitydiagram3.ftile.vcompact;
 
 import java.awt.geom.Point2D;
 
-import net.sourceforge.plantuml.FontParam;
-import net.sourceforge.plantuml.ISkinParam;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Ftile;
 import net.sourceforge.plantuml.activitydiagram3.ftile.FtileFactory;
 import net.sourceforge.plantuml.activitydiagram3.ftile.FtileFactoryDelegator;
 import net.sourceforge.plantuml.activitydiagram3.ftile.FtileGeometry;
-import net.sourceforge.plantuml.activitydiagram3.ftile.FtileMargedVertically;
-import net.sourceforge.plantuml.activitydiagram3.ftile.FtileMinWidth;
+import net.sourceforge.plantuml.activitydiagram3.ftile.FtileMargedRight;
 import net.sourceforge.plantuml.activitydiagram3.ftile.FtileUtils;
-import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.graphic.FontConfiguration;
-import net.sourceforge.plantuml.graphic.HorizontalAlignment;
-import net.sourceforge.plantuml.graphic.HtmlColor;
+import net.sourceforge.plantuml.graphic.Rainbow;
 import net.sourceforge.plantuml.graphic.StringBounder;
 import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.graphic.TextBlockUtils;
 import net.sourceforge.plantuml.skin.rose.Rose;
-import net.sourceforge.plantuml.ugraphic.UFont;
 import net.sourceforge.plantuml.ugraphic.UTranslate;
 
 public class FtileFactoryDelegatorAssembly extends FtileFactoryDelegator {
 
-	public FtileFactoryDelegatorAssembly(FtileFactory factory, ISkinParam skinParam) {
-		super(factory, skinParam);
+	public FtileFactoryDelegatorAssembly(FtileFactory factory) {
+		super(factory);
 	}
 
 	@Override
@@ -73,35 +65,29 @@ public class FtileFactoryDelegatorAssembly extends FtileFactoryDelegator {
 		final UTranslate translate2 = result.getTranslateFor(tile2, stringBounder);
 		final Point2D p2 = tile2.calculateDimension(stringBounder).translate(translate2).getPointIn();
 
-		final HtmlColor color = getInLinkRenderingColor(tile2);
+		final Rainbow color = getInLinkRenderingColor(tile2);
 
 		final ConnectionVerticalDown connection = new ConnectionVerticalDown(tile1, tile2, p1, p2, color, textBlock);
 		result = FtileUtils.addConnection(result, connection);
 		if (textBlock != null) {
-			final double width = result.calculateDimension(stringBounder).getWidth();
+			final FtileGeometry dim = result.calculateDimension(stringBounder);
+			final double width = dim.getWidth();
 			// System.err.println("width=" + width);
 			// System.err.println("p1=" + p1);
 			// System.err.println("p2=" + p2);
 			final double maxX = connection.getMaxX(stringBounder);
+			// System.err.println("FtileFactoryDelegatorAssembly dim=" + dim);
 			// System.err.println("maxX=" + maxX);
 			final double needed = (maxX - width) * 2;
-			result = new FtileMinWidth(result, needed);
+			// result = new FtileMinWidth(result, needed);
+			if (width < maxX) {
+				result = new FtileMargedRight(result, maxX);
+			}
+			// System.err.println("FtileFactoryDelegatorAssembly result=" + result.calculateDimension(stringBounder));
 		}
 		return result;
 	}
 
 	private final Rose rose = new Rose();
 
-	private TextBlock getTextBlock(Display display) {
-		// DUP1433
-		if (display == null) {
-			return null;
-		}
-		final ISkinParam skinParam = getSkinParam();
-		final UFont font = skinParam.getFont(FontParam.ACTIVITY_ARROW, null, false);
-		final HtmlColor color = rose.getFontColor(skinParam, FontParam.ACTIVITY_ARROW);
-		final FontConfiguration fontConfiguration = new FontConfiguration(font, color, skinParam.getHyperlinkColor(),
-				skinParam.useUnderlineForHyperlink());
-		return TextBlockUtils.create(display, fontConfiguration, HorizontalAlignment.LEFT, null, true);
-	}
 }

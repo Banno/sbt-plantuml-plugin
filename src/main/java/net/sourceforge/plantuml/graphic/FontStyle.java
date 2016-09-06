@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -27,8 +27,8 @@ package net.sourceforge.plantuml.graphic;
 
 import java.awt.Font;
 import java.util.EnumSet;
-import java.util.regex.Matcher;
 
+import net.sourceforge.plantuml.command.regex.Matcher2;
 import net.sourceforge.plantuml.command.regex.MyPattern;
 import net.sourceforge.plantuml.ugraphic.UFont;
 
@@ -104,7 +104,7 @@ public enum FontStyle {
 	}
 
 	public HtmlColor getExtendedColor(String s) {
-		final Matcher m = MyPattern.cmpile(getActivationPattern()).matcher(s);
+		final Matcher2 m = MyPattern.cmpile(getActivationPattern()).matcher(s);
 		if (m.find() == false || m.groupCount() != 1) {
 			return null;
 		}

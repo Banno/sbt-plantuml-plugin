@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -28,8 +28,10 @@ package net.sourceforge.plantuml;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import net.sourceforge.plantuml.command.BlocLines;
 import net.sourceforge.plantuml.command.Command;
 import net.sourceforge.plantuml.command.CommandExecutionResult;
 import net.sourceforge.plantuml.core.Diagram;
@@ -57,7 +59,11 @@ public class NewpagedDiagram extends AbstractPSystem {
 		return super.toString() + " SIZE=" + diagrams.size() + " " + diagrams;
 	}
 
-	public CommandExecutionResult executeCommand(Command cmd, List<String> lines) {
+	public Diagram getLastDiagram() {
+		return diagrams.get(diagrams.size() - 1);
+	}
+
+	public CommandExecutionResult executeCommand(Command cmd, BlocLines lines) {
 		final int nb = diagrams.size();
 		final CommandExecutionResult tmp = cmd.execute(diagrams.get(nb - 1), lines);
 		if (tmp.getNewDiagram() instanceof NewpagedDiagram) {
@@ -110,7 +116,12 @@ public class NewpagedDiagram extends AbstractPSystem {
 			if (sb.length() > 0) {
 				sb.append(" ");
 			}
-			sb.append(d.getWarningOrError());
+			if (d.getWarningOrError() != null) {
+				sb.append(d.getWarningOrError());
+			}
+		}
+		if (sb.length() == 0) {
+			return null;
 		}
 		return sb.toString();
 	}
@@ -121,6 +132,21 @@ public class NewpagedDiagram extends AbstractPSystem {
 		for (Diagram diagram : diagrams) {
 			((AbstractPSystem) diagram).makeDiagramReady();
 		}
+	}
+
+	@Override
+	public String checkFinalError() {
+		for (Diagram p : getDiagrams()) {
+			final String check = ((AbstractPSystem) p).checkFinalError();
+			if (check != null) {
+				return check;
+			}
+		}
+		return super.checkFinalError();
+	}
+
+	public final List<Diagram> getDiagrams() {
+		return Collections.unmodifiableList(diagrams);
 	}
 
 }

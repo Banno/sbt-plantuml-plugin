@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -509,6 +509,9 @@ public class EpsGraphics {
 	}
 
 	protected void appendColor(Color c) {
+		if (c == null) {
+			return;
+		}
 		final double r = c.getRed() / 255.0;
 		final double g = c.getGreen() / 255.0;
 		final double b = c.getBlue() / 255.0;
@@ -516,6 +519,9 @@ public class EpsGraphics {
 	}
 
 	protected void appendColorShort(Color c) {
+		if (c == null) {
+			return;
+		}
 		final double r = c.getRed() / 255.0;
 		final double g = c.getGreen() / 255.0;
 		final double b = c.getBlue() / 255.0;

@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -25,17 +25,15 @@
  */
 package net.sourceforge.plantuml.command;
 
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import net.sourceforge.plantuml.StringUtils;
+import net.sourceforge.plantuml.command.regex.Matcher2;
 import net.sourceforge.plantuml.command.regex.MyPattern;
+import net.sourceforge.plantuml.command.regex.Pattern2;
 import net.sourceforge.plantuml.core.Diagram;
 
 public abstract class CommandMultilinesBracket<S extends Diagram> implements Command<S> {
 
-	private final Pattern starting;
+	private final Pattern2 starting;
 
 	public CommandMultilinesBracket(String patternStart) {
 		if (patternStart.startsWith("(?i)^") == false || patternStart.endsWith("$") == false) {
@@ -55,15 +53,15 @@ public abstract class CommandMultilinesBracket<S extends Diagram> implements Com
 	protected void actionIfCommandValid() {
 	}
 
-	protected final Pattern getStartingPattern() {
+	protected final Pattern2 getStartingPattern() {
 		return starting;
 	}
 
-	final public CommandControl isValid(List<String> lines) {
+	final public CommandControl isValid(BlocLines lines) {
 		if (isCommandForbidden()) {
 			return CommandControl.NOT_OK;
 		}
-		final Matcher m1 = starting.matcher(StringUtils.trin(lines.get(0)));
+		final Matcher2 m1 = starting.matcher(StringUtils.trin(lines.getFirst499()));
 		if (m1.matches() == false) {
 			return CommandControl.NOT_OK;
 		}
@@ -72,8 +70,8 @@ public abstract class CommandMultilinesBracket<S extends Diagram> implements Com
 		}
 
 		int level = 1;
-		for (int i = 1; i < lines.size(); i++) {
-			final String s = StringUtils.trin(lines.get(i));
+		for (CharSequence cs : lines.subExtract(1, 0)) {
+			final String s = StringUtils.trin(cs);
 			if (isLineConsistent(s, level) == false) {
 				return CommandControl.NOT_OK;
 			}

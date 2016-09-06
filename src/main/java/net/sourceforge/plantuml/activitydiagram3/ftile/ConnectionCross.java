@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -43,10 +43,12 @@ public class ConnectionCross extends AbstractConnection {
 			final Swimlane swimlane1 = getFtile1().getSwimlaneOut();
 			final Swimlane swimlane2 = getFtile2().getSwimlaneIn();
 			if (swimlane1 == null) {
-				throw new IllegalStateException("" + getFtile1().getClass());
+				return;
+				// throw new IllegalStateException("" + getFtile1().getClass());
 			}
 			if (swimlane2 == null) {
-				throw new IllegalStateException("" + getFtile2().getClass());
+				return;
+				// throw new IllegalStateException("" + getFtile2().getClass());
 			}
 			conn.drawTranslate(ug, swimlane1.getTranslate(), swimlane2.getTranslate());
 		}

@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -35,7 +35,6 @@ import net.sourceforge.plantuml.graphic.HtmlColor;
 import net.sourceforge.plantuml.graphic.StringBounder;
 import net.sourceforge.plantuml.graphic.SymbolContext;
 import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.graphic.TextBlockUtils;
 import net.sourceforge.plantuml.skin.AbstractTextualComponent;
 import net.sourceforge.plantuml.skin.Area;
 import net.sourceforge.plantuml.ugraphic.UGraphic;
@@ -62,8 +61,7 @@ public class ComponentRoseReference extends AbstractTextualComponent {
 		this.symbolContext = symbolContext;
 		this.background = background;
 
-		this.textHeader = TextBlockUtils.create(stringsToDisplay.subList(0, 1), header, HorizontalAlignment.LEFT,
-				spriteContainer);
+		this.textHeader = stringsToDisplay.subList(0, 1).create(header, HorizontalAlignment.LEFT, spriteContainer);
 
 	}
 

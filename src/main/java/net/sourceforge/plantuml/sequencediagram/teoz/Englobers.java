@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -29,6 +29,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sourceforge.plantuml.graphic.StringBounder;
+import net.sourceforge.plantuml.real.Real;
+import net.sourceforge.plantuml.real.RealUtils;
 import net.sourceforge.plantuml.sequencediagram.Englober;
 import net.sourceforge.plantuml.sequencediagram.Participant;
 import net.sourceforge.plantuml.sequencediagram.ParticipantEnglober;
@@ -57,6 +59,10 @@ public class Englobers {
 		}
 	}
 
+	public int size() {
+		return englobers.size();
+	}
+
 	public double getOffsetForEnglobers(StringBounder stringBounder) {
 		double result = 0;
 		for (Englober englober : englobers) {
@@ -72,7 +78,6 @@ public class Englobers {
 		Englober last = null;
 		for (Englober current : englobers) {
 			current.addInternalConstraints();
-
 			if (last != null) {
 				last.addConstraintAfter(current);
 			}
@@ -84,6 +89,28 @@ public class Englobers {
 		for (Englober englober : englobers) {
 			englober.drawEnglober(ug, height, context);
 		}
+	}
+
+	public Real getMinX(StringBounder stringBounder) {
+		if (size() == 0) {
+			throw new IllegalStateException();
+		}
+		final List<Real> all = new ArrayList<Real>();
+		for (Englober englober : englobers) {
+			all.add(englober.getMinX(stringBounder));
+		}
+		return RealUtils.min(all);
+	}
+
+	public Real getMaxX(StringBounder stringBounder) {
+		if (size() == 0) {
+			throw new IllegalStateException();
+		}
+		final List<Real> all = new ArrayList<Real>();
+		for (Englober englober : englobers) {
+			all.add(englober.getMaxX(stringBounder));
+		}
+		return RealUtils.max(all);
 	}
 
 }

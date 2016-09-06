@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -35,6 +35,7 @@ import net.sourceforge.plantuml.classdiagram.ClassDiagram;
 import net.sourceforge.plantuml.command.CommandExecutionResult;
 import net.sourceforge.plantuml.command.SingleLineCommand;
 import net.sourceforge.plantuml.cucadiagram.Code;
+import net.sourceforge.plantuml.cucadiagram.Display;
 import net.sourceforge.plantuml.cucadiagram.IEntity;
 import net.sourceforge.plantuml.cucadiagram.Link;
 import net.sourceforge.plantuml.cucadiagram.LinkDecor;
@@ -88,7 +89,7 @@ public class CommandImport extends SingleLineCommand<ClassDiagram> {
 
 			for (String p : cl.getParents()) {
 				final IEntity ent2 = classDiagram.getOrCreateLeaf(Code.of(p), cl.getParentType(), null);
-				final Link link = new Link(ent2, ent1, new LinkType(LinkDecor.NONE, LinkDecor.EXTENDS), null, 2);
+				final Link link = new Link(ent2, ent1, new LinkType(LinkDecor.NONE, LinkDecor.EXTENDS), Display.NULL, 2);
 				classDiagram.addLink(link);
 			}
 		}

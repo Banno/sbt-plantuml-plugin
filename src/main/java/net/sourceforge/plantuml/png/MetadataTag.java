@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -27,6 +27,7 @@ package net.sourceforge.plantuml.png;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Iterator;
 
 import javax.imageio.ImageIO;
@@ -39,16 +40,21 @@ import org.w3c.dom.Node;
 
 public class MetadataTag {
 
-	private final File f;
+	private final Object source;
 	private final String tag;
 
-	public MetadataTag(File f, String tag) {
-		this.f = f;
+	public MetadataTag(File file, String tag) {
+		this.source = file;
+		this.tag = tag;
+	}
+
+	public MetadataTag(InputStream is, String tag) {
+		this.source = is;
 		this.tag = tag;
 	}
 
 	public String getData() throws IOException {
-		final ImageInputStream iis = ImageIO.createImageInputStream(f);
+		final ImageInputStream iis = ImageIO.createImageInputStream(source);
 		final Iterator<ImageReader> readers = ImageIO.getImageReaders(iis);
 
 		if (readers.hasNext()) {

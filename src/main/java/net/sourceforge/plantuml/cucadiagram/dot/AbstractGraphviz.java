@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -30,6 +30,7 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
 
+import net.sourceforge.plantuml.ISkinParam;
 import net.sourceforge.plantuml.Log;
 import net.sourceforge.plantuml.OptionFlags;
 import net.sourceforge.plantuml.StringUtils;
@@ -39,31 +40,31 @@ abstract class AbstractGraphviz implements Graphviz {
 	private final File dotExe;
 	private final String dotString;
 	private final String[] type;
+	private final ISkinParam skinParam;
 
 	static boolean isWindows() {
 		return File.separatorChar == '\\';
 	}
 
-	AbstractGraphviz(String dotString, String... type) {
+	AbstractGraphviz(ISkinParam skinParam, String dotString, String... type) {
 		if (type == null) {
 			throw new IllegalArgumentException();
 		}
+		this.skinParam = skinParam;
 		this.dotExe = searchDotExe();
 		this.dotString = dotString;
 		this.type = type;
 	}
 
 	private File searchDotExe() {
-		if (OptionFlags.getInstance().getDotExecutable() == null) {
+		if (skinParam == null || skinParam.getDotExecutable() == null) {
 			final String getenv = GraphvizUtils.getenvGraphvizDot();
 			if (getenv == null) {
 				return specificDotExe();
 			}
 			return new File(getenv);
 		}
-
-		return new File(OptionFlags.getInstance().getDotExecutable());
-
+		return new File(skinParam.getDotExecutable());
 	}
 
 	abstract protected File specificDotExe();
@@ -73,7 +74,7 @@ abstract class AbstractGraphviz implements Graphviz {
 			throw new IllegalArgumentException();
 		}
 
-		if (illegalDotExe()) {
+		if (getExeState() != ExeState.OK) {
 			// createPngNoGraphviz(os, new FileFormatOption(FileFormat.valueOf(type[0].goUpperCase())));
 			throw new IllegalStateException();
 		}
@@ -114,8 +115,8 @@ abstract class AbstractGraphviz implements Graphviz {
 		return state;
 	}
 
-	public boolean illegalDotExe() {
-		return dotExe == null || dotExe.isFile() == false || dotExe.canRead() == false;
+	final public ExeState getExeState() {
+		return ExeState.checkFile(dotExe);
 	}
 
 	final public String dotVersion() {

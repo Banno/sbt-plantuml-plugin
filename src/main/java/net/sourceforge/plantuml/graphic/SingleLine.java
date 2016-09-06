@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -32,9 +32,9 @@ import java.util.List;
 import net.sourceforge.plantuml.Dimension2DDouble;
 import net.sourceforge.plantuml.SpriteContainer;
 import net.sourceforge.plantuml.Url;
-import net.sourceforge.plantuml.ugraphic.Sprite;
 import net.sourceforge.plantuml.ugraphic.UGraphic;
 import net.sourceforge.plantuml.ugraphic.UTranslate;
+import net.sourceforge.plantuml.ugraphic.sprite.Sprite;
 
 class SingleLine extends AbstractTextBlock implements Line {
 
@@ -63,7 +63,7 @@ class SingleLine extends AbstractTextBlock implements Line {
 			} else if (cmd instanceof SpriteCommand) {
 				final Sprite sprite = spriteContainer.getSprite(((SpriteCommand) cmd).getSprite());
 				if (sprite != null) {
-					blocs.add(sprite.asTextBlock(fontConfiguration.getColor()));
+					blocs.add(sprite.asTextBlock(fontConfiguration.getColor(), 1));
 				}
 			} else if (cmd instanceof FontChange) {
 				fontConfiguration = ((FontChange) cmd).apply(fontConfiguration);

@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -31,6 +31,7 @@ import net.sourceforge.plantuml.EnsureVisible;
 import net.sourceforge.plantuml.ugraphic.ColorMapper;
 import net.sourceforge.plantuml.ugraphic.UDriver;
 import net.sourceforge.plantuml.ugraphic.UImage;
+import net.sourceforge.plantuml.ugraphic.UImageSvg;
 import net.sourceforge.plantuml.ugraphic.UParam;
 import net.sourceforge.plantuml.ugraphic.UShape;
 
@@ -43,6 +44,9 @@ public class DriverImageG2d implements UDriver<Graphics2D> {
 	}
 
 	public void draw(UShape ushape, double x, double y, ColorMapper mapper, UParam param, Graphics2D g2d) {
+		if (ushape instanceof UImageSvg) {
+			return;
+		}
 		final UImage shape = (UImage) ushape;
 		visible.ensureVisible(x, y);
 		visible.ensureVisible(x + shape.getWidth(), y + shape.getHeight());

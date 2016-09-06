@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -34,40 +34,68 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sourceforge.plantuml.ISkinParam;
+import net.sourceforge.plantuml.Log;
 import net.sourceforge.plantuml.StringUtils;
+import net.sourceforge.plantuml.vizjs.GraphvizJs;
+import net.sourceforge.plantuml.vizjs.VizJsEngine;
 
 public class GraphvizUtils {
 
+	private static final String VIZJS = "vizjs";
 	private static int DOT_VERSION_LIMIT = 226;
 
 	private static boolean isWindows() {
 		return File.separatorChar == '\\';
 	}
 
-	@Deprecated
-	public static Graphviz create(String dotString, String... type) {
+	private static String dotExecutable;
+
+	public static final String getDotExecutableForTest() {
+		return dotExecutable;
+	}
+
+	public static final void setDotExecutable(String value) {
+		dotExecutable = value;
+	}
+
+	public static Graphviz create(ISkinParam skinParam, String dotString, String... type) {
+		if (useVizJs(skinParam)) {
+			Log.info("Using " + VIZJS);
+			return new GraphvizJs(dotString);
+		}
 		final AbstractGraphviz result;
 		if (isWindows()) {
-			result = new GraphvizWindows(dotString, type);
+			result = new GraphvizWindows(skinParam, dotString, type);
 		} else {
-			result = new GraphvizLinux(dotString, type);
+			result = new GraphvizLinux(skinParam, dotString, type);
 		}
-		// if (OptionFlags.GRAPHVIZCACHE) {
-		// return new GraphvizCached(result);
-		// }
+		if (result.getExeState() != ExeState.OK && VizJsEngine.isOk()) {
+			Log.info("Error with file " + result.getDotExe() + ": " + result.getExeState().getTextMessage());
+			Log.info("Using " + VIZJS);
+			return new GraphvizJs(dotString);
+		}
 		return result;
 	}
 
-	// public static Graphviz create2(GraphvizLayoutStrategy strategy, String
-	// dotString, String... type) {
-	// return new AbstractGraphviz2(getOS(), strategy, dotString, type);
-	// }
+	private static boolean useVizJs(ISkinParam skinParam) {
+		if (skinParam != null && VIZJS.equalsIgnoreCase(skinParam.getDotExecutable()) && VizJsEngine.isOk()) {
+			return true;
+		}
+		if (VIZJS.equalsIgnoreCase(getenvGraphvizDot()) && VizJsEngine.isOk()) {
+			return true;
+		}
+		return false;
+	}
 
 	static public File getDotExe() {
 		return create(null, "png").getDotExe();
 	}
 
 	public static String getenvGraphvizDot() {
+		if (StringUtils.isNotEmpty(dotExecutable)) {
+			return StringUtils.eventuallyRemoveStartingAndEndingDoubleQuote(dotExecutable);
+		}
 		final String env = System.getProperty("GRAPHVIZ_DOT");
 		if (StringUtils.isNotEmpty(env)) {
 			return StringUtils.eventuallyRemoveStartingAndEndingDoubleQuote(env);
@@ -77,6 +105,18 @@ public class GraphvizUtils {
 			return StringUtils.eventuallyRemoveStartingAndEndingDoubleQuote(getenv);
 		}
 		return null;
+	}
+
+	public static int getenvImageLimit() {
+		final String env = System.getProperty("PLANTUML_LIMIT_SIZE");
+		if (StringUtils.isNotEmpty(env) && env.matches("\\d+")) {
+			return Integer.parseInt(env);
+		}
+		final String getenv = System.getenv("PLANTUML_LIMIT_SIZE");
+		if (StringUtils.isNotEmpty(getenv) && getenv.matches("\\d+")) {
+			return Integer.parseInt(getenv);
+		}
+		return 4096;
 	}
 
 	public static String getenvLogData() {
@@ -91,16 +131,12 @@ public class GraphvizUtils {
 
 	public static String dotVersion() throws IOException, InterruptedException {
 		if (dotVersion == null) {
-			if (GraphvizUtils.getDotExe() == null) {
-				dotVersion = "Error: Dot not installed";
-			} else if (GraphvizUtils.getDotExe().exists() == false) {
-				dotVersion = "Error: " + GraphvizUtils.getDotExe().getAbsolutePath() + " does not exist";
-			} else if (GraphvizUtils.getDotExe().isFile() == false) {
-				dotVersion = "Error: " + GraphvizUtils.getDotExe().getAbsolutePath() + " is not a file";
-			} else if (GraphvizUtils.getDotExe().canRead() == false) {
-				dotVersion = "Error: " + GraphvizUtils.getDotExe().getAbsolutePath() + " cannot be read";
-			} else {
+			final File dotExe = GraphvizUtils.getDotExe();
+			final ExeState exeState = ExeState.checkFile(dotExe);
+			if (exeState == ExeState.OK) {
 				dotVersion = create(null, "png").dotVersion();
+			} else {
+				dotVersion = "Error:" + exeState.getTextMessage(dotExe);
 			}
 		}
 		return dotVersion;
@@ -129,7 +165,24 @@ public class GraphvizUtils {
 			red = "<b><color:red>";
 			bold = "<b>";
 		}
+
 		final List<String> result = new ArrayList<String>();
+		if (useVizJs(null)) {
+			result.add("VizJs library is used!");
+			try {
+				final String err = getTestCreateSimpleFile();
+				if (err == null) {
+					result.add(bold + "Installation seems OK. File generation OK");
+				} else {
+					result.add(red + err);
+				}
+			} catch (Exception e) {
+				result.add(red + e.toString());
+				e.printStackTrace();
+			}
+			return Collections.unmodifiableList(result);
+		}
+
 		final String ent = GraphvizUtils.getenvGraphvizDot();
 		if (ent == null) {
 			result.add("The environment variable GRAPHVIZ_DOT has not been set");
@@ -139,22 +192,9 @@ public class GraphvizUtils {
 		final File dotExe = GraphvizUtils.getDotExe();
 		result.add("Dot executable is " + dotExe);
 
-		boolean ok = true;
-		if (dotExe == null) {
-			result.add(red + "Error: No dot executable found");
-			ok = false;
-		} else if (dotExe.exists() == false) {
-			result.add(red + "Error: file does not exist");
-			ok = false;
-		} else if (dotExe.isFile() == false) {
-			result.add(red + "Error: not a valid file");
-			ok = false;
-		} else if (dotExe.canRead() == false) {
-			result.add(red + "Error: cannot be read");
-			ok = false;
-		}
+		final ExeState exeState = ExeState.checkFile(dotExe);
 
-		if (ok) {
+		if (exeState == ExeState.OK) {
 			try {
 				final String version = GraphvizUtils.dotVersion();
 				result.add("Dot version: " + version);
@@ -177,6 +217,7 @@ public class GraphvizUtils {
 				e.printStackTrace();
 			}
 		} else {
+			result.add(red + "Error: " + exeState.getTextMessage());
 			result.add("Error: only sequence diagrams will be generated");
 		}
 
@@ -184,7 +225,7 @@ public class GraphvizUtils {
 	}
 
 	static String getTestCreateSimpleFile() throws IOException {
-		final Graphviz graphviz2 = GraphvizUtils.create("digraph foo { test; }", "svg");
+		final Graphviz graphviz2 = GraphvizUtils.create(null, "digraph foo { test; }", "svg");
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		final ProcessState state = graphviz2.createFile3(baos);
 		if (state.differs(ProcessState.TERMINATED_OK())) {
@@ -202,12 +243,5 @@ public class GraphvizUtils {
 		}
 		return null;
 	}
-
-	// public static OS getOS() {
-	// if (isWindows()) {
-	// return new OSWindows();
-	// }
-	// return new OSLinux();
-	// }
 
 }

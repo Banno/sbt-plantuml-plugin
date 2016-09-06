@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -36,6 +36,7 @@ import net.sourceforge.plantuml.ugraphic.UTranslate;
 public class FtileMinWidth extends FtileDecorate {
 
 	private final double minWidth;
+	private FtileGeometry calculateDimensionInternal;
 
 	public FtileMinWidth(Ftile tile, double minWidth) {
 		super(tile);
@@ -50,6 +51,13 @@ public class FtileMinWidth extends FtileDecorate {
 
 	@Override
 	public FtileGeometry calculateDimension(StringBounder stringBounder) {
+		if (calculateDimensionInternal == null) {
+			calculateDimensionInternal = calculateDimensionSlow(stringBounder);
+		}
+		return calculateDimensionInternal;
+	}
+
+	private FtileGeometry calculateDimensionSlow(StringBounder stringBounder) {
 		final FtileGeometry geo = super.calculateDimension(stringBounder);
 		final double left = getPoint2(geo.getLeft(), stringBounder);
 		if (geo.hasPointOut() == false) {

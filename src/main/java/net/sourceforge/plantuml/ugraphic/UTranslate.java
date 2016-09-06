@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -59,6 +59,10 @@ public class UTranslate implements UChange {
 		return dy;
 	}
 
+	public boolean isAlmostSame(UTranslate other) {
+		return this.dx == other.dx || this.dy == other.dy;
+	}
+
 	public Point2D getTranslated(Point2D p) {
 		if (p == null) {
 			return null;
@@ -80,6 +84,10 @@ public class UTranslate implements UChange {
 
 	public Rectangle2D apply(Rectangle2D rect) {
 		return new Rectangle2D.Double(rect.getX() + dx, rect.getY() + dy, rect.getWidth(), rect.getHeight());
+	}
+
+	public UTranslate multiplyBy(double v) {
+		return new UTranslate(dx * v, dy * v);
 	}
 
 }

@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -40,7 +40,6 @@ import net.sourceforge.plantuml.graphic.HorizontalAlignment;
 import net.sourceforge.plantuml.graphic.HtmlColorUtils;
 import net.sourceforge.plantuml.graphic.StringBounder;
 import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.graphic.TextBlockUtils;
 import net.sourceforge.plantuml.ugraphic.UChangeColor;
 import net.sourceforge.plantuml.ugraphic.UEllipse;
 import net.sourceforge.plantuml.ugraphic.UFont;
@@ -54,7 +53,7 @@ public class Tile extends AbstractTextBlock implements TextBlock {
 	private final int num;
 
 	private final UFont numberFont = new UFont("Monospaced", Font.PLAIN, 11);
-	private final FontConfiguration fc = new FontConfiguration(numberFont, HtmlColorUtils.BLACK, HtmlColorUtils.BLUE, true);
+	private final FontConfiguration fc = FontConfiguration.blackBlueTrue(numberFont);
 	private final Map<TileGeometry, TileArea> geometries;
 
 	Tile(int num) {
@@ -72,8 +71,7 @@ public class Tile extends AbstractTextBlock implements TextBlock {
 
 	public void drawU(UGraphic ug) {
 		ug = ug.apply(new UChangeColor(HtmlColorUtils.BLACK));
-		final TextBlock n = TextBlockUtils.create(Display.create("" + num), fc, HorizontalAlignment.LEFT,
-				new SpriteContainerEmpty());
+		final TextBlock n = Display.create("" + num).create(fc, HorizontalAlignment.LEFT, new SpriteContainerEmpty());
 		final Dimension2D dimNum = n.calculateDimension(ug.getStringBounder());
 		final Dimension2D dimTotal = calculateDimension(ug.getStringBounder());
 		final double diffx = dimTotal.getWidth() - dimNum.getWidth();

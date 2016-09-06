@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -53,7 +53,7 @@ public class GraphicStrings extends AbstractTextBlock implements IEntityImage {
 	private final HtmlColor green;
 
 	private final HtmlColor hyperlinkColor = HtmlColorUtils.BLUE;
-	
+
 	private final boolean useUnderlineForHyperlink = true;
 
 	private final List<String> strings;
@@ -102,14 +102,15 @@ public class GraphicStrings extends AbstractTextBlock implements IEntityImage {
 	private TextBlock getTextBlock() {
 		TextBlock result = null;
 		if (maxLine == 0) {
-			result = TextBlockUtils.create(Display.create(strings), new FontConfiguration(font, green, hyperlinkColor, useUnderlineForHyperlink),
+			result = Display.create(strings).create(
+					new FontConfiguration(font, green, hyperlinkColor, useUnderlineForHyperlink),
 					HorizontalAlignment.LEFT, new SpriteContainerEmpty());
 		} else {
 			for (int i = 0; i < strings.size(); i += maxLine) {
 				final int n = Math.min(i + maxLine, strings.size());
-				final TextBlock textBlock1 = TextBlockUtils.create(Display.create(strings.subList(i, n)),
-						new FontConfiguration(font, green, hyperlinkColor, useUnderlineForHyperlink), HorizontalAlignment.LEFT,
-						new SpriteContainerEmpty());
+				final TextBlock textBlock1 = Display.create(strings.subList(i, n)).create(
+						new FontConfiguration(font, green, hyperlinkColor, useUnderlineForHyperlink),
+						HorizontalAlignment.LEFT, new SpriteContainerEmpty());
 				if (result == null) {
 					result = textBlock1;
 				} else {

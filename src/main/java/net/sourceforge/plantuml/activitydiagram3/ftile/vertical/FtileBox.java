@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -29,16 +29,17 @@ import java.awt.geom.Dimension2D;
 import java.util.Collections;
 import java.util.Set;
 
+import net.sourceforge.plantuml.ColorParam;
 import net.sourceforge.plantuml.Dimension2DDouble;
 import net.sourceforge.plantuml.FontParam;
 import net.sourceforge.plantuml.ISkinParam;
+import net.sourceforge.plantuml.SkinParamUtils;
 import net.sourceforge.plantuml.activitydiagram3.LinkRendering;
 import net.sourceforge.plantuml.activitydiagram3.ftile.AbstractFtile;
 import net.sourceforge.plantuml.activitydiagram3.ftile.BoxStyle;
-import net.sourceforge.plantuml.activitydiagram3.ftile.Ftile;
-import net.sourceforge.plantuml.activitydiagram3.ftile.FtileEmpty;
 import net.sourceforge.plantuml.activitydiagram3.ftile.FtileGeometry;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Swimlane;
+import net.sourceforge.plantuml.creole.CreoleMode;
 import net.sourceforge.plantuml.creole.CreoleParser;
 import net.sourceforge.plantuml.creole.Sheet;
 import net.sourceforge.plantuml.creole.SheetBlock1;
@@ -48,6 +49,7 @@ import net.sourceforge.plantuml.cucadiagram.Display;
 import net.sourceforge.plantuml.graphic.FontConfiguration;
 import net.sourceforge.plantuml.graphic.HorizontalAlignment;
 import net.sourceforge.plantuml.graphic.HtmlColor;
+import net.sourceforge.plantuml.graphic.HtmlColorAndStyle;
 import net.sourceforge.plantuml.graphic.StringBounder;
 import net.sourceforge.plantuml.graphic.TextBlock;
 import net.sourceforge.plantuml.graphic.UDrawable;
@@ -64,11 +66,10 @@ public class FtileBox extends AbstractFtile {
 
 	private final TextBlock tb;
 
-	private final HtmlColor borderColor;
-	private final HtmlColor backColor;
 	private final LinkRendering inRenreding;
 	private final Swimlane swimlane;
 	private final BoxStyle style;
+	private final ISkinParam skinParam;
 
 	final public LinkRendering getInLinkRendering() {
 		return inRenreding;
@@ -102,19 +103,15 @@ public class FtileBox extends AbstractFtile {
 
 	}
 
-	public FtileBox(boolean shadowing, Display label, HtmlColor color, HtmlColor backColor, UFont font,
-			HtmlColor arrowColor, Swimlane swimlane, BoxStyle style, ISkinParam skinParam) {
-		super(shadowing);
+	public FtileBox(ISkinParam skinParam, Display label, UFont font, Swimlane swimlane, BoxStyle style) {
+		super(skinParam);
 		this.style = style;
-		this.borderColor = color;
+		this.skinParam = skinParam;
 		this.swimlane = swimlane;
-		this.backColor = backColor;
-		this.inRenreding = new LinkRendering(arrowColor);
-		final HtmlColor fontColor = skinParam.getFontHtmlColor(FontParam.ACTIVITY, null);
-		final FontConfiguration fc = new FontConfiguration(font, fontColor, skinParam.getHyperlinkColor(),
-				skinParam.useUnderlineForHyperlink());
-
-		final Sheet sheet = new CreoleParser(fc, HorizontalAlignment.LEFT, skinParam, false).createSheet(label);
+		this.inRenreding = new LinkRendering(HtmlColorAndStyle.build(skinParam));
+		final FontConfiguration fc = new FontConfiguration(skinParam, FontParam.ACTIVITY, null);
+		final Sheet sheet = new CreoleParser(fc, skinParam.getDefaultTextAlignment(HorizontalAlignment.LEFT),
+				skinParam, CreoleMode.FULL).createSheet(label);
 		this.tb = new SheetBlock2(new SheetBlock1(sheet, 0, skinParam.getPadding()), new MyStencil(), new UStroke(1));
 		this.print = label.toString();
 	}
@@ -130,9 +127,12 @@ public class FtileBox extends AbstractFtile {
 		final Dimension2D dimTotal = calculateDimension(ug.getStringBounder());
 		final double widthTotal = dimTotal.getWidth();
 		final double heightTotal = dimTotal.getHeight();
-		final UDrawable rect = style.getUDrawable(widthTotal, heightTotal, shadowing());
+		final UDrawable rect = style.getUDrawable(widthTotal, heightTotal, skinParam().shadowing());
 
-		ug = ug.apply(new UChangeColor(borderColor)).apply(new UChangeBackColor(backColor)).apply(new UStroke(1.5));
+		final HtmlColor borderColor = SkinParamUtils.getColor(skinParam, ColorParam.activityBorder, null);
+		final HtmlColor backColor = SkinParamUtils.getColor(skinParam, ColorParam.activityBackground, null);
+
+		ug = ug.apply(new UChangeColor(borderColor)).apply(new UChangeBackColor(backColor)).apply(getThickness());
 		rect.drawU(ug);
 
 		tb.drawU(ug.apply(new UTranslate(MARGIN, MARGIN)));

@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -35,7 +35,8 @@ import net.sourceforge.plantuml.cucadiagram.GroupType;
 import net.sourceforge.plantuml.cucadiagram.IEntity;
 import net.sourceforge.plantuml.cucadiagram.IGroup;
 import net.sourceforge.plantuml.cucadiagram.Stereotype;
-import net.sourceforge.plantuml.graphic.HtmlColorUtils;
+import net.sourceforge.plantuml.graphic.color.ColorParser;
+import net.sourceforge.plantuml.graphic.color.ColorType;
 
 public class CommandNamespace extends SingleLineCommand2<ClassDiagram> {
 
@@ -45,11 +46,11 @@ public class CommandNamespace extends SingleLineCommand2<ClassDiagram> {
 
 	private static RegexConcat getRegexConcat() {
 		return new RegexConcat(new RegexLeaf("^namespace[%s]+"), //
-				new RegexLeaf("NAME", "([\\p{L}0-9_][\\p{L}0-9_.:]*)"), //
+				new RegexLeaf("NAME", "([\\p{L}0-9_][\\p{L}0-9_.:\\\\]*)"), //
 				new RegexLeaf("[%s]*"), //
 				new RegexLeaf("STEREOTYPE", "(\\<\\<.*\\>\\>)?"), //
 				new RegexLeaf("[%s]*"), //
-				new RegexLeaf("COLOR", "(" + HtmlColorUtils.COLOR_REGEXP + ")?"), //
+				ColorParser.exp1(), //
 				new RegexLeaf("[%s]*\\{$"));
 	}
 
@@ -65,7 +66,7 @@ public class CommandNamespace extends SingleLineCommand2<ClassDiagram> {
 		}
 		final String color = arg.get("COLOR", 0);
 		if (color != null) {
-			p.setSpecificBackcolor(diagram.getSkinParam().getIHtmlColorSet().getColorIfValid(color));
+			p.setSpecificColorTOBEREMOVED(ColorType.BACK, diagram.getSkinParam().getIHtmlColorSet().getColorIfValid(color));
 		}
 		return CommandExecutionResult.ok();
 	}

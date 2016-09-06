@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -25,10 +25,8 @@
  */
 package net.sourceforge.plantuml.command;
 
-import java.util.List;
-import java.util.regex.Matcher;
-
 import net.sourceforge.plantuml.StringUtils;
+import net.sourceforge.plantuml.command.regex.Matcher2;
 import net.sourceforge.plantuml.command.regex.MyPattern;
 import net.sourceforge.plantuml.command.regex.RegexConcat;
 import net.sourceforge.plantuml.core.Diagram;
@@ -53,12 +51,12 @@ public abstract class CommandMultilines2<S extends Diagram> implements Command<S
 		return new String[] { "START: " + starting.getPattern(), "END: " + getPatternEnd() };
 	}
 
-	final public CommandControl isValid(List<String> lines) {
-		lines = strategy.filter(lines);
+	final public CommandControl isValid(BlocLines lines) {
+		lines = lines.cleanList2(strategy);
 		if (isCommandForbidden()) {
 			return CommandControl.NOT_OK;
 		}
-		final boolean result1 = starting.match(StringUtils.trin(lines.get(0)));
+		final boolean result1 = starting.match(StringUtils.trin(lines.getFirst499()));
 		if (result1 == false) {
 			return CommandControl.NOT_OK;
 		}
@@ -66,7 +64,7 @@ public abstract class CommandMultilines2<S extends Diagram> implements Command<S
 			return CommandControl.OK_PARTIAL;
 		}
 
-		final Matcher m1 = MyPattern.cmpile(getPatternEnd()).matcher(StringUtils.trinNoTrace(lines.get(lines.size() - 1)));
+		final Matcher2 m1 = MyPattern.cmpile(getPatternEnd()).matcher(StringUtils.trinNoTrace(lines.getLast499()));
 		if (m1.matches() == false) {
 			return CommandControl.OK_PARTIAL;
 		}
@@ -75,11 +73,12 @@ public abstract class CommandMultilines2<S extends Diagram> implements Command<S
 		return CommandControl.OK;
 	}
 
-	public final CommandExecutionResult execute(S system, List<String> lines) {
-		return executeNow(system, strategy.filter(lines));
+	public final CommandExecutionResult execute(S system, BlocLines lines) {
+		lines = lines.cleanList2(strategy);
+		return executeNow(system, lines);
 	}
 
-	public abstract CommandExecutionResult executeNow(S system, List<String> lines);
+	public abstract CommandExecutionResult executeNow(S system, BlocLines lines);
 
 	protected boolean isCommandForbidden() {
 		return false;

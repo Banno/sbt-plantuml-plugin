@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -29,11 +29,11 @@ import java.awt.geom.Dimension2D;
 
 import net.sourceforge.plantuml.Dimension2DDouble;
 import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.SkinParamBackcolored;
 import net.sourceforge.plantuml.cucadiagram.Display;
 import net.sourceforge.plantuml.graphic.AbstractTextBlock;
 import net.sourceforge.plantuml.graphic.HtmlColor;
 import net.sourceforge.plantuml.graphic.StringBounder;
+import net.sourceforge.plantuml.graphic.color.Colors;
 import net.sourceforge.plantuml.skin.Area;
 import net.sourceforge.plantuml.skin.Component;
 import net.sourceforge.plantuml.skin.ComponentType;
@@ -47,9 +47,9 @@ public class EntityImageNoteLink extends AbstractTextBlock implements IEntityIma
 
 	private final Component comp;
 
-	public EntityImageNoteLink(Display note, HtmlColor htmlColor, ISkinParam skinParam) {
+	public EntityImageNoteLink(Display note, Colors colors, ISkinParam skinParam) {
 		final Rose skin = new Rose();
-		comp = skin.createComponent(ComponentType.NOTE, null, new SkinParamBackcolored(skinParam, htmlColor), note);
+		comp = skin.createComponent(ComponentType.NOTE, null, colors.mute(skinParam), note);
 	}
 
 	public Dimension2D calculateDimension(StringBounder stringBounder) {

@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -27,12 +27,16 @@ package net.sourceforge.plantuml.activitydiagram3;
 
 import java.util.Collection;
 
+import net.sourceforge.plantuml.ISkinParam;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Ftile;
 import net.sourceforge.plantuml.activitydiagram3.ftile.FtileFactory;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Swimlane;
 import net.sourceforge.plantuml.cucadiagram.Display;
 import net.sourceforge.plantuml.graphic.HtmlColor;
+import net.sourceforge.plantuml.graphic.Rainbow;
+import net.sourceforge.plantuml.graphic.color.Colors;
 import net.sourceforge.plantuml.sequencediagram.NotePosition;
+import net.sourceforge.plantuml.sequencediagram.NoteType;
 
 public class Branch {
 
@@ -40,16 +44,17 @@ public class Branch {
 	private final Display labelTest;
 	private final Display labelPositive;
 	private final HtmlColor color;
-
-	private LinkRendering inlinkRendering;
+	private LinkRendering inlinkRendering = LinkRendering.none();
 
 	private Ftile ftile;
 
-	public boolean isOnlySingleStop() {
-		return list.isOnlySingleStop();
-	}
-
 	public Branch(Swimlane swimlane, Display labelPositive, Display labelTest, HtmlColor color) {
+		if (labelPositive == null) {
+			throw new IllegalArgumentException();
+		}
+		if (labelTest == null) {
+			throw new IllegalArgumentException();
+		}
 		this.list = new InstructionList(swimlane);
 		this.labelTest = labelTest;
 		this.labelPositive = labelPositive;
@@ -64,11 +69,14 @@ public class Branch {
 		return list.kill();
 	}
 
-	public void addNote(Display note, NotePosition position) {
-		list.addNote(note, position);
+	public boolean addNote(Display note, NotePosition position, NoteType type, Colors colors) {
+		return list.addNote(note, position, type, colors);
 	}
 
 	public final void setInlinkRendering(LinkRendering inlinkRendering) {
+		if (inlinkRendering == null) {
+			throw new IllegalArgumentException();
+		}
 		this.inlinkRendering = inlinkRendering;
 	}
 
@@ -82,7 +90,7 @@ public class Branch {
 
 	public final Display getLabelPositive() {
 		final LinkRendering in = ftile.getInLinkRendering();
-		if (in != null && in.getDisplay() != null) {
+		if (in != null && Display.isNull(in.getDisplay()) == false) {
 			return in.getDisplay();
 		}
 		return labelPositive;
@@ -92,16 +100,16 @@ public class Branch {
 		return labelTest;
 	}
 
-	public final HtmlColor getInlinkRenderingColor() {
-		return inlinkRendering == null ? null : inlinkRendering.getColor();
+	public final Rainbow getInlinkRenderingColorAndStyle() {
+		return inlinkRendering == null ? null : inlinkRendering.getRainbow();
 	}
 
 	public final Ftile getFtile() {
 		return ftile;
 	}
 
-	public boolean shadowing() {
-		return ftile.shadowing();
+	public ISkinParam skinParam() {
+		return ftile.skinParam();
 	}
 
 	public final HtmlColor getColor() {
@@ -110,6 +118,14 @@ public class Branch {
 
 	public boolean isEmpty() {
 		return list.isEmpty();
+	}
+
+	public Instruction getLast() {
+		return list.getLast();
+	}
+
+	public boolean isOnlySingleStop() {
+		return list.isOnlySingleStop();
 	}
 
 }

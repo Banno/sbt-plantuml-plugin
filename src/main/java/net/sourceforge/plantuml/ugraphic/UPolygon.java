@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -33,17 +33,24 @@ import java.util.List;
 public class UPolygon extends AbstractShadowable {
 
 	private final List<Point2D.Double> all = new ArrayList<Point2D.Double>();
+	private final String name;
 
 	private MinMax minmax = MinMax.getEmpty(false);
 
 	public UPolygon() {
+		this((String) null);
 	}
 
 	public UPolygon(List<Point2D.Double> points) {
+		this((String) null);
 		all.addAll(points);
 		for (Point2D.Double pt : all) {
 			manageMinMax(pt.getX(), pt.getY());
 		}
+	}
+
+	public UPolygon(String name) {
+		this.name = name;
 	}
 
 	public void addPoint(double x, double y) {
@@ -76,6 +83,9 @@ public class UPolygon extends AbstractShadowable {
 
 	@Override
 	public String toString() {
+		if (name != null) {
+			return name;
+		}
 		return super.toString() + " " + all;
 	}
 

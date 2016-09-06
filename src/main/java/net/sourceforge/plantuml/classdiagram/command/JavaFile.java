@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -32,19 +32,19 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import net.sourceforge.plantuml.StringUtils;
+import net.sourceforge.plantuml.command.regex.Matcher2;
 import net.sourceforge.plantuml.command.regex.MyPattern;
+import net.sourceforge.plantuml.command.regex.Pattern2;
 import net.sourceforge.plantuml.cucadiagram.LeafType;
 
 class JavaFile {
 
-	private static final Pattern classDefinition = MyPattern
+	private static final Pattern2 classDefinition = MyPattern
 			.cmpile("^(?:public[%s]+|abstract[%s]+|final[%s]+)*(class|interface|enum|annotation)[%s]+(\\w+)(?:.*\\b(extends|implements)[%s]+([\\w%s,]+))?");
 
-	private static final Pattern packageDefinition = MyPattern.cmpile("^package[%s]+([\\w+.]+)[%s]*;");
+	private static final Pattern2 packageDefinition = MyPattern.cmpile("^package[%s]+([\\w+.]+)[%s]*;");
 
 	private final List<JavaClass> all = new ArrayList<JavaClass>();
 
@@ -65,11 +65,11 @@ class JavaFile {
 		String s;
 		while ((s = br.readLine()) != null) {
 			s = StringUtils.trin(s);
-			final Matcher matchPackage = packageDefinition.matcher(s);
+			final Matcher2 matchPackage = packageDefinition.matcher(s);
 			if (matchPackage.find()) {
 				javaPackage = matchPackage.group(1);
 			} else {
-				final Matcher matchClassDefinition = classDefinition.matcher(s);
+				final Matcher2 matchClassDefinition = classDefinition.matcher(s);
 				if (matchClassDefinition.find()) {
 					final String n = matchClassDefinition.group(2);
 					final String p = matchClassDefinition.group(4);

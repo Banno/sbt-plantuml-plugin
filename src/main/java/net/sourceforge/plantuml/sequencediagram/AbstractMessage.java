@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -48,13 +48,14 @@ public abstract class AbstractMessage implements EventWithDeactivate {
 	private NotePosition notePosition;
 	private HtmlColor noteBackColor;
 	private Url urlNote;
+	private NoteStyle noteStyle;
 	private final Url url;
 	private final String messageNumber;
 	private boolean parallel = false;
 
 	public AbstractMessage(Display label, ArrowConfiguration arrowConfiguration, String messageNumber) {
 		this.url = label.initUrl();
-		this.label = label.removeUrl(url);
+		this.label = label.removeHeadingUrl(url);
 		this.arrowConfiguration = arrowConfiguration;
 		this.messageNumber = messageNumber;
 	}
@@ -129,7 +130,7 @@ public abstract class AbstractMessage implements EventWithDeactivate {
 	public final Display getLabel() {
 		return label;
 	}
-	
+
 	public final Display getLabelNumbered() {
 		if (getMessageNumber() == null) {
 			return getLabel();
@@ -140,7 +141,6 @@ public abstract class AbstractMessage implements EventWithDeactivate {
 		return result;
 	}
 
-
 	public final ArrowConfiguration getArrowConfiguration() {
 		return arrowConfiguration;
 	}
@@ -148,15 +148,20 @@ public abstract class AbstractMessage implements EventWithDeactivate {
 	public final Display getNote() {
 		return notes == null ? notes : notes;
 	}
+	
+	public final NoteStyle getNoteStyle() {
+		return noteStyle;
+	}
 
 	public final Url getUrlNote() {
 		return urlNote;
 	}
 
-	public final void setNote(Display strings, NotePosition notePosition, String backcolor, Url url) {
+	public final void setNote(Display strings, NotePosition notePosition, NoteStyle noteStyle, String backcolor, Url url) {
 		if (notePosition != NotePosition.LEFT && notePosition != NotePosition.RIGHT) {
 			throw new IllegalArgumentException();
 		}
+		this.noteStyle = noteStyle;
 		this.notes = strings;
 		this.urlNote = url;
 		this.notePosition = overideNotePosition(notePosition);

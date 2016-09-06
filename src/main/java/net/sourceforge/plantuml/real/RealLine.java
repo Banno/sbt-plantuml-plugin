@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -27,8 +27,10 @@ package net.sourceforge.plantuml.real;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 class RealLine {
 
@@ -36,10 +38,16 @@ class RealLine {
 
 	private double min;
 	private double max;
+	private Set<AbstractReal> all = new HashSet<AbstractReal>();
 
 	void register(double v) {
-		min = Math.min(min, v);
-		max = Math.max(max, v);
+		// System.err.println("RealLine::register " + v);
+		// min = Math.min(min, v);
+		// max = Math.max(max, v);
+	}
+
+	void register2(AbstractReal abstractReal) {
+		all.add(abstractReal);
 	}
 
 	public double getAbsoluteMin() {
@@ -60,8 +68,6 @@ class RealLine {
 		int cpt = 0;
 		final Map<PositiveForce, Integer> counter = new HashMap<PositiveForce, Integer>();
 		do {
-			min = 0;
-			max = 0;
 			boolean done = true;
 			for (PositiveForce f : forces) {
 				// System.err.println("force=" + f);
@@ -76,6 +82,19 @@ class RealLine {
 				// System.err.println("cpt=" + cpt + " size=" + forces.size());
 				CPT += cpt;
 				// System.err.println("CPT=" + CPT);
+				min = 0;
+				max = 0;
+				for (AbstractReal real : all) {
+					final double v = real.getCurrentValue();
+					// System.err.println("RealLine::compile v=" + v);
+					if (v > max) {
+						max = v;
+					}
+					if (v < min) {
+						min = v;
+					}
+				}
+				// System.err.println("RealLine::compile min=" + min + " max=" + max);
 				return;
 			}
 			cpt++;
@@ -88,6 +107,9 @@ class RealLine {
 	}
 
 	private void printCounter(Map<PositiveForce, Integer> counter) {
+		for (PositiveForce f : forces) {
+			System.err.println("force=" + f);
+		}
 		for (Map.Entry<PositiveForce, Integer> ent : counter.entrySet()) {
 			System.err.println("count=" + ent.getValue() + " for " + ent.getKey());
 		}

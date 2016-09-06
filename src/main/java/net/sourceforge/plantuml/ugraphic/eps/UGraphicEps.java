@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -25,16 +25,14 @@
  */
 package net.sourceforge.plantuml.ugraphic.eps;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 
+import net.sourceforge.plantuml.FileFormat;
 import net.sourceforge.plantuml.Url;
 import net.sourceforge.plantuml.eps.EpsGraphics;
 import net.sourceforge.plantuml.eps.EpsStrategy;
 import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.graphic.TextBlockUtils;
 import net.sourceforge.plantuml.graphic.UDrawable;
 import net.sourceforge.plantuml.posimo.DotPath;
 import net.sourceforge.plantuml.ugraphic.AbstractCommonUGraphic;
@@ -76,7 +74,7 @@ public class UGraphicEps extends AbstractUGraphic<EpsGraphics> implements ClipCo
 	private UGraphicEps(ColorMapper colorMapper, EpsStrategy strategy, EpsGraphics eps) {
 		super(colorMapper, eps);
 		this.strategyTOBEREMOVED = strategy;
-		this.stringBounder = TextBlockUtils.getDummyStringBounder();
+		this.stringBounder = FileFormat.PNG.getDefaultStringBounder();
 		register(strategy);
 	}
 

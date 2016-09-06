@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -28,17 +28,12 @@ package net.sourceforge.plantuml;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import net.sourceforge.plantuml.StringUtils;
-
 public class Pragma {
 
 	private final Map<String, String> values = new LinkedHashMap<String, String>();
 
 	public void define(String name, String value) {
 		values.put(name, value);
-		if (name.equalsIgnoreCase("graphviz_dot")) {
-			OptionFlags.getInstance().setDotExecutable(StringUtils.eventuallyRemoveStartingAndEndingDoubleQuote(value));
-		}
 	}
 
 	public boolean isDefine(String name) {
@@ -55,6 +50,11 @@ public class Pragma {
 
 	public boolean horizontalLineBetweenDifferentPackageAllowed() {
 		return isDefine("horizontallinebetweendifferentpackageallowed");
+	}
+
+	public boolean useVerticalIf() {
+		final String teoz = getValue("useverticalif");
+		return "true".equalsIgnoreCase(teoz) || "on".equalsIgnoreCase(teoz);
 	}
 
 	public boolean useTeozLayout() {

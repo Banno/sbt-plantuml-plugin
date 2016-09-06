@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -28,11 +28,10 @@ package net.sourceforge.plantuml;
 import net.sourceforge.plantuml.cucadiagram.Rankdir;
 import net.sourceforge.plantuml.cucadiagram.Stereotype;
 import net.sourceforge.plantuml.cucadiagram.dot.DotSplines;
-import net.sourceforge.plantuml.cucadiagram.dot.GraphvizLayoutStrategy;
 import net.sourceforge.plantuml.graphic.HorizontalAlignment;
 import net.sourceforge.plantuml.graphic.HtmlColor;
-import net.sourceforge.plantuml.graphic.IHtmlColorSet;
 import net.sourceforge.plantuml.graphic.SkinParameter;
+import net.sourceforge.plantuml.graphic.color.Colors;
 import net.sourceforge.plantuml.svek.ConditionStyle;
 import net.sourceforge.plantuml.svek.PackageStyle;
 import net.sourceforge.plantuml.ugraphic.ColorMapper;
@@ -49,15 +48,17 @@ public interface ISkinParam extends ISkinSimple {
 
 	public HtmlColor getHtmlColor(ColorParam param, Stereotype stereotype, boolean clickable);
 
-	public HtmlColor getFontHtmlColor(FontParam param, Stereotype stereotype);
+	public Colors getColors(ColorParam param, Stereotype stereotype);
+
+	public HtmlColor getFontHtmlColor(Stereotype stereotype, FontParam... param);
 
 	public UStroke getThickness(LineParam param, Stereotype stereotype);
 
-	public UFont getFont(FontParam fontParam, Stereotype stereotype, boolean inPackageTitle);
+	public UFont getFont(Stereotype stereotype, boolean inPackageTitle, FontParam... fontParam);
 
 	public HorizontalAlignment getHorizontalAlignment(AlignParam param);
 
-	public HorizontalAlignment getDefaultTextAlignment();
+	public HorizontalAlignment getDefaultTextAlignment(HorizontalAlignment defaultValue);
 
 	public int getCircledCharacterRadius();
 
@@ -69,9 +70,11 @@ public interface ISkinParam extends ISkinSimple {
 
 	public DotSplines getDotSplines();
 
-	public GraphvizLayoutStrategy getStrategy();
+	public String getDotExecutable();
 
 	public boolean shadowing();
+	
+	public boolean shadowingForNote(Stereotype stereotype);
 
 	public boolean shadowing2(SkinParameter skinParameter);
 
@@ -105,14 +108,19 @@ public interface ISkinParam extends ISkinSimple {
 
 	public boolean useOctagonForActivity(Stereotype stereotype);
 
-	public IHtmlColorSet getIHtmlColorSet();
-
 	public int groupInheritance();
-	
+
 	public boolean useGuillemet();
 
 	public boolean handwritten();
 
 	public String getSvgLinkTarget();
+	
+	public int getTabSize();
+	
+	public int maxAsciiMessageLength();
+	
+	public int colorArrowSeparationSpace();
+
 
 }

@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -26,13 +26,13 @@
 package net.sourceforge.plantuml.sequencediagram;
 
 import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.SkinParamBackcolored;
 import net.sourceforge.plantuml.SpecificBackcolorable;
 import net.sourceforge.plantuml.Url;
 import net.sourceforge.plantuml.UrlBuilder;
 import net.sourceforge.plantuml.UrlBuilder.ModeUrl;
 import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.graphic.HtmlColor;
+import net.sourceforge.plantuml.cucadiagram.Stereotype;
+import net.sourceforge.plantuml.graphic.color.Colors;
 
 public class Note extends AbstractEvent implements Event, SpecificBackcolorable {
 
@@ -43,6 +43,8 @@ public class Note extends AbstractEvent implements Event, SpecificBackcolorable 
 
 	private final NotePosition position;
 	private NoteStyle style = NoteStyle.NORMAL;
+
+	// private Stereotype stereotype;
 
 	private final Url url;
 
@@ -59,8 +61,9 @@ public class Note extends AbstractEvent implements Event, SpecificBackcolorable 
 		this.p2 = p2;
 		this.position = position;
 		if (strings != null && strings.size() > 0) {
-			final UrlBuilder urlBuilder = new UrlBuilder(null, ModeUrl.STRICT);
-			this.url = urlBuilder.getUrl(strings.get(0).toString());
+			final UrlBuilder urlBuilder = new UrlBuilder(null, ModeUrl.AT_START);
+			final String s = strings.asStringWithHiddenNewLine();
+			this.url = urlBuilder.getUrl(s);
 		} else {
 			this.url = null;
 		}
@@ -68,7 +71,7 @@ public class Note extends AbstractEvent implements Event, SpecificBackcolorable 
 		if (this.url == null) {
 			this.strings = strings;
 		} else {
-			this.strings = strings.subList(1, strings.size());
+			this.strings = strings.removeUrlHiddenNewLineUrl();
 		}
 	}
 
@@ -88,14 +91,20 @@ public class Note extends AbstractEvent implements Event, SpecificBackcolorable 
 		return position;
 	}
 
-	private HtmlColor specificBackcolor;
-
-	public HtmlColor getSpecificBackColor() {
-		return specificBackcolor;
+	public Colors getColors(ISkinParam skinParam) {
+		return colors;
 	}
 
-	public void setSpecificBackcolor(HtmlColor color) {
-		this.specificBackcolor = color;
+	// public void setSpecificColorTOBEREMOVED(ColorType type, HtmlColor color) {
+	// if (color != null) {
+	// this.colors = colors.add(type, color);
+	// }
+	// }
+
+	private Colors colors = Colors.empty();
+
+	public void setColors(Colors colors) {
+		this.colors = colors;
 	}
 
 	public boolean dealWith(Participant someone) {
@@ -118,8 +127,18 @@ public class Note extends AbstractEvent implements Event, SpecificBackcolorable 
 		this.style = style;
 	}
 
-	public SkinParamBackcolored getSkinParamBackcolored(ISkinParam skinParam) {
-		return new SkinParamBackcolored(skinParam, getSpecificBackColor());
+	public ISkinParam getSkinParamBackcolored(ISkinParam skinParam) {
+		// return new SkinParamBackcolored(skinParam, getColors(skinParam).getColor(ColorType.BACK));
+		return colors.mute(skinParam);
+	}
+
+	public void setStereotype(Stereotype stereotype) {
+		// this.stereotype = stereotype;
+	}
+
+	@Override
+	public String toString() {
+		return super.toString() + " " + strings;
 	}
 
 }

@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -25,16 +25,10 @@
  */
 package net.sourceforge.plantuml.sequencediagram.graphic;
 
-import net.sourceforge.plantuml.OptionFlags;
 import net.sourceforge.plantuml.Url;
-import net.sourceforge.plantuml.cucadiagram.Display;
 import net.sourceforge.plantuml.graphic.StringBounder;
 import net.sourceforge.plantuml.sequencediagram.AbstractMessage;
-import net.sourceforge.plantuml.sequencediagram.LifeEvent;
-import net.sourceforge.plantuml.sequencediagram.LifeEventType;
-import net.sourceforge.plantuml.sequencediagram.MessageNumber;
 import net.sourceforge.plantuml.sequencediagram.NotePosition;
-import net.sourceforge.plantuml.sequencediagram.Participant;
 import net.sourceforge.plantuml.skin.ArrowConfiguration;
 import net.sourceforge.plantuml.skin.Component;
 
@@ -78,7 +72,7 @@ abstract class Step1Abstract {
 	}
 
 	protected final void setConfig(ArrowConfiguration config) {
-		this.config = config;
+		this.config = config.withThickness(drawingSet.getArrowThickness());
 	}
 
 	protected final Component getNote() {

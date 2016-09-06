@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -25,20 +25,19 @@
  */
 package net.sourceforge.plantuml.graphic;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import net.sourceforge.plantuml.StringUtils;
+import net.sourceforge.plantuml.command.regex.Matcher2;
 import net.sourceforge.plantuml.command.regex.MyPattern;
+import net.sourceforge.plantuml.command.regex.Pattern2;
 
 class FontFamilyChange implements FontChange {
 
-	static private final Pattern colorPattern = MyPattern.cmpile("(?i)" + Splitter.fontFamilyPattern);
+	static private final Pattern2 colorPattern = MyPattern.cmpile("(?i)" + Splitter.fontFamilyPattern);
 
 	private final String family;
 
 	FontFamilyChange(String s) {
-		final Matcher matcherColor = colorPattern.matcher(s);
+		final Matcher2 matcherColor = colorPattern.matcher(s);
 		if (matcherColor.find() == false) {
 			throw new IllegalArgumentException();
 		}

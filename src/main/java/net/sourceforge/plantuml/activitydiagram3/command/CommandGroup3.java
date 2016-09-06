@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -49,7 +49,7 @@ public class CommandGroup3 extends SingleLineCommand2<ActivityDiagram3> {
 
 	@Override
 	protected CommandExecutionResult executeArg(ActivityDiagram3 diagram, RegexResult arg) {
-		diagram.startGroup(Display.getWithNewlines(arg.get("NAME", 0)), null, null);
+		diagram.startGroup(Display.getWithNewlines(arg.get("NAME", 0)), null, null, null);
 		return CommandExecutionResult.ok();
 	}
 

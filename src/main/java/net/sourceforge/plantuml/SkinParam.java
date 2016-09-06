@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -33,44 +33,51 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
+import net.sourceforge.plantuml.command.regex.Matcher2;
 import net.sourceforge.plantuml.command.regex.MyPattern;
+import net.sourceforge.plantuml.command.regex.Pattern2;
+import net.sourceforge.plantuml.creole.CommandCreoleMonospaced;
 import net.sourceforge.plantuml.cucadiagram.Rankdir;
 import net.sourceforge.plantuml.cucadiagram.Stereotype;
 import net.sourceforge.plantuml.cucadiagram.dot.DotSplines;
-import net.sourceforge.plantuml.cucadiagram.dot.GraphvizLayoutStrategy;
 import net.sourceforge.plantuml.graphic.HorizontalAlignment;
 import net.sourceforge.plantuml.graphic.HtmlColor;
 import net.sourceforge.plantuml.graphic.HtmlColorSetSimple;
 import net.sourceforge.plantuml.graphic.HtmlColorUtils;
 import net.sourceforge.plantuml.graphic.IHtmlColorSet;
 import net.sourceforge.plantuml.graphic.SkinParameter;
+import net.sourceforge.plantuml.graphic.color.Colors;
 import net.sourceforge.plantuml.svek.ConditionStyle;
 import net.sourceforge.plantuml.svek.PackageStyle;
 import net.sourceforge.plantuml.ugraphic.ColorMapper;
 import net.sourceforge.plantuml.ugraphic.ColorMapperIdentity;
 import net.sourceforge.plantuml.ugraphic.ColorMapperMonochrome;
-import net.sourceforge.plantuml.ugraphic.Sprite;
 import net.sourceforge.plantuml.ugraphic.UFont;
 import net.sourceforge.plantuml.ugraphic.UStroke;
+import net.sourceforge.plantuml.ugraphic.sprite.Sprite;
+import net.sourceforge.plantuml.ugraphic.sprite.SpriteImage;
 
 public class SkinParam implements ISkinParam {
 
+	private static final String stereoPatternString = "\\<\\<(.*?)\\>\\>";
+	private static final Pattern2 stereoPattern = MyPattern.cmpile(stereoPatternString);
+
 	private final Map<String, String> params = new HashMap<String, String>();
 	private Rankdir rankdir = Rankdir.TOP_TO_BOTTOM;
+	private String dotExecutable;
+
+	public String getDotExecutable() {
+		return dotExecutable;
+	}
+
+	public void setDotExecutable(String dotExecutable) {
+		this.dotExecutable = dotExecutable;
+	}
 
 	public void setParam(String key, String value) {
 		params.put(cleanForKey(key), StringUtils.trin(value));
 	}
-
-	private static final String stereoPatternString = "\\<\\<(.*?)\\>\\>";
-	private static final Pattern stereoPattern = MyPattern.cmpile(stereoPatternString);
-
-	// public SkinParam() {
-	//
-	// }
 
 	public static SkinParam noShadowing() {
 		final SkinParam result = new SkinParam();
@@ -78,16 +85,10 @@ public class SkinParam implements ISkinParam {
 		return result;
 	}
 
-	// public SkinParam(String type) {
-	// if (type == null) {
-	// setParam("shadowing", "false");
-	// }
-	// }
-
 	static String cleanForKey(String key) {
 		key = StringUtils.trin(StringUtils.goLowerCase(key));
 		key = key.replaceAll("_|\\.|\\s", "");
-		key = replaceSmart(key, "partition", "package");
+		// key = replaceSmart(key, "partition", "package");
 		key = replaceSmart(key, "sequenceparticipant", "participant");
 		key = replaceSmart(key, "sequenceactor", "actor");
 		if (key.contains("arrow")) {
@@ -100,7 +101,7 @@ public class SkinParam implements ISkinParam {
 		// // key = key.replaceAll("componentarrow", "genericarrow");
 		// // key = key.replaceAll("statearrow", "genericarrow");
 		// // key = key.replaceAll("usecasearrow", "genericarrow");
-		final Matcher m = stereoPattern.matcher(key);
+		final Matcher2 m = stereoPattern.matcher(key);
 		if (m.find()) {
 			final String s = m.group(1);
 			key = key.replaceAll(stereoPatternString, "");
@@ -154,17 +155,34 @@ public class SkinParam implements ISkinParam {
 	public HtmlColor getHtmlColor(ColorParam param, Stereotype stereotype, boolean clickable) {
 		if (stereotype != null) {
 			checkStereotype(stereotype);
-			final String value2 = getValue(param.name() + "color" + stereotype.getLabel(false));
-			if (value2 != null && getIHtmlColorSet().getColorIfValid(value2) != null) {
-				return getIHtmlColorSet().getColorIfValid(value2);
+			for (String s : stereotype.getMultipleLabels()) {
+				final String value2 = getValue(param.name() + "color" + "<<" + s + ">>");
+				if (value2 != null && getIHtmlColorSet().getColorIfValid(value2) != null) {
+					return getIHtmlColorSet().getColorIfValid(value2);
+				}
 			}
 		}
 		final String value = getValue(getParamName(param, clickable));
-		final boolean acceptTransparent = param == ColorParam.background;
 		if (value == null) {
 			return null;
 		}
+		final boolean acceptTransparent = param == ColorParam.background;
 		return getIHtmlColorSet().getColorIfValid(value, acceptTransparent);
+	}
+
+	public Colors getColors(ColorParam param, Stereotype stereotype) {
+		if (stereotype != null) {
+			checkStereotype(stereotype);
+			final String value2 = getValue(param.name() + "color" + stereotype.getLabel(false));
+			if (value2 != null && getIHtmlColorSet().getColorIfValid(value2) != null) {
+				return new Colors(value2, getIHtmlColorSet(), param.getColorType());
+			}
+		}
+		final String value = getValue(getParamName(param, false));
+		if (value == null) {
+			return Colors.empty();
+		}
+		return new Colors(value, getIHtmlColorSet(), param.getColorType());
 	}
 
 	private String getParamName(ColorParam param, boolean clickable) {
@@ -183,78 +201,88 @@ public class SkinParam implements ISkinParam {
 		// }
 	}
 
-	private int getFontSize(FontParam param, Stereotype stereotype) {
+	private int getFontSize(Stereotype stereotype, FontParam... param) {
 		if (stereotype != null) {
 			checkStereotype(stereotype);
-			final String value2 = getValue(param.name() + "fontsize" + stereotype.getLabel(false));
+			final String value2 = getFirstValueNonNullWithSuffix("fontsize" + stereotype.getLabel(false), param);
 			if (value2 != null && value2.matches("\\d+")) {
 				return Integer.parseInt(value2);
 			}
 		}
-		String value = getValue(param.name() + "fontsize");
+		String value = getFirstValueNonNullWithSuffix("fontsize", param);
 		if (value == null || value.matches("\\d+") == false) {
 			value = getValue("defaultfontsize");
 		}
 		if (value == null || value.matches("\\d+") == false) {
-			return param.getDefaultSize(this);
+			return param[0].getDefaultSize(this);
 		}
 		return Integer.parseInt(value);
 	}
 
-	private String getFontFamily(FontParam param, Stereotype stereotype) {
+	private String getFontFamily(Stereotype stereotype, FontParam... param) {
 		if (stereotype != null) {
 			checkStereotype(stereotype);
-			final String value2 = getValue(param.name() + "fontname" + stereotype.getLabel(false));
+			final String value2 = getFirstValueNonNullWithSuffix("fontname" + stereotype.getLabel(false), param);
 			if (value2 != null) {
 				return StringUtils.eventuallyRemoveStartingAndEndingDoubleQuote(value2);
 			}
 		}
 		// Times, Helvetica, Courier or Symbol
-		String value = getValue(param.name() + "fontname");
+		String value = getFirstValueNonNullWithSuffix("fontname", param);
 		if (value != null) {
 			return StringUtils.eventuallyRemoveStartingAndEndingDoubleQuote(value);
 		}
-		if (param != FontParam.CIRCLED_CHARACTER) {
+		if (param[0] != FontParam.CIRCLED_CHARACTER) {
 			value = getValue("defaultfontname");
 			if (value != null) {
 				return StringUtils.eventuallyRemoveStartingAndEndingDoubleQuote(value);
 			}
 		}
-		return param.getDefaultFamily();
+		return param[0].getDefaultFamily();
 	}
 
-	public HtmlColor getFontHtmlColor(FontParam param, Stereotype stereotype) {
+	public HtmlColor getFontHtmlColor(Stereotype stereotype, FontParam... param) {
 		String value = null;
 		if (stereotype != null) {
 			checkStereotype(stereotype);
-			value = getValue(param.name() + "fontcolor" + stereotype.getLabel(false));
+			value = getFirstValueNonNullWithSuffix("fontcolor" + stereotype.getLabel(false), param);
 		}
 		if (value == null || getIHtmlColorSet().getColorIfValid(value) == null) {
-			value = getValue(param.name() + "fontcolor");
+			value = getFirstValueNonNullWithSuffix("fontcolor", param);
 		}
 		if (value == null || getIHtmlColorSet().getColorIfValid(value) == null) {
 			value = getValue("defaultfontcolor");
 		}
 		if (value == null || getIHtmlColorSet().getColorIfValid(value) == null) {
-			value = param.getDefaultColor();
+			value = param[0].getDefaultColor();
 		}
 		return getIHtmlColorSet().getColorIfValid(value);
 	}
 
-	private int getFontStyle(FontParam param, Stereotype stereotype, boolean inPackageTitle) {
+	private String getFirstValueNonNullWithSuffix(String suffix, FontParam... param) {
+		for (FontParam p : param) {
+			final String v = getValue(p.name() + suffix);
+			if (v != null) {
+				return v;
+			}
+		}
+		return null;
+	}
+
+	private int getFontStyle(Stereotype stereotype, boolean inPackageTitle, FontParam... param) {
 		String value = null;
 		if (stereotype != null) {
 			checkStereotype(stereotype);
-			value = getValue(param.name() + "fontstyle" + stereotype.getLabel(false));
+			value = getFirstValueNonNullWithSuffix("fontstyle" + stereotype.getLabel(false), param);
 		}
 		if (value == null) {
-			value = getValue(param.name() + "fontstyle");
+			value = getFirstValueNonNullWithSuffix("fontstyle", param);
 		}
 		if (value == null) {
 			value = getValue("defaultfontstyle");
 		}
 		if (value == null) {
-			return param.getDefaultFontStyle(this, inPackageTitle);
+			return param[0].getDefaultFontStyle(this, inPackageTitle);
 		}
 		int result = Font.PLAIN;
 		if (StringUtils.goLowerCase(value).contains("bold")) {
@@ -266,13 +294,13 @@ public class SkinParam implements ISkinParam {
 		return result;
 	}
 
-	public UFont getFont(FontParam fontParam, Stereotype stereotype, boolean inPackageTitle) {
+	public UFont getFont(Stereotype stereotype, boolean inPackageTitle, FontParam... fontParam) {
 		if (stereotype != null) {
 			checkStereotype(stereotype);
 		}
-		final String fontFamily = getFontFamily(fontParam, stereotype);
-		final int fontStyle = getFontStyle(fontParam, stereotype, inPackageTitle);
-		final int fontSize = getFontSize(fontParam, stereotype);
+		final String fontFamily = getFontFamily(stereotype, fontParam);
+		final int fontStyle = getFontStyle(stereotype, inPackageTitle, fontParam);
+		final int fontSize = getFontSize(stereotype, fontParam);
 		return new UFont(fontFamily, fontStyle, fontSize);
 	}
 
@@ -284,7 +312,7 @@ public class SkinParam implements ISkinParam {
 		// return 11;
 		// Log.println("SIZE1="+getFontSize(FontParam.CIRCLED_CHARACTER));
 		// Log.println("SIZE1="+getFontSize(FontParam.CIRCLED_CHARACTER)/3);
-		return getFontSize(FontParam.CIRCLED_CHARACTER, null) / 3 + 6;
+		return getFontSize(null, FontParam.CIRCLED_CHARACTER) / 3 + 6;
 	}
 
 	public int classAttributeIconSize() {
@@ -350,23 +378,6 @@ public class SkinParam implements ISkinParam {
 		return DotSplines.SPLINES;
 	}
 
-	public GraphvizLayoutStrategy getStrategy() {
-		final String value = getValue("layout");
-		if ("neato".equalsIgnoreCase(value)) {
-			return GraphvizLayoutStrategy.NEATO;
-		}
-		if ("circo".equalsIgnoreCase(value)) {
-			return GraphvizLayoutStrategy.CIRCO;
-		}
-		if ("fdp".equalsIgnoreCase(value)) {
-			return GraphvizLayoutStrategy.FDP;
-		}
-		if ("twopi".equalsIgnoreCase(value)) {
-			return GraphvizLayoutStrategy.TWOPI;
-		}
-		return GraphvizLayoutStrategy.DOT;
-	}
-
 	public HorizontalAlignment getHorizontalAlignment(AlignParam param) {
 		final String value;
 		switch (param) {
@@ -386,11 +397,11 @@ public class SkinParam implements ISkinParam {
 		return result;
 	}
 
-	public HorizontalAlignment getDefaultTextAlignment() {
+	public HorizontalAlignment getDefaultTextAlignment(HorizontalAlignment defaultValue) {
 		final String value = getValue("defaulttextalignment");
 		final HorizontalAlignment result = HorizontalAlignment.fromString(value);
 		if (result == null) {
-			return HorizontalAlignment.CENTER;
+			return defaultValue;
 		}
 		return result;
 	}
@@ -425,6 +436,21 @@ public class SkinParam implements ISkinParam {
 			return false;
 		}
 		return true;
+	}
+
+	public boolean shadowingForNote(Stereotype stereotype) {
+		if (stereotype != null) {
+			checkStereotype(stereotype);
+			final String value2 = getValue("note" + "shadowing" + stereotype.getLabel(false));
+			if (value2 != null) {
+				return value2.equalsIgnoreCase("true");
+			}
+		}
+		final String value2 = getValue("note" + "shadowing");
+		if (value2 != null) {
+			return value2.equalsIgnoreCase("true");
+		}
+		return shadowing();
 	}
 
 	public boolean shadowing2(SkinParameter skinParameter) {
@@ -464,7 +490,11 @@ public class SkinParam implements ISkinParam {
 	}
 
 	public Sprite getSprite(String name) {
-		return sprites.get(name);
+		Sprite result = sprites.get(name);
+		if (result == null) {
+			result = SpriteImage.fromInternal(name);
+		}
+		return result;
 	}
 
 	public boolean useUml2ForComponent() {
@@ -662,6 +692,38 @@ public class SkinParam implements ISkinParam {
 			return "_top";
 		}
 		return value;
+	}
+
+	public String getMonospacedFamily() {
+		final String value = getValue("defaultMonospacedFontName");
+		if (value == null) {
+			return CommandCreoleMonospaced.MONOSPACED;
+		}
+		return value;
+	}
+
+	public int getTabSize() {
+		final String value = getValue("tabsize");
+		if (value != null && value.matches("\\d+")) {
+			return Integer.parseInt(value);
+		}
+		return 8;
+	}
+
+	public int maxAsciiMessageLength() {
+		final String value = getValue("maxasciimessagelength");
+		if (value != null && value.matches("\\d+")) {
+			return Integer.parseInt(value);
+		}
+		return -1;
+	}
+
+	public int colorArrowSeparationSpace() {
+		final String value = getValue("colorarrowseparationspace");
+		if (value != null && value.matches("\\d+")) {
+			return Integer.parseInt(value);
+		}
+		return 0;
 	}
 
 }

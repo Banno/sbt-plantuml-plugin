@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -25,8 +25,6 @@
  */
 package net.sourceforge.plantuml.command;
 
-import java.util.List;
-
 import net.sourceforge.plantuml.UmlDiagram;
 
 public class CommandAffineTransformMultiline extends CommandMultilines<UmlDiagram> {
@@ -40,9 +38,9 @@ public class CommandAffineTransformMultiline extends CommandMultilines<UmlDiagra
 		return "(?i)^[%s]*!\\}[%s]*$";
 	}
 
-	public CommandExecutionResult execute(final UmlDiagram diagram, List<String> lines) {
-		final List<String> data = lines.subList(1, lines.size() - 1);
-		diagram.setAnimation(data);
+	public CommandExecutionResult execute(final UmlDiagram diagram, BlocLines lines) {
+		lines = lines.subExtract(1, 1);
+		diagram.setAnimation(lines);
 		return CommandExecutionResult.ok();
 	}
 

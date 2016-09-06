@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -61,6 +61,10 @@ public abstract class AbstractUGraphic<O> extends AbstractCommonUGraphic {
 		if (shape instanceof UEmpty) {
 			return;
 		}
+		if (shape instanceof UComment) {
+			drawComment((UComment) shape);
+			return;
+		}
 		final UDriver<O> driver = drivers.get(shape.getClass());
 		if (driver == null) {
 			throw new UnsupportedOperationException(shape.getClass().toString() + " " + this.getClass());
@@ -77,6 +81,9 @@ public abstract class AbstractUGraphic<O> extends AbstractCommonUGraphic {
 			driver.draw(shape, getTranslateX(), getTranslateY(), getColorMapper(), getParam(), g2d);
 		}
 		afterDraw();
+	}
+
+	protected void drawComment(UComment shape) {
 	}
 
 	protected void beforeDraw() {

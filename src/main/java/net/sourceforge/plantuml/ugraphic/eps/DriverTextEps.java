@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -26,12 +26,14 @@
 package net.sourceforge.plantuml.ugraphic.eps;
 
 import java.awt.Color;
-import java.awt.FontMetrics;
+import java.awt.Shape;
 import java.awt.font.FontRenderContext;
 import java.awt.font.TextLayout;
-import java.awt.geom.Dimension2D;
 import java.awt.geom.PathIterator;
+import java.util.ArrayList;
+import java.util.List;
 
+import net.sourceforge.plantuml.FileFormat;
 import net.sourceforge.plantuml.eps.EpsGraphics;
 import net.sourceforge.plantuml.eps.EpsGraphicsMacroAndText;
 import net.sourceforge.plantuml.eps.EpsStrategy;
@@ -49,7 +51,6 @@ import net.sourceforge.plantuml.ugraphic.UFont;
 import net.sourceforge.plantuml.ugraphic.UParam;
 import net.sourceforge.plantuml.ugraphic.UShape;
 import net.sourceforge.plantuml.ugraphic.UText;
-import net.sourceforge.plantuml.ugraphic.g2d.DriverTextAsPathG2d;
 
 public class DriverTextEps implements UDriver<EpsGraphics> {
 
@@ -59,7 +60,7 @@ public class DriverTextEps implements UDriver<EpsGraphics> {
 	private final EpsStrategy strategy;
 
 	public DriverTextEps(ClipContainer clipContainer, EpsStrategy strategy) {
-		this.stringBounder = TextBlockUtils.getDummyStringBounder();
+		this.stringBounder = FileFormat.PNG.getDefaultStringBounder();
 		this.clipContainer = clipContainer;
 		this.fontRenderContext = TextBlockUtils.getFontRenderContext();
 		this.strategy = strategy;
@@ -82,7 +83,8 @@ public class DriverTextEps implements UDriver<EpsGraphics> {
 		final FontConfiguration fontConfiguration = shape.getFontConfiguration();
 		final UFont font = fontConfiguration.getFont();
 
-		final TextLayout t = new TextLayout(shape.getText(), font.getFont(), fontRenderContext);
+		final TextLayout textLayout = new TextLayout(shape.getText(), font.getFont(), fontRenderContext);
+		// System.err.println("text=" + shape.getText());
 
 		MinMax dim = null;
 
@@ -93,14 +95,14 @@ public class DriverTextEps implements UDriver<EpsGraphics> {
 				eps.setFillColor(extended);
 				eps.setStrokeWidth("1", 0, 0);
 				if (dim == null) {
-					dim = getMinMax(x, y, t.getOutline(null).getPathIterator(null));
+					dim = getMinMax(x, y, getOutline(textLayout).getPathIterator(null));
 				}
 				eps.epsRectangle(dim.getMinX() - 1, dim.getMinY() - 1, dim.getWidth() + 2, dim.getHeight() + 2, 0, 0);
 			}
 		}
 
 		eps.setStrokeColor(mapper.getMappedColor(fontConfiguration.getColor()));
-		drawPathIterator(eps, x, y, t.getOutline(null).getPathIterator(null));
+		drawPathIterator(eps, x, y, getOutline(textLayout));
 
 		if (fontConfiguration.containsStyle(FontStyle.UNDERLINE)) {
 			final HtmlColor extended = fontConfiguration.getExtendedColor();
@@ -108,7 +110,7 @@ public class DriverTextEps implements UDriver<EpsGraphics> {
 				eps.setStrokeColor(mapper.getMappedColor(extended));
 			}
 			if (dim == null) {
-				dim = getMinMax(x, y, t.getOutline(null).getPathIterator(null));
+				dim = getMinMax(x, y, getOutline(textLayout).getPathIterator(null));
 			}
 			eps.setStrokeWidth("1.1", 0, 0);
 			eps.epsLine(x, y + 1.5, x + dim.getWidth(), y + 1.5);
@@ -116,7 +118,7 @@ public class DriverTextEps implements UDriver<EpsGraphics> {
 		}
 		if (fontConfiguration.containsStyle(FontStyle.WAVE)) {
 			if (dim == null) {
-				dim = getMinMax(x, y, t.getOutline(null).getPathIterator(null));
+				dim = getMinMax(x, y, getOutline(textLayout).getPathIterator(null));
 			}
 			final int ypos = (int) (y + 2.5) - 1;
 			final HtmlColor extended = fontConfiguration.getExtendedColor();
@@ -136,7 +138,7 @@ public class DriverTextEps implements UDriver<EpsGraphics> {
 				eps.setStrokeColor(mapper.getMappedColor(extended));
 			}
 			if (dim == null) {
-				dim = getMinMax(x, y, t.getOutline(null).getPathIterator(null));
+				dim = getMinMax(x, y, getOutline(textLayout).getPathIterator(null));
 			}
 			// final FontMetrics fm = font.getFontMetrics();
 			final double ypos = (dim.getMinY() + dim.getMaxY() * 2) / 3;
@@ -145,6 +147,10 @@ public class DriverTextEps implements UDriver<EpsGraphics> {
 			eps.setStrokeWidth("1", 0, 0);
 		}
 
+	}
+
+	private Shape getOutline(final TextLayout textLayout) {
+		return textLayout.getOutline(null);
 	}
 
 	private void drawAsText(UText shape, double x, double y, UParam param, EpsGraphics eps, ColorMapper mapper) {
@@ -158,8 +164,26 @@ public class DriverTextEps implements UDriver<EpsGraphics> {
 
 	}
 
-	static void drawPathIterator(EpsGraphics eps, double x, double y, PathIterator path) {
+	static void drawPathIterator(EpsGraphics eps, double x, double y, Shape shape) {
+		final List<Integer> breaks = analyze(shape);
+		if (breaks.size() == 0) {
+			final PathIterator path = shape.getPathIterator(null);
+			drawSingle(eps, x, y, path);
+			return;
+		}
+		// System.err.println("breaks=" + breaks);
+		final PathIterator path = new PathIteratorLimited(shape, 0, breaks.get(0));
+		drawSingle(eps, x, y, path);
+		for (int i = 0; i < breaks.size() - 1; i++) {
+			final PathIterator path2 = new PathIteratorLimited(shape, breaks.get(i) + 1, breaks.get(i + 1));
+			drawSingle(eps, x, y, path2);
+		}
+		final PathIterator path3 = new PathIteratorLimited(shape, breaks.get(breaks.size() - 1) + 1, Integer.MAX_VALUE);
+		drawSingle(eps, x, y, path3);
 
+	}
+
+	private static void drawSingle(EpsGraphics eps, double x, double y, final PathIterator path) {
 		eps.newpath();
 		final double coord[] = new double[6];
 		while (path.isDone() == false) {
@@ -182,7 +206,40 @@ public class DriverTextEps implements UDriver<EpsGraphics> {
 		}
 
 		eps.fill(path.getWindingRule());
+	}
 
+	private static List<Integer> analyze(Shape shape) {
+		int count = PathIteratorLimited.count(shape);
+		final List<Integer> closings = getClosings(shape.getPathIterator(null));
+		final List<Integer> result = new ArrayList<Integer>();
+		for (Integer cl : closings) {
+			if (cl + 2 >= count) {
+				break;
+			}
+			final PathIterator path1 = new PathIteratorLimited(shape, 0, cl);
+			final PathIterator path2 = new PathIteratorLimited(shape, cl + 1, Integer.MAX_VALUE);
+			final double max1 = getMinMax(0, 0, path1).getMaxX();
+			final double min2 = getMinMax(0, 0, path2).getMinX();
+			if (min2 > max1) {
+				result.add(cl);
+			}
+		}
+		return result;
+	}
+
+	private static List<Integer> getClosings(PathIterator path) {
+		final List<Integer> result = new ArrayList<Integer>();
+		int current = 0;
+		final double coord[] = new double[6];
+		while (path.isDone() == false) {
+			final int code = path.currentSegment(coord);
+			if (code == PathIterator.SEG_CLOSE) {
+				result.add(current);
+			}
+			current++;
+			path.next();
+		}
+		return result;
 	}
 
 	static private MinMax getMinMax(double x, double y, PathIterator path) {
@@ -213,4 +270,5 @@ public class DriverTextEps implements UDriver<EpsGraphics> {
 		return result;
 
 	}
+
 }

@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -43,6 +43,8 @@ import net.sourceforge.plantuml.cucadiagram.Link;
 import net.sourceforge.plantuml.cucadiagram.Stereotype;
 import net.sourceforge.plantuml.cucadiagram.dot.DotData;
 import net.sourceforge.plantuml.graphic.HtmlColor;
+import net.sourceforge.plantuml.graphic.StringBounder;
+import net.sourceforge.plantuml.graphic.color.ColorType;
 import net.sourceforge.plantuml.skin.rose.Rose;
 import net.sourceforge.plantuml.svek.image.EntityImageState;
 import net.sourceforge.plantuml.ugraphic.UFont;
@@ -51,6 +53,7 @@ public final class GroupPngMakerActivity {
 
 	private final CucaDiagram diagram;
 	private final IGroup group;
+	private final StringBounder stringBounder;
 
 	class InnerGroupHierarchy implements GroupHierarchy {
 
@@ -67,9 +70,10 @@ public final class GroupPngMakerActivity {
 
 	}
 
-	public GroupPngMakerActivity(CucaDiagram diagram, IGroup group) {
+	public GroupPngMakerActivity(CucaDiagram diagram, IGroup group, StringBounder stringBounder) {
 		this.diagram = diagram;
 		this.group = group;
+		this.stringBounder = stringBounder;
 	}
 
 	private List<Link> getPureInnerLinks() {
@@ -87,7 +91,7 @@ public final class GroupPngMakerActivity {
 
 	public IEntityImage getImage() throws IOException, InterruptedException {
 		// final List<? extends CharSequence> display = group.getDisplay();
-		// final TextBlock title = TextBlockUtils.create(display, new FontConfiguration(
+		// final TextBlock title = Display.create(display, new FontConfiguration(
 		// getFont(FontParam.STATE), HtmlColorUtils.BLACK), HorizontalAlignment.CENTER, diagram.getSkinParam());
 
 		if (group.size() == 0) {
@@ -102,15 +106,16 @@ public final class GroupPngMakerActivity {
 				skinParam, new InnerGroupHierarchy(), diagram.getColorMapper(), diagram.getEntityFactory(), false,
 				DotMode.NORMAL, diagram.getNamespaceSeparator(), diagram.getPragma());
 
-		final CucaDiagramFileMakerSvek2 svek2 = new CucaDiagramFileMakerSvek2(dotData, diagram.getEntityFactory(),
-				diagram.getSource(), diagram.getPragma());
+		final DotDataImageBuilder svek2 = new DotDataImageBuilder(dotData, diagram.getEntityFactory(),
+				diagram.getSource(), diagram.getPragma(), stringBounder);
 
 		if (group.getGroupType() == GroupType.INNER_ACTIVITY) {
 			final Stereotype stereo = group.getStereotype();
 			final HtmlColor borderColor = getColor(ColorParam.activityBorder, stereo);
-			final HtmlColor backColor = group.getSpecificBackColor() == null ? getColor(ColorParam.background, stereo)
-					: group.getSpecificBackColor();
-			return new InnerActivity(svek2.createFile(), borderColor, backColor, skinParam.shadowing());
+			final HtmlColor backColor = group.getColors(skinParam).getColor(ColorType.BACK) == null ? getColor(
+					ColorParam.background, stereo) : group.getColors(skinParam).getColor(ColorType.BACK);
+			return new InnerActivity(svek2.buildImage(null, new String[0]), borderColor, backColor,
+					skinParam.shadowing());
 		}
 
 		throw new UnsupportedOperationException(group.getGroupType().toString());
@@ -119,7 +124,7 @@ public final class GroupPngMakerActivity {
 
 	private UFont getFont(FontParam fontParam) {
 		final ISkinParam skinParam = diagram.getSkinParam();
-		return skinParam.getFont(fontParam, null, false);
+		return skinParam.getFont(null, false, fontParam);
 	}
 
 	private final Rose rose = new Rose();
