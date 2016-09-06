@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -25,12 +25,12 @@
  */
 package net.sourceforge.plantuml.command.note;
 
-import java.util.List;
-
+import net.sourceforge.plantuml.StringUtils;
 import net.sourceforge.plantuml.Url;
 import net.sourceforge.plantuml.UrlBuilder;
 import net.sourceforge.plantuml.UrlBuilder.ModeUrl;
 import net.sourceforge.plantuml.activitydiagram.ActivityDiagram;
+import net.sourceforge.plantuml.command.BlocLines;
 import net.sourceforge.plantuml.command.Command;
 import net.sourceforge.plantuml.command.CommandExecutionResult;
 import net.sourceforge.plantuml.command.CommandMultilines2;
@@ -46,42 +46,45 @@ import net.sourceforge.plantuml.cucadiagram.LeafType;
 import net.sourceforge.plantuml.cucadiagram.Link;
 import net.sourceforge.plantuml.cucadiagram.LinkDecor;
 import net.sourceforge.plantuml.cucadiagram.LinkType;
-import net.sourceforge.plantuml.graphic.HtmlColorUtils;
-import net.sourceforge.plantuml.StringUtils;
+import net.sourceforge.plantuml.graphic.color.ColorParser;
+import net.sourceforge.plantuml.graphic.color.ColorType;
 import net.sourceforge.plantuml.utils.UniqueSequence;
 
 public final class FactoryNoteActivityCommand implements SingleMultiFactoryCommand<ActivityDiagram> {
 
 	private RegexConcat getRegexConcatMultiLine() {
-		return new RegexConcat(new RegexLeaf("^note[%s]+"), //
+		return new RegexConcat(new RegexLeaf("^[%s]*note[%s]+"), //
 				new RegexLeaf("POSITION", "(right|left|top|bottom)[%s]*"), //
-				new RegexLeaf("COLOR", "(" + HtmlColorUtils.COLOR_REGEXP + ")?"), //
+				ColorParser.exp1(), //
 				new RegexLeaf("[%s]*"), //
 				new RegexLeaf("$"));
 	}
 
 	private RegexConcat getRegexConcatSingleLine() {
-		return new RegexConcat(new RegexLeaf("^note[%s]+"), //
+		return new RegexConcat(new RegexLeaf("^[%s]*note[%s]+"), //
 				new RegexLeaf("POSITION", "(right|left|top|bottom)[%s]*"), //
-				new RegexLeaf("COLOR", "(" + HtmlColorUtils.COLOR_REGEXP + ")?"), //
+				ColorParser.exp1(), //
 				new RegexLeaf("[%s]*:[%s]*"), //
 				new RegexLeaf("NOTE", "(.*)"), //
 				new RegexLeaf("$"));
 	}
 
-	public Command<ActivityDiagram> createMultiLine() {
+	public Command<ActivityDiagram> createMultiLine(boolean withBracket) {
 		return new CommandMultilines2<ActivityDiagram>(getRegexConcatMultiLine(),
 				MultilinesStrategy.KEEP_STARTING_QUOTE) {
 
 			@Override
 			public String getPatternEnd() {
-				return "(?i)^end[%s]?note$";
+				return "(?i)^[%s]*end[%s]?note$";
 			}
 
-			public final CommandExecutionResult executeNow(final ActivityDiagram system, List<String> lines) {
+			public final CommandExecutionResult executeNow(final ActivityDiagram system, BlocLines lines) {
 				// StringUtils.trim(lines, true);
-				final RegexResult arg = getStartingPattern().matcher(StringUtils.trin(lines.get(0)));
-				Display strings = Display.create(StringUtils.removeEmptyColumns(lines.subList(1, lines.size() - 1)));
+				final RegexResult arg = getStartingPattern().matcher(StringUtils.trin(lines.getFirst499()));
+				lines = lines.subExtract(1, 1);
+				lines = lines.removeEmptyColumns();
+				
+				Display strings = lines.toDisplay();
 
 				Url url = null;
 				if (strings.size() > 0) {
@@ -118,7 +121,7 @@ public final class FactoryNoteActivityCommand implements SingleMultiFactoryComma
 
 	private CommandExecutionResult executeInternal(ActivityDiagram diagram, RegexResult arg, IEntity note) {
 
-		note.setSpecificBackcolor(diagram.getSkinParam().getIHtmlColorSet().getColorIfValid(arg.get("COLOR", 0)));
+		note.setSpecificColorTOBEREMOVED(ColorType.BACK, diagram.getSkinParam().getIHtmlColorSet().getColorIfValid(arg.get("COLOR", 0)));
 
 		IEntity activity = diagram.getLastEntityConsulted();
 		if (activity == null) {
@@ -133,13 +136,13 @@ public final class FactoryNoteActivityCommand implements SingleMultiFactoryComma
 		final LinkType type = new LinkType(LinkDecor.NONE, LinkDecor.NONE).getDashed();
 
 		if (position == Position.RIGHT) {
-			link = new Link(activity, note, type, null, 1);
+			link = new Link(activity, note, type, Display.NULL, 1);
 		} else if (position == Position.LEFT) {
-			link = new Link(note, activity, type, null, 1);
+			link = new Link(note, activity, type, Display.NULL, 1);
 		} else if (position == Position.BOTTOM) {
-			link = new Link(activity, note, type, null, 2);
+			link = new Link(activity, note, type, Display.NULL, 2);
 		} else if (position == Position.TOP) {
-			link = new Link(note, activity, type, null, 2);
+			link = new Link(note, activity, type, Display.NULL, 2);
 		} else {
 			throw new IllegalArgumentException();
 		}

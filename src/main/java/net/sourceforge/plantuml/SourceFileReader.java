@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -25,12 +25,14 @@
  */
 package net.sourceforge.plantuml;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
@@ -43,6 +45,7 @@ import net.sourceforge.plantuml.code.Transcoder;
 import net.sourceforge.plantuml.code.TranscoderUtil;
 import net.sourceforge.plantuml.core.Diagram;
 import net.sourceforge.plantuml.preproc.Defines;
+import net.sourceforge.plantuml.preproc.FileWithSuffix;
 
 public class SourceFileReader implements ISourceFileReader {
 
@@ -90,7 +93,7 @@ public class SourceFileReader implements ISourceFileReader {
 		this.outputDirectory = outputDirectory;
 
 		builder = new BlockUmlBuilder(config, charset, defines, getReader(charset), file.getAbsoluteFile()
-				.getParentFile());
+				.getParentFile(), file.getAbsolutePath());
 	}
 
 	public boolean hasError() {
@@ -102,6 +105,53 @@ public class SourceFileReader implements ISourceFileReader {
 		return false;
 	}
 
+	private File getDirIfDirectory(String newName) {
+		Log.info("Checking=" + newName);
+		if (endsWithSlashOrAntislash(newName)) {
+			Log.info("It ends with / so it looks like a directory");
+			newName = newName.substring(0, newName.length() - 1);
+			File f = new File(newName);
+			Log.info("f=" + f);
+			if (f.isAbsolute() == false) {
+				Log.info("It's relative, so let's change it");
+				f = new File(outputDirectory, newName);
+				Log.info("f=" + f);
+			}
+			if (f.exists() == false) {
+				Log.info("It does not exist: let's create it");
+				try {
+					f.mkdirs();
+				} catch (Exception e) {
+					Log.info("Error " + e);
+				}
+				if (f.exists() && f.isDirectory()) {
+					Log.info("Creation ok");
+					return f;
+				}
+				Log.info("We cannot create it");
+			} else if (f.isDirectory() == false) {
+				Log.info("It exists, but is not a directory: we ignore it");
+				return null;
+			}
+			return f;
+
+		}
+		File f = new File(newName);
+		Log.info("f=" + f);
+		if (f.isAbsolute() == false) {
+			Log.info("Relative, so let's change it");
+			f = new File(outputDirectory, newName);
+			Log.info("f=" + f);
+		}
+		if (f.exists() && f.isDirectory()) {
+			Log.info("It's an existing directory");
+			return f;
+		}
+		Log.info("It's not a directory");
+		return null;
+
+	}
+
 	public List<GeneratedImage> getGeneratedImages() throws IOException {
 		Log.info("Reading file: " + file);
 
@@ -109,16 +159,46 @@ public class SourceFileReader implements ISourceFileReader {
 		final List<GeneratedImage> result = new ArrayList<GeneratedImage>();
 
 		for (BlockUml blockUml : builder.getBlockUmls()) {
-			String newName = blockUml.getFilename();
-
-			if (newName == null) {
-				newName = fileFormatOption.getFileFormat().changeName(file.getName(), cpt++);
+			String newName = blockUml.getFileOrDirname();
+			Log.info("name from block=" + newName);
+			File suggested = null;
+			if (newName != null) {
+				final File dir = getDirIfDirectory(newName);
+				if (dir == null) {
+					Log.info(newName + " is not taken as a directory");
+					suggested = new File(outputDirectory, newName);
+				} else {
+					Log.info("We are going to create files in directory " + dir);
+					newName = fileFormatOption.getFileFormat().changeName(file.getName(), cpt++);
+					suggested = new File(dir, newName);
+				}
+				Log.info("We are going to put data in " + suggested);
 			}
-
-			final File suggested = new File(outputDirectory, newName);
+			if (suggested == null) {
+				newName = fileFormatOption.getFileFormat().changeName(file.getName(), cpt++);
+				suggested = new File(outputDirectory, newName);
+			}
 			suggested.getParentFile().mkdirs();
 
-			final Diagram system = blockUml.getDiagram();
+			final Diagram system;
+			try {
+				system = blockUml.getDiagram();
+			} catch (Throwable t) {
+				final GeneratedImage image = new GeneratedImageImpl(suggested, "Crash Error", blockUml);
+				OutputStream os = null;
+				try {
+					os = new BufferedOutputStream(new FileOutputStream(suggested));
+					UmlDiagram.exportDiagramError(os, t, fileFormatOption, null, blockUml.getFlashData(),
+							UmlDiagram.getFailureText2(t));
+				} finally {
+					if (os != null) {
+						os.close();
+					}
+				}
+
+				return Collections.singletonList(image);
+			}
+
 			final List<File> exportDiagrams = PSystemUtils.exportDiagrams(system, suggested, fileFormatOption);
 			OptionFlags.getInstance().logData(file, system);
 
@@ -134,7 +214,7 @@ public class SourceFileReader implements ISourceFileReader {
 						ps.close();
 					}
 				}
-				final GeneratedImage generatedImage = new GeneratedImage(f, desc, blockUml);
+				final GeneratedImage generatedImage = new GeneratedImageImpl(f, desc, blockUml);
 				result.add(generatedImage);
 			}
 
@@ -143,6 +223,10 @@ public class SourceFileReader implements ISourceFileReader {
 		Log.info("Number of image(s): " + result.size());
 
 		return Collections.unmodifiableList(result);
+	}
+
+	private boolean endsWithSlashOrAntislash(String newName) {
+		return newName.endsWith("/") || newName.endsWith("\\");
 	}
 
 	public List<String> getEncodedUrl() throws IOException {
@@ -169,7 +253,7 @@ public class SourceFileReader implements ISourceFileReader {
 		this.fileFormatOption = fileFormatOption;
 	}
 
-	public final Set<File> getIncludedFiles() {
+	public final Set<FileWithSuffix> getIncludedFiles() {
 		return builder.getIncludedFiles();
 	}
 

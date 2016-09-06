@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -33,23 +33,22 @@ import net.sourceforge.plantuml.StringUtils;
 public enum MultilinesStrategy {
 	REMOVE_STARTING_QUOTE, KEEP_STARTING_QUOTE;
 
-	public List<String> filter(List<String> lines) {
+	public void cleanList(List<? extends CharSequence> lines) {
 		if (this == REMOVE_STARTING_QUOTE) {
 			filterQuote(lines);
 		}
-		return lines;
 	}
 
-	private void filterQuote(List<String> lines) {
-		for (final Iterator<String> it = lines.iterator(); it.hasNext();) {
-			final String s = it.next();
+	private void filterQuote(List<? extends CharSequence> lines) {
+		for (final Iterator<? extends CharSequence> it = lines.iterator(); it.hasNext();) {
+			final CharSequence s = it.next();
 			if (hasStartingQuote(s)) {
 				it.remove();
 			}
 		}
 	}
 
-	private boolean hasStartingQuote(String s) {
+	private boolean hasStartingQuote(CharSequence s) {
 		return StringUtils.trinNoTrace(s).startsWith("\'");
 	}
 }

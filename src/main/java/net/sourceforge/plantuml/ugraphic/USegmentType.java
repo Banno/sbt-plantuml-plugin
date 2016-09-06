@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -27,6 +27,7 @@ package net.sourceforge.plantuml.ugraphic;
 
 import java.awt.geom.PathIterator;
 import java.util.EnumSet;
+
 import net.sourceforge.plantuml.ugraphic.arc.ExtendedPathIterator;
 
 public enum USegmentType {

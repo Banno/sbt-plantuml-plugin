@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -34,6 +34,9 @@ public class FtileDecorateOut extends FtileDecorate {
 
 	public FtileDecorateOut(final Ftile ftile, final LinkRendering linkRendering) {
 		super(ftile);
+		if (linkRendering == null) {
+			throw new IllegalArgumentException();
+		}
 		this.linkRendering = linkRendering;
 	}
 

@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -30,11 +30,11 @@ import java.util.List;
 import net.sourceforge.plantuml.command.CommandExecutionResult;
 import net.sourceforge.plantuml.command.SingleLineCommand;
 import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.sequencediagram.AbstractMessage;
 import net.sourceforge.plantuml.sequencediagram.EventWithDeactivate;
 import net.sourceforge.plantuml.sequencediagram.LifeEventType;
 import net.sourceforge.plantuml.sequencediagram.Message;
 import net.sourceforge.plantuml.sequencediagram.SequenceDiagram;
+import net.sourceforge.plantuml.skin.ArrowBody;
 import net.sourceforge.plantuml.skin.ArrowConfiguration;
 
 public class CommandReturn extends SingleLineCommand<SequenceDiagram> {
@@ -57,7 +57,7 @@ public class CommandReturn extends SingleLineCommand<SequenceDiagram> {
 			doDeactivation = false;
 		}
 
-		final ArrowConfiguration arrow = message.getArrowConfiguration().withDotted();
+		final ArrowConfiguration arrow = message.getArrowConfiguration().withBody(ArrowBody.DOTTED);
 
 		sequenceDiagram.addMessage(
 				new Message(message.getParticipant2(), message.getParticipant1(), Display.getWithNewlines(arg

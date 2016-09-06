@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -25,20 +25,19 @@
  */
 package net.sourceforge.plantuml.eggs;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import net.sourceforge.plantuml.AbstractPSystem;
 import net.sourceforge.plantuml.command.PSystemSingleLineFactory;
+import net.sourceforge.plantuml.command.regex.Matcher2;
 import net.sourceforge.plantuml.command.regex.MyPattern;
+import net.sourceforge.plantuml.command.regex.Pattern2;
 
 public class PSystemPathFactory extends PSystemSingleLineFactory {
 
-	final private static Pattern p = MyPattern.cmpile("(?i)^path[%s]+([0-9A-Za-z]+)$");
+	final private static Pattern2 p = MyPattern.cmpile("(?i)^path[%s]+([0-9A-Za-z]+)$");
 
 	@Override
 	protected AbstractPSystem executeLine(String line) {
-		final Matcher m = p.matcher(line);
+		final Matcher2 m = p.matcher(line);
 		if (m.find() == false) {
 			return null;
 		}

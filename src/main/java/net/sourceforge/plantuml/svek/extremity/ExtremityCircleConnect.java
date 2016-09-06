@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -42,6 +42,11 @@ class ExtremityCircleConnect extends Extremity {
 	private final double radius = 6;
 	private final double radius2 = 10;
 	private final double ortho;
+
+	@Override
+	public Point2D somePoint() {
+		return dest;
+	}
 
 	public ExtremityCircleConnect(Point2D p1, double ortho) {
 		this.px = p1.getX() - radius;

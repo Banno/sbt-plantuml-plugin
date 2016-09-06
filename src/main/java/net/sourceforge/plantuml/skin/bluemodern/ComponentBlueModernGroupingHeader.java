@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -34,7 +34,6 @@ import net.sourceforge.plantuml.graphic.HorizontalAlignment;
 import net.sourceforge.plantuml.graphic.HtmlColor;
 import net.sourceforge.plantuml.graphic.StringBounder;
 import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.graphic.TextBlockUtils;
 import net.sourceforge.plantuml.skin.AbstractTextualComponent;
 import net.sourceforge.plantuml.skin.Area;
 import net.sourceforge.plantuml.ugraphic.UChangeBackColor;
@@ -59,18 +58,19 @@ public class ComponentBlueModernGroupingHeader extends AbstractTextualComponent 
 	private final HtmlColor borderColor;
 
 	public ComponentBlueModernGroupingHeader(HtmlColor headerBackgroundColor, HtmlColor generalBackgroundColor,
-			HtmlColor borderColor, HtmlColor fontColor2, FontConfiguration bigFont, UFont smallFont, Display strings, ISkinSimple spriteContainer) {
-		super(strings.get(0), bigFont, HorizontalAlignment.LEFT, 15, 30, 1, spriteContainer, 0, null,
-				null);
+			HtmlColor borderColor, HtmlColor fontColor2, FontConfiguration bigFont, UFont smallFont, Display strings,
+			ISkinSimple spriteContainer) {
+		super(strings.get(0), bigFont, HorizontalAlignment.LEFT, 15, 30, 1, spriteContainer, 0, null, null);
 		this.headerBackgroundColor = headerBackgroundColor;
 		this.generalBackgroundColor = generalBackgroundColor;
 		this.borderColor = borderColor;
 		if (strings.size() == 1 || strings.get(1) == null) {
 			this.commentTextBlock = null;
 		} else {
-			this.commentTextBlock = TextBlockUtils.create(Display.create("[" + strings.get(1) + "]"),
-					new FontConfiguration(smallFont, fontColor2, bigFont.getHyperlinkColor(), bigFont.useUnderlineForHyperlink()), HorizontalAlignment.LEFT,
-					spriteContainer);
+			final FontConfiguration fontConfiguration = new FontConfiguration(smallFont, fontColor2,
+					bigFont.getHyperlinkColor(), bigFont.useUnderlineForHyperlink(), spriteContainer.getTabSize());
+			this.commentTextBlock = Display.create("[" + strings.get(1) + "]").create(fontConfiguration,
+					HorizontalAlignment.LEFT, spriteContainer);
 		}
 	}
 

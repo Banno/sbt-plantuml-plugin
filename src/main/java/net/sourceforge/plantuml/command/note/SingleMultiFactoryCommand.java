@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -32,6 +32,6 @@ public interface SingleMultiFactoryCommand<D extends Diagram> {
 
 	public Command<D> createSingleLine();
 
-	public Command<D> createMultiLine();
+	public Command<D> createMultiLine(boolean withBracket);
 
 }

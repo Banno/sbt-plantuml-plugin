@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -24,6 +24,8 @@
  * Original Author:  Arnaud Roques
  */
 package net.sourceforge.plantuml.svek.extremity;
+
+import java.awt.geom.Point2D;
 
 import net.sourceforge.plantuml.graphic.HtmlColorUtils;
 import net.sourceforge.plantuml.ugraphic.UChangeBackColor;
@@ -47,6 +49,12 @@ class MiddleCircleCircled extends Extremity {
 		this.angle = angle;
 		this.mode = mode;
 	}
+	
+	@Override
+	public Point2D somePoint() {
+		return null;
+	}
+
 
 	public void drawU(UGraphic ug) {
 		ug = ug.apply(new UChangeBackColor(HtmlColorUtils.WHITE));

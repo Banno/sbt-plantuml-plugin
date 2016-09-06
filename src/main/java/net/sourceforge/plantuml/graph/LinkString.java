@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -25,20 +25,19 @@
  */
 package net.sourceforge.plantuml.graph;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import net.sourceforge.plantuml.command.regex.Matcher2;
 import net.sourceforge.plantuml.command.regex.MyPattern;
+import net.sourceforge.plantuml.command.regex.Pattern2;
 
 public class LinkString {
 
-	final private static Pattern p = MyPattern.cmpile("(.*)->(.*)");
+	final private static Pattern2 p = MyPattern.cmpile("(.*)->(.*)");
 
 	final private String node1;
 	final private String node2;
 
 	public LinkString(String desc) {
-		final Matcher m = p.matcher(desc);
+		final Matcher2 m = p.matcher(desc);
 		if (m.find() == false) {
 			throw new IllegalArgumentException();
 		}

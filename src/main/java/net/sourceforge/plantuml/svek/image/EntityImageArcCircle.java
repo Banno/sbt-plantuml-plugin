@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -30,7 +30,6 @@ import java.awt.geom.Dimension2D;
 import net.sourceforge.plantuml.Dimension2DDouble;
 import net.sourceforge.plantuml.FontParam;
 import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.SkinParamUtils;
 import net.sourceforge.plantuml.cucadiagram.Display;
 import net.sourceforge.plantuml.cucadiagram.ILeaf;
 import net.sourceforge.plantuml.cucadiagram.Stereotype;
@@ -38,7 +37,6 @@ import net.sourceforge.plantuml.graphic.FontConfiguration;
 import net.sourceforge.plantuml.graphic.HorizontalAlignment;
 import net.sourceforge.plantuml.graphic.StringBounder;
 import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.graphic.TextBlockUtils;
 import net.sourceforge.plantuml.svek.AbstractEntityImage;
 import net.sourceforge.plantuml.svek.ShapeType;
 import net.sourceforge.plantuml.ugraphic.UGraphic;
@@ -56,20 +54,15 @@ public class EntityImageArcCircle extends AbstractEntityImage {
 
 		final Stereotype stereotype = entity.getStereotype();
 
-		this.name = TextBlockUtils.create(
-				entity.getDisplay(),
-				new FontConfiguration(SkinParamUtils.getFont(getSkinParam(),
-						FontParam.COMPONENT, stereotype), SkinParamUtils.getFontColor(getSkinParam(),
-				FontParam.COMPONENT, stereotype), getSkinParam().getHyperlinkColor(), getSkinParam().useUnderlineForHyperlink()), HorizontalAlignment.CENTER, skinParam);
+		this.name = entity.getDisplay().create(new FontConfiguration(getSkinParam(), FontParam.COMPONENT, stereotype),
+				HorizontalAlignment.CENTER, skinParam);
 
 		if (stereotype == null || stereotype.getLabel(false) == null) {
 			this.stereo = null;
 		} else {
-			this.stereo = TextBlockUtils.create(
-					Display.getWithNewlines(stereotype.getLabel(getSkinParam().useGuillemet())),
-					new FontConfiguration(SkinParamUtils.getFont(getSkinParam(),
-							FontParam.COMPONENT_STEREOTYPE, stereotype), SkinParamUtils.getFontColor(getSkinParam(),
-					FontParam.COMPONENT_STEREOTYPE, null), getSkinParam().getHyperlinkColor(), getSkinParam().useUnderlineForHyperlink()), HorizontalAlignment.CENTER, skinParam);
+			this.stereo = Display.getWithNewlines(stereotype.getLabel(getSkinParam().useGuillemet())).create(
+					new FontConfiguration(getSkinParam(), FontParam.COMPONENT_STEREOTYPE, stereotype),
+					HorizontalAlignment.CENTER, skinParam);
 		}
 
 	}

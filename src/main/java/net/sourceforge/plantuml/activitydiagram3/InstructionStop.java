@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -28,8 +28,6 @@ package net.sourceforge.plantuml.activitydiagram3;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Ftile;
 import net.sourceforge.plantuml.activitydiagram3.ftile.FtileFactory;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Swimlane;
-import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.sequencediagram.NotePosition;
 
 public class InstructionStop extends MonoSwimable implements Instruction {
 
@@ -38,10 +36,15 @@ public class InstructionStop extends MonoSwimable implements Instruction {
 	public InstructionStop(Swimlane swimlane, LinkRendering inlinkRendering) {
 		super(swimlane);
 		this.inlinkRendering = inlinkRendering;
+		if (inlinkRendering == null) {
+			throw new IllegalArgumentException();
+		}
 	}
 
 	public Ftile createFtile(FtileFactory factory) {
-		return factory.stop(getSwimlaneIn());
+		Ftile result = factory.stop(getSwimlaneIn());
+		result = eventuallyAddNote(factory, result, result.getSwimlaneIn());
+		return result;
 	}
 
 	public void add(Instruction other) {
@@ -54,10 +57,6 @@ public class InstructionStop extends MonoSwimable implements Instruction {
 
 	public LinkRendering getInLinkRendering() {
 		return inlinkRendering;
-	}
-
-	public void addNote(Display note, NotePosition position) {
-		throw new UnsupportedOperationException();
 	}
 
 }

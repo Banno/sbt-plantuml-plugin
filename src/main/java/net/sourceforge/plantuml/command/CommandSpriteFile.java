@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -28,6 +28,7 @@ package net.sourceforge.plantuml.command;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 import javax.imageio.ImageIO;
 
@@ -37,7 +38,7 @@ import net.sourceforge.plantuml.UmlDiagram;
 import net.sourceforge.plantuml.command.regex.RegexConcat;
 import net.sourceforge.plantuml.command.regex.RegexLeaf;
 import net.sourceforge.plantuml.command.regex.RegexResult;
-import net.sourceforge.plantuml.ugraphic.SpriteImage;
+import net.sourceforge.plantuml.ugraphic.sprite.SpriteImage;
 
 public class CommandSpriteFile extends SingleLineCommand2<UmlDiagram> {
 
@@ -59,11 +60,20 @@ public class CommandSpriteFile extends SingleLineCommand2<UmlDiagram> {
 		final String src = arg.get("FILE", 0);
 		final BufferedImage im;
 		try {
-			final File f = FileSystem.getInstance().getFile(src);
-			if (f.exists() == false) {
-				return CommandExecutionResult.error("File does not exist: " + src);
+			if (src.startsWith("jar:")) {
+				final String inner = src.substring(4) + ".png";
+				final InputStream is = SpriteImage.getInternalSprite(inner);
+				if (is == null) {
+					return CommandExecutionResult.error("No such internal sprite: " + inner);
+				}
+				im = ImageIO.read(is);
+			} else {
+				final File f = FileSystem.getInstance().getFile(src);
+				if (f.exists() == false) {
+					return CommandExecutionResult.error("File does not exist: " + src);
+				}
+				im = ImageIO.read(f);
 			}
-			im = ImageIO.read(f);
 		} catch (IOException e) {
 			Log.error("Error reading " + src + " " + e);
 			return CommandExecutionResult.error("Cannot read: " + src);

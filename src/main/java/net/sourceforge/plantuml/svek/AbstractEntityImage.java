@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -37,6 +37,7 @@ public abstract class AbstractEntityImage extends AbstractTextBlock implements I
 	private final ISkinParam skinParam;
 
 	public AbstractEntityImage(IEntity entity, ISkinParam skinParam) {
+		// System.err.println("Creating abstractEntityImage "+getClass());
 		if (entity == null) {
 			throw new IllegalArgumentException("entity null");
 		}

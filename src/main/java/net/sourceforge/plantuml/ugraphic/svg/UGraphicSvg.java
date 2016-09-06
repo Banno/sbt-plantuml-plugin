@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -30,6 +30,7 @@ import java.io.OutputStream;
 
 import javax.xml.transform.TransformerException;
 
+import net.sourceforge.plantuml.FileFormat;
 import net.sourceforge.plantuml.Url;
 import net.sourceforge.plantuml.graphic.HtmlColorGradient;
 import net.sourceforge.plantuml.graphic.StringBounder;
@@ -41,6 +42,7 @@ import net.sourceforge.plantuml.ugraphic.AbstractUGraphic;
 import net.sourceforge.plantuml.ugraphic.ClipContainer;
 import net.sourceforge.plantuml.ugraphic.ColorMapper;
 import net.sourceforge.plantuml.ugraphic.UCenteredCharacter;
+import net.sourceforge.plantuml.ugraphic.UComment;
 import net.sourceforge.plantuml.ugraphic.UEllipse;
 import net.sourceforge.plantuml.ugraphic.UGraphic2;
 import net.sourceforge.plantuml.ugraphic.UImage;
@@ -102,7 +104,7 @@ public class UGraphicSvg extends AbstractUGraphic<SvgGraphics> implements ClipCo
 
 	private UGraphicSvg(ColorMapper colorMapper, SvgGraphics svg, boolean textAsPath, String linkTarget) {
 		super(colorMapper, svg);
-		this.stringBounder = TextBlockUtils.getDummyStringBounder();
+		this.stringBounder = FileFormat.PNG.getDefaultStringBounder();
 		this.textAsPath2 = textAsPath;
 		this.target = linkTarget;
 		register();
@@ -151,6 +153,11 @@ public class UGraphicSvg extends AbstractUGraphic<SvgGraphics> implements ClipCo
 
 	public void writeImageTOBEMOVED(OutputStream os, String metadata, int dpi) throws IOException {
 		createXml(os);
+	}
+
+	@Override
+	protected void drawComment(UComment comment) {
+		getGraphicObject().addComment(comment.getComment());
 	}
 
 	// @Override

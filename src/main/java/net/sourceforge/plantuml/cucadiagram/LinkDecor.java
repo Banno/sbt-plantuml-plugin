@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -26,6 +26,7 @@
 package net.sourceforge.plantuml.cucadiagram;
 
 import net.sourceforge.plantuml.OptionFlags;
+import net.sourceforge.plantuml.graphic.HtmlColor;
 import net.sourceforge.plantuml.svek.extremity.ExtremityFactory;
 import net.sourceforge.plantuml.svek.extremity.ExtremityFactoryArrow;
 import net.sourceforge.plantuml.svek.extremity.ExtremityFactoryArrowAndCircle;
@@ -71,7 +72,7 @@ public enum LinkDecor {
 		return arrowSize;
 	}
 
-	public ExtremityFactory getExtremityFactory() {
+	public ExtremityFactory getExtremityFactory(HtmlColor backgroundColor) {
 		if (this == LinkDecor.PLUS) {
 			return new ExtremityFactoryPlus();
 		} else if (this == LinkDecor.ARROW_TRIANGLE) {
@@ -83,9 +84,9 @@ public enum LinkDecor {
 		} else if (this == LinkDecor.ARROW_AND_CIRCLE) {
 			return new ExtremityFactoryArrowAndCircle();
 		} else if (this == LinkDecor.AGREGATION) {
-			return new ExtremityFactoryDiamond(false);
+			return new ExtremityFactoryDiamond(false, backgroundColor);
 		} else if (this == LinkDecor.COMPOSITION) {
-			return new ExtremityFactoryDiamond(true);
+			return new ExtremityFactoryDiamond(true, backgroundColor);
 		} else if (this == LinkDecor.CIRCLE) {
 			return new ExtremityFactoryCircle();
 		} else if (this == LinkDecor.SQUARRE) {

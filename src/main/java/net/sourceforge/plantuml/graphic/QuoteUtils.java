@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -147,11 +147,44 @@ public class QuoteUtils {
 					"There is something down there! Something not us.", //
 					"I saw a glimpse of my future and everything's changed for me now.", //
 					"In space no one can hear you scream", //
-					"I can't lie to you about your chances, but... you have my sympathies.", // 
+					"I can't lie to you about your chances, but... you have my sympathies.", //
 					"There is an explanation for this, you know.", //
 					"Bishop: I'm afraid I have some bad news.", //
-					"Do me a favour. Disconnect me. I could be reworked, but I'll never be top of the line again."
+					"Do me a favour. Disconnect me. I could be reworked, but I'll never be top of the line again.", //
+					"Take it easy, don't push the little button on the joystick!", //
+					"I'm a very private person.", //
+					"To sculpt an elephant from a big block of marble, just knock away all the bits that don't look like an elephant.", //
+					"Who said you could talk to me? Have I got something on my face ?", //
+					"We've been through worst", //
+					"United we stand", //
+					"We shall never surrender", //
+					"Absolute honesty isn't always the most diplomatic nor the safest form of communication with emotional beings.", //
+					"Humor: seventy-five percent. [Confirmed] Self destruct sequence in T minus 10, 9... ", //
+					"It's... complicated.", //
+					"Do not open until 1985", //
+					"I still mess up but I'll just start again", //
+					"I won't give up, no I won't give in; Till I reach the end; And then I'll start again", //
+					"I wanna try even though I could fail", //
+					"Sometimes we come last but we did our best", //
+					"If you see something, say something", //
+					"In theory there is no difference between theory and practice. But, in practice, there is.", //
+					"Daylight, I must wait for the sunrise. I must think of a new life. And I mustn't give in.", //
+					"If I cannot bring you comfort then at least I bring you hope", //
+					"We all must learn from small misfortune, count the blessings that are real", //
+					"Prepare Three Sealed Envelopes...", //
+					"You know that thing you just did? Don't do that", //
+					"It took me a long time to understand that if you want to do this job well you have to stay detached.", //
+					"Do you like your morning tea weak or strong ?", //
+					"Winter is coming", //
+					"What fools these mortals be!", //
+					"Something wicked this way comes.", //
+					"I think I get it, what was it? Poker Night? Bachelor Party?", // 
+					"It's alright to be scared. Remember, there is no courage without fear.", //
+					"Through readiness and discipline we are masters of our fate.", //
+					"With great power comes great responsibility", //
+					"If a machine can learn the value of human life, maybe we can too ?" //
 			);
+
 	private QuoteUtils() {
 	}
 

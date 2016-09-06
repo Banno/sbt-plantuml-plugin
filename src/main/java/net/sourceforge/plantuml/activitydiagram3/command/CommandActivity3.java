@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -36,12 +36,13 @@ import net.sourceforge.plantuml.command.regex.RegexConcat;
 import net.sourceforge.plantuml.command.regex.RegexLeaf;
 import net.sourceforge.plantuml.command.regex.RegexResult;
 import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.graphic.HtmlColor;
-import net.sourceforge.plantuml.graphic.HtmlColorUtils;
+import net.sourceforge.plantuml.graphic.color.ColorParser;
+import net.sourceforge.plantuml.graphic.color.ColorType;
+import net.sourceforge.plantuml.graphic.color.Colors;
 
 public class CommandActivity3 extends SingleLineCommand2<ActivityDiagram3> {
 
-	public static final String ENDING_GROUP = "(;|(?<![/|<>}\\]])(?:[/<}\\]])|(?<!\\</?\\w{1,5})(?<!\\<img[^>]{1,999})(?<!\\<\\$\\w{1,999})(?<!\\>)(?:\\>)|(?<!\\|.{1,999})(?:\\|))";
+	public static final String ENDING_GROUP = "(;|\\\\\\\\|(?<![/|<>}\\]])(?:[/<}\\]])|(?<!\\</?\\w{1,5})(?<!\\<img[^>]{1,999})(?<!\\<\\$\\w{1,999})(?<!\\>)(?:\\>)|(?<!\\|.{1,999})(?:\\|))";
 
 	public CommandActivity3() {
 		super(getRegexConcat());
@@ -50,11 +51,16 @@ public class CommandActivity3 extends SingleLineCommand2<ActivityDiagram3> {
 	static RegexConcat getRegexConcat() {
 		return new RegexConcat(new RegexLeaf("^"), //
 				new RegexLeaf("URL", "(" + UrlBuilder.getRegexp() + ")?"), //
-				new RegexLeaf("COLOR", "(?::?(" + HtmlColorUtils.COLOR_REGEXP + "))?"), //
+				color().getRegex(), //
+				new RegexLeaf("[%s]*"), //
 				new RegexLeaf(":"), //
 				new RegexLeaf("LABEL", "(.*)"), //
 				new RegexLeaf("STYLE", ENDING_GROUP), //
 				new RegexLeaf("$"));
+	}
+
+	private static ColorParser color() {
+		return ColorParser.simpleColor(ColorType.BACK);
 	}
 
 	@Override
@@ -68,9 +74,9 @@ public class CommandActivity3 extends SingleLineCommand2<ActivityDiagram3> {
 			url = urlBuilder.getUrl(arg.get("URL", 0));
 		}
 
-		final HtmlColor color = diagram.getSkinParam().getIHtmlColorSet().getColorIfValid(arg.get("COLOR", 0));
+		final Colors colors = color().getColor(arg, diagram.getSkinParam().getIHtmlColorSet());
 		final BoxStyle style = BoxStyle.fromChar(arg.get("STYLE", 0).charAt(0));
-		diagram.addActivity(Display.getWithNewlines(arg.get("LABEL", 0)), color, style, url);
+		diagram.addActivity(Display.getWithNewlines(arg.get("LABEL", 0)), style, url, colors);
 		return CommandExecutionResult.ok();
 	}
 

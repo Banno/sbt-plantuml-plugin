@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -38,29 +38,40 @@ public class OptionFlags {
 
 	// static public final boolean PBBACK = false;
 	// static public boolean GRAPHVIZCACHE = false;
-	static public final boolean TRACE_DOT = false;
+	// static public final boolean TRACE_DOT = false;
 
 	static public boolean ALLOW_INCLUDE = true;
 
 	static public final boolean USE_HECTOR = false;
 	static public boolean ADD_NICE_FOR_DOT = false;
 	static public final boolean STRICT_SELFMESSAGE_POSITION = true;
+
+	// static public final boolean USE_IF_VERTICAL = true;
 	static public final boolean FORCE_TEOZ = false;
 	static public final boolean USE_INTERFACE_EYE1 = false;
 	static public final boolean USE_INTERFACE_EYE2 = false;
 	static public final boolean SWI2 = false;
+	// static public final boolean USE_COMPOUND = false;
+	static public final boolean OMEGA_CROSSING = false;
+	// static public final boolean LINK_BETWEEN_FIELDS = true;
+
+	// static public final boolean USE_JDOT = false;
 
 	public void reset() {
 		reset(false);
 	}
 
+	public final void setDotExecutable(String dotExecutable) {
+		GraphvizUtils.setDotExecutable(dotExecutable);
+	}
+
 	private void reset(boolean exit) {
-		keepTmpFiles = false;
+		// keepTmpFiles = false;
 		verbose = false;
 		metadata = false;
 		word = false;
 		systemExit = exit;
-		dotExecutable = null;
+		GraphvizUtils.setDotExecutable(null);
 		gui = false;
 		quiet = false;
 		checkDotError = false;
@@ -77,12 +88,11 @@ public class OptionFlags {
 
 	private static final OptionFlags singleton = new OptionFlags();
 
-	private boolean keepTmpFiles;
+	// private boolean keepTmpFiles;
 	private boolean verbose;
 	private boolean metadata;
 	private boolean word;
 	private boolean systemExit;
-	private String dotExecutable;
 	private boolean gui;
 	private boolean quiet;
 	private boolean checkDotError;
@@ -101,13 +111,13 @@ public class OptionFlags {
 		return singleton;
 	}
 
-	public synchronized final boolean isKeepTmpFiles() {
-		return keepTmpFiles;
-	}
-
-	public synchronized final void setKeepTmpFiles(boolean keepTmpFiles) {
-		this.keepTmpFiles = keepTmpFiles;
-	}
+	// public synchronized final boolean isKeepTmpFiles() {
+	// return keepTmpFiles;
+	// }
+	//
+	// public synchronized final void setKeepTmpFiles(boolean keepTmpFiles) {
+	// this.keepTmpFiles = keepTmpFiles;
+	// }
 
 	public final boolean isVerbose() {
 		return verbose;
@@ -139,14 +149,6 @@ public class OptionFlags {
 
 	public final void setSystemExit(boolean systemExit) {
 		this.systemExit = systemExit;
-	}
-
-	public final String getDotExecutable() {
-		return dotExecutable;
-	}
-
-	public final void setDotExecutable(String dotExecutable) {
-		this.dotExecutable = dotExecutable;
 	}
 
 	public final boolean isGui() {

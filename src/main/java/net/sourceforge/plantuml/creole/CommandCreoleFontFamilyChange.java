@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -25,16 +25,15 @@
  */
 package net.sourceforge.plantuml.creole;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import net.sourceforge.plantuml.command.regex.Matcher2;
 import net.sourceforge.plantuml.command.regex.MyPattern;
+import net.sourceforge.plantuml.command.regex.Pattern2;
 import net.sourceforge.plantuml.graphic.FontConfiguration;
 import net.sourceforge.plantuml.graphic.Splitter;
 
 public class CommandCreoleFontFamilyChange implements Command {
 
-	private final Pattern pattern;
+	private final Pattern2 pattern;
 
 	public static Command create() {
 		return new CommandCreoleFontFamilyChange("^(?i)(" + Splitter.fontFamilyPattern + "(.*?)\\</font\\>)");
@@ -50,7 +49,7 @@ public class CommandCreoleFontFamilyChange implements Command {
 	}
 
 	public int matchingSize(String line) {
-		final Matcher m = pattern.matcher(line);
+		final Matcher2 m = pattern.matcher(line);
 		if (m.find() == false) {
 			return 0;
 		}
@@ -58,7 +57,7 @@ public class CommandCreoleFontFamilyChange implements Command {
 	}
 
 	public String executeAndGetRemaining(String line, StripeSimple stripe) {
-		final Matcher m = pattern.matcher(line);
+		final Matcher2 m = pattern.matcher(line);
 		if (m.find() == false) {
 			throw new IllegalStateException();
 		}

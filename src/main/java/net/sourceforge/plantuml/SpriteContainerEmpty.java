@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -25,12 +25,16 @@
  */
 package net.sourceforge.plantuml;
 
-import net.sourceforge.plantuml.ugraphic.Sprite;
+import net.sourceforge.plantuml.creole.CommandCreoleMonospaced;
+import net.sourceforge.plantuml.graphic.HtmlColorSetSimple;
+import net.sourceforge.plantuml.graphic.IHtmlColorSet;
+import net.sourceforge.plantuml.ugraphic.sprite.Sprite;
+import net.sourceforge.plantuml.ugraphic.sprite.SpriteImage;
 
 public class SpriteContainerEmpty implements SpriteContainer, ISkinSimple {
 
 	public Sprite getSprite(String name) {
-		return null;
+		return SpriteImage.fromInternal(name);
 	}
 
 	public String getValue(String key) {
@@ -43,6 +47,18 @@ public class SpriteContainerEmpty implements SpriteContainer, ISkinSimple {
 
 	public boolean useGuillemet() {
 		return false;
+	}
+
+	public String getMonospacedFamily() {
+		return CommandCreoleMonospaced.MONOSPACED;
+	}
+
+	public int getTabSize() {
+		return 8;
+	}
+
+	public IHtmlColorSet getIHtmlColorSet() {
+		return new HtmlColorSetSimple();
 	}
 
 }

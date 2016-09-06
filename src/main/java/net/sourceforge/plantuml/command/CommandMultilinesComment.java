@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -25,22 +25,25 @@
  */
 package net.sourceforge.plantuml.command;
 
-import java.util.List;
-
 import net.sourceforge.plantuml.core.Diagram;
 
 public class CommandMultilinesComment extends CommandMultilines<Diagram> {
 
+	public static final String COMMENT_MULTILINE_START = "(?i)^[%s]*/[%q]([^%q]|[%q][^/])*$";
+	public static final String COMMENT_MULTILINE_END = "(?i)^([^%q]|[%q][^/])*[%q]/[%s]*$";
+	public static final String COMMENT_SINGLE_LINE = "(?i)^[%s]*([%q].*||/[%q].*[%q]/[%s]*)$";
+	public static final String INNER_COMMENT = "/[%q].*?[%q]/";
+
 	public CommandMultilinesComment() {
-		super("(?i)^[%s]*/[%q].*$");
+		super(COMMENT_MULTILINE_START);
 	}
 
 	@Override
 	public String getPatternEnd() {
-		return "(?i)^.*[%q]/[%s]*$";
+		return COMMENT_MULTILINE_END;
 	}
 
-	public CommandExecutionResult execute(final Diagram diagram, List<String> lines) {
+	public CommandExecutionResult execute(final Diagram diagram, BlocLines lines) {
 		return CommandExecutionResult.ok();
 	}
 

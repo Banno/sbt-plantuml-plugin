@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -38,6 +38,9 @@ public class AsciiEncoder implements URLEncoder {
 	}
 
 	public String encode(byte data[]) {
+		if (data == null) {
+			return "";
+		}
 		final StringBuilder resu = new StringBuilder((data.length * 4 + 2) / 3);
 		for (int i = 0; i < data.length; i += 3) {
 			append3bytes(resu, data[i] & 0xFF, i + 1 < data.length ? data[i + 1] & 0xFF : 0,

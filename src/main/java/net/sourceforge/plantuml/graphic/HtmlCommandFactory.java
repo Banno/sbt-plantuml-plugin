@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -32,11 +32,12 @@ import net.sourceforge.plantuml.Url;
 import net.sourceforge.plantuml.UrlBuilder;
 import net.sourceforge.plantuml.UrlBuilder.ModeUrl;
 import net.sourceforge.plantuml.command.regex.MyPattern;
+import net.sourceforge.plantuml.command.regex.Pattern2;
 
 class HtmlCommandFactory {
 
-	static final Pattern addStyle;
-	static final Pattern removeStyle;
+	static final Pattern2 addStyle;
+	static final Pattern2 removeStyle;
 
 	static {
 		final StringBuilder sbAddStyle = new StringBuilder();
@@ -58,7 +59,7 @@ class HtmlCommandFactory {
 		removeStyle = MyPattern.cmpile(sbRemoveStyle.toString(), Pattern.CASE_INSENSITIVE);
 	}
 
-	private Pattern htmlTag = MyPattern.cmpile(Splitter.htmlTag, Pattern.CASE_INSENSITIVE);
+	private Pattern2 htmlTag = MyPattern.cmpile(Splitter.htmlTag, Pattern.CASE_INSENSITIVE);
 
 	HtmlCommand getHtmlCommand(String s) {
 		if (htmlTag.matcher(s).matches() == false) {

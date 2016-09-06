@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.plantuml.FileFormat;
+import net.sourceforge.plantuml.StringUtils;
 import net.sourceforge.plantuml.cucadiagram.CucaDiagram;
 import net.sourceforge.plantuml.cucadiagram.Display;
 import net.sourceforge.plantuml.cucadiagram.IEntity;
@@ -49,7 +50,6 @@ import net.sourceforge.plantuml.posimo.GraphvizSolverB;
 import net.sourceforge.plantuml.posimo.Path;
 import net.sourceforge.plantuml.ugraphic.UTranslate;
 import net.sourceforge.plantuml.ugraphic.txt.UGraphicTxt;
-import net.sourceforge.plantuml.StringUtils;
 
 public final class CucaDiagramTxtMaker {
 
@@ -116,14 +116,14 @@ public final class CucaDiagramTxtMaker {
 		ug.getCharArea().drawHLine('-', y, 1, w - 1);
 		y++;
 		for (Member att : ent.getBodier().getFieldsToDisplay()) {
-			final List<String> disp = StringUtils.getWithNewlines2(att.getDisplay(true));
+			final List<String> disp = StringUtils.getWithNewlines(att.getDisplay(true));
 			ug.getCharArea().drawStringsLR(disp, 1, y);
 			y += StringUtils.getHeight(disp);
 		}
 		ug.getCharArea().drawHLine('-', y, 1, w - 1);
 		y++;
 		for (Member att : ent.getBodier().getMethodsToDisplay()) {
-			final List<String> disp = StringUtils.getWithNewlines2(att.getDisplay(true));
+			final List<String> disp = StringUtils.getWithNewlines(att.getDisplay(true));
 			ug.getCharArea().drawStringsLR(disp, 1, y);
 			y += StringUtils.getHeight(disp);
 		}

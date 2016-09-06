@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -31,10 +31,13 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import net.sourceforge.plantuml.ColorParam;
 import net.sourceforge.plantuml.ISkinParam;
 import net.sourceforge.plantuml.SkinParamBackcolored;
+import net.sourceforge.plantuml.SkinParamForceColor;
 import net.sourceforge.plantuml.graphic.HtmlColor;
 import net.sourceforge.plantuml.graphic.StringBounder;
+import net.sourceforge.plantuml.graphic.SymbolContext;
 import net.sourceforge.plantuml.skin.Component;
 import net.sourceforge.plantuml.skin.ComponentType;
 import net.sourceforge.plantuml.skin.Skin;
@@ -45,13 +48,13 @@ public class LifeLine {
 
 	static class Variation {
 		final private LifeSegmentVariation type;
-		final private HtmlColor backcolor;
+		final private SymbolContext colors;
 		final private double y;
 
-		Variation(LifeSegmentVariation type, double y, HtmlColor backcolor) {
+		Variation(LifeSegmentVariation type, double y, SymbolContext backcolor) {
 			this.type = type;
 			this.y = y;
-			this.backcolor = backcolor;
+			this.colors = backcolor;
 		}
 
 		@Override
@@ -74,7 +77,7 @@ public class LifeLine {
 		this.shadowing = shadowing;
 	}
 
-	public void addSegmentVariation(LifeSegmentVariation type, double y, HtmlColor backcolor) {
+	public void addSegmentVariation(LifeSegmentVariation type, double y, SymbolContext colors) {
 		if (events.size() > 0) {
 			final Variation last = events.get(events.size() - 1);
 			if (y < last.y) {
@@ -86,7 +89,7 @@ public class LifeLine {
 				// throw new IllegalArgumentException();
 			}
 		}
-		events.add(new Variation(type, y, backcolor));
+		events.add(new Variation(type, y, colors));
 		final int currentLevel = type.apply(stairs.getLastValue());
 		stairs.addStep(y, currentLevel);
 		assert getLevel(y) == stairs.getValue(y);
@@ -171,10 +174,10 @@ public class LifeLine {
 			if (level == 0) {
 				final double y1 = events.get(i).y;
 				final double y2 = events.get(j).y;
-				return new SegmentColored(y1, y2, events.get(i).backcolor, shadowing);
+				return new SegmentColored(y1, y2, events.get(i).colors, shadowing);
 			}
 		}
-		return new SegmentColored(events.get(i).y, events.get(events.size() - 1).y, events.get(i).backcolor, shadowing);
+		return new SegmentColored(events.get(i).y, events.get(events.size() - 1).y, events.get(i).colors, shadowing);
 	}
 
 	private Collection<SegmentColored> getSegmentsCutted(StringBounder stringBounder, int i) {
@@ -194,7 +197,12 @@ public class LifeLine {
 			ComponentType type = ComponentType.ALIVE_BOX_CLOSE_OPEN;
 			for (final Iterator<SegmentColored> it = getSegmentsCutted(stringBounder, i).iterator(); it.hasNext();) {
 				final SegmentColored seg = it.next();
-				final ISkinParam skinParam2 = new SkinParamBackcolored(skinParam, seg.getSpecificBackColor());
+				ISkinParam skinParam2 = new SkinParamBackcolored(skinParam, seg.getSpecificBackColor());
+				final HtmlColor specificLineColor = seg.getSpecificLineColor();
+				if (specificLineColor != null) {
+					skinParam2 = new SkinParamForceColor(skinParam2, ColorParam.sequenceLifeLineBorder,
+							specificLineColor);
+				}
 				if (it.hasNext() == false) {
 					type = type == ComponentType.ALIVE_BOX_CLOSE_OPEN ? ComponentType.ALIVE_BOX_CLOSE_CLOSE
 							: ComponentType.ALIVE_BOX_OPEN_CLOSE;
@@ -229,5 +237,12 @@ public class LifeLine {
 
 	public final boolean shadowing() {
 		return shadowing;
+	}
+
+	public SymbolContext getColors() {
+		if (events.size() == 0) {
+			return null;
+		}
+		return events.get(events.size() - 1).colors;
 	}
 }

@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -33,7 +33,9 @@ import net.sourceforge.plantuml.activitydiagram3.ftile.Ftile;
 import net.sourceforge.plantuml.activitydiagram3.ftile.FtileFactory;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Swimlane;
 import net.sourceforge.plantuml.cucadiagram.Display;
+import net.sourceforge.plantuml.graphic.color.Colors;
 import net.sourceforge.plantuml.sequencediagram.NotePosition;
+import net.sourceforge.plantuml.sequencediagram.NoteType;
 
 public class InstructionSplit implements Instruction {
 
@@ -45,6 +47,9 @@ public class InstructionSplit implements Instruction {
 		this.parent = parent;
 		this.splits.add(new InstructionList());
 		this.inlinkRendering = inlinkRendering;
+		if (inlinkRendering == null) {
+			throw new IllegalArgumentException();
+		}
 	}
 
 	private InstructionList getLast() {
@@ -90,8 +95,8 @@ public class InstructionSplit implements Instruction {
 		return inlinkRendering;
 	}
 
-	public void addNote(Display note, NotePosition position) {
-		getLast().addNote(note, position);
+	public boolean addNote(Display note, NotePosition position, NoteType type, Colors colors) {
+		return getLast().addNote(note, position, type, colors);
 	}
 
 	public Set<Swimlane> getSwimlanes() {

@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -25,12 +25,14 @@
  */
 package net.sourceforge.plantuml;
 
-import net.sourceforge.plantuml.graphic.HtmlColor;
+import net.sourceforge.plantuml.graphic.color.Colors;
 
 public interface SpecificBackcolorable {
 
-	public HtmlColor getSpecificBackColor();
+	public Colors getColors(ISkinParam skinParam);
 
-	public void setSpecificBackcolor(HtmlColor specificBackcolor);
+	// public void setSpecificColorTOBEREMOVED(ColorType type, HtmlColor color);
+	
+	public void setColors(Colors colors);
 
 }

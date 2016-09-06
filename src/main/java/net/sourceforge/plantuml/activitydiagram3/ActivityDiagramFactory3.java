@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -36,6 +36,7 @@ import net.sourceforge.plantuml.activitydiagram3.command.CommandArrowLong3;
 import net.sourceforge.plantuml.activitydiagram3.command.CommandElse3;
 import net.sourceforge.plantuml.activitydiagram3.command.CommandElseIf2;
 import net.sourceforge.plantuml.activitydiagram3.command.CommandElseLegacy1;
+import net.sourceforge.plantuml.activitydiagram3.command.CommandEnd3;
 import net.sourceforge.plantuml.activitydiagram3.command.CommandEndPartition3;
 import net.sourceforge.plantuml.activitydiagram3.command.CommandEndif3;
 import net.sourceforge.plantuml.activitydiagram3.command.CommandFork3;
@@ -61,7 +62,6 @@ import net.sourceforge.plantuml.activitydiagram3.command.CommandSplitAgain3;
 import net.sourceforge.plantuml.activitydiagram3.command.CommandSplitEnd3;
 import net.sourceforge.plantuml.activitydiagram3.command.CommandStart3;
 import net.sourceforge.plantuml.activitydiagram3.command.CommandStop3;
-import net.sourceforge.plantuml.activitydiagram3.command.CommandEnd3;
 import net.sourceforge.plantuml.activitydiagram3.command.CommandSwimlane;
 import net.sourceforge.plantuml.activitydiagram3.command.CommandSwimlane2;
 import net.sourceforge.plantuml.activitydiagram3.command.CommandWhile3;
@@ -91,12 +91,11 @@ public class ActivityDiagramFactory3 extends UmlDiagramFactory {
 		cmds.add(new CommandActivity3());
 		cmds.add(new CommandIf4());
 		cmds.add(new CommandIf2());
-		cmds.add(new CommandDecoratorMultine(new CommandIf2())); // UmlDiagramFactory
-		// cmds.add(new CommandIf2Multilines());
+		cmds.add(new CommandDecoratorMultine(new CommandIf2(), 50));
 		cmds.add(new CommandIfLegacy1());
 		cmds.add(new CommandElseIf2());
 		cmds.add(new CommandElse3());
-		cmds.add(new CommandDecoratorMultine(new CommandElse3()));
+		cmds.add(new CommandDecoratorMultine(new CommandElse3(), 50));
 		cmds.add(new CommandElseLegacy1());
 		cmds.add(new CommandEndif3());
 		cmds.add(new CommandRepeat3());
@@ -125,6 +124,7 @@ public class ActivityDiagramFactory3 extends UmlDiagramFactory {
 
 		cmds.add(new CommandLabel());
 		cmds.add(new CommandGoto());
+		cmds.add(new CommandDecoratorMultine(new CommandElseIf2(), 50));
 
 		return cmds;
 	}

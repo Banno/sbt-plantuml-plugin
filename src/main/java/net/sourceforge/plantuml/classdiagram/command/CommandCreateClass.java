@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -25,8 +25,6 @@
  */
 package net.sourceforge.plantuml.classdiagram.command;
 
-import java.util.Locale;
-
 import net.sourceforge.plantuml.FontParam;
 import net.sourceforge.plantuml.StringUtils;
 import net.sourceforge.plantuml.Url;
@@ -44,7 +42,10 @@ import net.sourceforge.plantuml.cucadiagram.Display;
 import net.sourceforge.plantuml.cucadiagram.ILeaf;
 import net.sourceforge.plantuml.cucadiagram.LeafType;
 import net.sourceforge.plantuml.cucadiagram.Stereotype;
-import net.sourceforge.plantuml.graphic.HtmlColorUtils;
+import net.sourceforge.plantuml.graphic.HtmlColor;
+import net.sourceforge.plantuml.graphic.color.ColorParser;
+import net.sourceforge.plantuml.graphic.color.ColorType;
+import net.sourceforge.plantuml.graphic.color.Colors;
 
 public class CommandCreateClass extends SingleLineCommand2<ClassDiagram> {
 
@@ -65,13 +66,13 @@ public class CommandCreateClass extends SingleLineCommand2<ClassDiagram> {
 						"(interface|enum|annotation|abstract[%s]+class|abstract|class)[%s]+"), //
 				new RegexOr(//
 						new RegexConcat(//
-								new RegexLeaf("DISPLAY1", "[%g]([^%g]+)[%g]"), //
+								new RegexLeaf("DISPLAY1", "[%g](.+)[%g]"), //
 								new RegexLeaf("[%s]+as[%s]+"), //
 								new RegexLeaf("CODE1", "(" + CODE + ")")), //
 						new RegexConcat(//
 								new RegexLeaf("CODE2", "(" + CODE + ")"), //
 								new RegexLeaf("[%s]+as[%s]+"), // //
-								new RegexLeaf("DISPLAY2", "[%g]([^%g]+)[%g]")), //
+								new RegexLeaf("DISPLAY2", "[%g](.+)[%g]")), //
 						new RegexLeaf("CODE3", "(" + CODE + ")"), //
 						new RegexLeaf("CODE4", "[%g]([^%g]+)[%g]")), //
 				new RegexLeaf("GENERIC", "(?:[%s]*\\<(" + GenericRegexProducer.PATTERN + ")\\>)?"), //
@@ -80,12 +81,16 @@ public class CommandCreateClass extends SingleLineCommand2<ClassDiagram> {
 				new RegexLeaf("[%s]*"), //
 				new RegexLeaf("URL", "(" + UrlBuilder.getRegexp() + ")?"), //
 				new RegexLeaf("[%s]*"), //
-				new RegexLeaf("COLOR", "(" + HtmlColorUtils.COLOR_REGEXP + ")?"), //
+				color().getRegex(), //
 				new RegexLeaf("[%s]*"), //
 				new RegexLeaf("LINECOLOR", "(?:##(?:\\[(dotted|dashed|bold)\\])?(\\w+)?)?"), //
 				new RegexLeaf("EXTENDS", "([%s]+(extends)[%s]+(" + CommandCreateClassMultilines.CODES + "))?"), //
 				new RegexLeaf("IMPLEMENTS", "([%s]+(implements)[%s]+(" + CommandCreateClassMultilines.CODES + "))?"), //
 				new RegexLeaf("$"));
+	}
+
+	private static ColorParser color() {
+		return ColorParser.simpleColor(ColorType.BACK);
 	}
 
 	@Override
@@ -105,7 +110,7 @@ public class CommandCreateClass extends SingleLineCommand2<ClassDiagram> {
 		}
 		if (stereotype != null) {
 			entity.setStereotype(new Stereotype(stereotype, diagram.getSkinParam().getCircledCharacterRadius(), diagram
-					.getSkinParam().getFont(FontParam.CIRCLED_CHARACTER, null, false), diagram.getSkinParam()
+					.getSkinParam().getFont(null, false, FontParam.CIRCLED_CHARACTER), diagram.getSkinParam()
 					.getIHtmlColorSet()));
 		}
 		if (generic != null) {
@@ -119,9 +124,27 @@ public class CommandCreateClass extends SingleLineCommand2<ClassDiagram> {
 			entity.addUrl(url);
 		}
 
-		entity.setSpecificBackcolor(diagram.getSkinParam().getIHtmlColorSet().getColorIfValid(arg.get("COLOR", 0)));
-		entity.setSpecificLineColor(diagram.getSkinParam().getIHtmlColorSet().getColorIfValid(arg.get("LINECOLOR", 1)));
-		CommandCreateClassMultilines.applyStroke(entity, arg.get("LINECOLOR", 0));
+		Colors colors = color().getColor(arg, diagram.getSkinParam().getIHtmlColorSet());
+
+		final HtmlColor lineColor = diagram.getSkinParam().getIHtmlColorSet().getColorIfValid(arg.get("LINECOLOR", 1));
+		if (lineColor != null) {
+			colors = colors.add(ColorType.LINE, lineColor);
+		}
+		if (arg.get("LINECOLOR", 0) != null) {
+			colors = colors.addLegacyStroke(arg.get("LINECOLOR", 0));
+		}
+		entity.setColors(colors);
+
+		// entity.setSpecificColorTOBEREMOVED(ColorType.LINE, lineColor);
+		// entity.setSpecificColorTOBEREMOVED(ColorType.HEADER, colors.getColor(ColorType.HEADER));
+		//
+		// if (colors.getLineStyle() != null) {
+		// entity.setSpecificLineStroke(LinkStyle.getStroke(colors.getLineStyle()));
+		// }
+		//
+		// if (arg.get("LINECOLOR", 0) != null) {
+		// entity.applyStroke(arg.get("LINECOLOR", 0));
+		// }
 
 		// manageExtends(diagram, arg, entity);
 		CommandCreateClassMultilines.manageExtends("EXTENDS", diagram, arg, entity);
@@ -129,7 +152,6 @@ public class CommandCreateClass extends SingleLineCommand2<ClassDiagram> {
 
 		return CommandExecutionResult.ok();
 	}
-
 	// public static void manageExtends(ClassDiagram system, RegexResult arg, final IEntity entity) {
 	// if (arg.get("EXTENDS", 1) != null) {
 	// final Mode mode = arg.get("EXTENDS", 1).equalsIgnoreCase("extends") ? Mode.EXTENDS : Mode.IMPLEMENTS;

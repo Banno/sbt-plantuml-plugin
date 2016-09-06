@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -28,38 +28,59 @@ package net.sourceforge.plantuml;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import net.sourceforge.plantuml.command.regex.MyPattern;
+import net.sourceforge.plantuml.command.regex.Matcher2;
 import net.sourceforge.plantuml.core.Diagram;
+import net.sourceforge.plantuml.utils.StartUtils;
 
 public class BlockUml {
 
-	private final List<? extends CharSequence> data;
+	private final List<CharSequence2> data;
 	private final int startLine;
 	private Diagram system;
 
-	private static final Pattern patternFilename = MyPattern.cmpile("^@start[^%s{}%g]+[%s{][%s%g]*([^%g]*?)[%s}%g]*$");
-
 	BlockUml(String... strings) {
-		this(Arrays.asList(strings), 0);
+		this(convert(strings), 0);
 	}
 
-	public BlockUml(List<? extends CharSequence> strings, int startLine) {
+	public String getFlashData() {
+		final StringBuilder sb = new StringBuilder();
+		for (CharSequence2 line : data) {
+			sb.append(line);
+			sb.append('\r');
+			sb.append('\n');
+		}
+		return sb.toString();
+	}
+
+	public static List<CharSequence2> convert(String... strings) {
+		return convert(Arrays.asList(strings));
+	}
+
+	public static List<CharSequence2> convert(List<String> strings) {
+		final List<CharSequence2> result = new ArrayList<CharSequence2>();
+		LineLocationImpl location = new LineLocationImpl("block", null);
+		for (String s : strings) {
+			location = location.oneLineRead();
+			result.add(new CharSequence2Impl(s, location));
+		}
+		return result;
+	}
+
+	public BlockUml(List<CharSequence2> strings, int startLine) {
 		this.startLine = startLine;
-		final String s0 = StringUtils.trin(strings.get(0).toString());
-		if (s0.startsWith("@start") == false) {
+		final CharSequence2 s0 = strings.get(0).trin();
+		if (StartUtils.startsWithSymbolAnd("start", s0) == false) {
 			throw new IllegalArgumentException();
 		}
-		this.data = new ArrayList<CharSequence>(strings);
+		this.data = new ArrayList<CharSequence2>(strings);
 	}
 
-	public String getFilename() {
+	public String getFileOrDirname() {
 		if (OptionFlags.getInstance().isWord()) {
 			return null;
 		}
-		final Matcher m = patternFilename.matcher(StringUtils.trin(data.get(0).toString()));
+		final Matcher2 m = StartUtils.patternFilename.matcher(StringUtils.trin(data.get(0).toString()));
 		final boolean ok = m.find();
 		if (ok == false) {
 			return null;
@@ -75,6 +96,9 @@ public class BlockUml {
 				return null;
 			}
 		}
+		if (result.startsWith("file://")) {
+			result = result.substring("file://".length());
+		}
 		return result;
 	}
 
@@ -87,6 +111,10 @@ public class BlockUml {
 
 	public final int getStartLine() {
 		return startLine;
+	}
+
+	public final List<CharSequence2> getData() {
+		return data;
 	}
 
 }

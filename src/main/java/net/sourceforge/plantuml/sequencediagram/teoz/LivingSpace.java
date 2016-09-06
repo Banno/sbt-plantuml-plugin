@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -29,6 +29,7 @@ import java.awt.geom.Dimension2D;
 import java.util.List;
 
 import net.sourceforge.plantuml.ISkinParam;
+import net.sourceforge.plantuml.Url;
 import net.sourceforge.plantuml.graphic.HorizontalAlignment;
 import net.sourceforge.plantuml.graphic.StringBounder;
 import net.sourceforge.plantuml.graphic.VerticalAlignment;
@@ -69,7 +70,7 @@ public class LivingSpace {
 	private final EventsHistory eventsHistory;
 	private boolean create = false;
 	private double createY = 0;
-	
+
 	private final ParticipantEnglober englober;
 
 	public int getLevelAt(Tile tile, EventsHistoryMode mode) {
@@ -145,7 +146,7 @@ public class LivingSpace {
 	public void drawLineAndLiveBoxes(UGraphic ug, double height, Context2D context) {
 
 		mutingLine.drawLine(ug, context, createY, height);
-		liveBoxes.drawBoxes(ug, height, context);
+		liveBoxes.drawBoxes(ug, context, createY, height);
 	}
 
 	// public void addDelayTile(DelayTile tile) {
@@ -158,7 +159,7 @@ public class LivingSpace {
 			return;
 		}
 		final Component comp = rose.createComponent(headType, null, p.getSkinParamBackcolored(skinParam),
-				p.getDisplay(false));
+				p.getDisplay(skinParam.forceSequenceParticipantUnderlined()));
 		final Dimension2D dim = comp.getPreferredDimension(ug.getStringBounder());
 		if (horizontalAlignment == HorizontalAlignment.RIGHT) {
 			ug = ug.apply(new UTranslate(-dim.getWidth(), 0));
@@ -167,12 +168,18 @@ public class LivingSpace {
 			ug = ug.apply(new UTranslate(0, -dim.getHeight() / 2));
 		}
 		final Area area = new Area(dim);
+		final Url url = getParticipant().getUrl();
+		if (url != null) {
+			ug.startUrl(url);
+		}
 		comp.drawU(ug, area, context);
+		if (url != null) {
+			ug.closeAction();
+		}
 	}
 
 	public Dimension2D getHeadPreferredDimension(StringBounder stringBounder) {
-		// final Component comp = skin.createComponent(headType, null, skinParam, p.getDisplay(false));
-		final Component comp = rose.createComponent(headType, null, skinParam, p.getDisplay(false));
+		final Component comp = rose.createComponent(headType, null, skinParam, p.getDisplay(skinParam.forceSequenceParticipantUnderlined()));
 		final Dimension2D dim = comp.getPreferredDimension(stringBounder);
 		return dim;
 	}
@@ -188,10 +195,16 @@ public class LivingSpace {
 		return posC;
 	}
 
+	public Real getPosC2(StringBounder stringBounder) {
+		final double delta = liveBoxes.getMaxPosition(stringBounder);
+		return getPosC(stringBounder).addFixed(delta);
+	}
+
 	public Real getPosD(StringBounder stringBounder) {
 		if (posD == null) {
 			this.posD = posB.addFixed(this.getPreferredWidth(stringBounder));
 		}
+		// System.err.println("LivingSpace::getPosD "+posD.getCurrentValue());
 		return posD;
 	}
 
@@ -204,7 +217,7 @@ public class LivingSpace {
 	}
 
 	public void goCreate(double y) {
-		System.err.println("LivingSpace::goCreate");
+		System.err.println("LivingSpace::goCreate y=" + y);
 		this.createY = y;
 		this.create = true;
 	}

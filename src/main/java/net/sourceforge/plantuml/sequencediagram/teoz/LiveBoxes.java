@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -30,8 +30,10 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import net.sourceforge.plantuml.ISkinParam;
+import net.sourceforge.plantuml.graphic.StringBounder;
 import net.sourceforge.plantuml.sequencediagram.Participant;
 import net.sourceforge.plantuml.skin.Context2D;
+import net.sourceforge.plantuml.skin.SimpleContext2D;
 import net.sourceforge.plantuml.skin.Skin;
 import net.sourceforge.plantuml.ugraphic.UGraphic;
 import net.sourceforge.plantuml.ugraphic.UTranslate;
@@ -49,8 +51,14 @@ public class LiveBoxes {
 		this.skinParam = skinParam;
 	}
 
-	public void drawBoxes(UGraphic ug, double totalHeight, Context2D context) {
-		final Stairs2 stairs = eventsHistory.getStairs(totalHeight);
+	public double getMaxPosition(StringBounder stringBounder) {
+		final int max = eventsHistory.getMaxValue();
+		final LiveBoxesDrawer drawer = new LiveBoxesDrawer(new SimpleContext2D(true), skin, skinParam, delays);
+		return drawer.getWidth(stringBounder) / 2.0 * max;
+	}
+
+	public void drawBoxes(UGraphic ug, Context2D context, double createY, double endY) {
+		final Stairs2 stairs = eventsHistory.getStairs(createY, endY);
 		final int max = stairs.getMaxValue();
 		if (max == 0) {
 			drawDestroys(ug, stairs, context);
@@ -77,7 +85,7 @@ public class LiveBoxes {
 			final IntegerColored integerColored = stairs.getValue(yposition.getValue());
 			final int level = integerColored.getValue();
 			if (pending && level == levelToDraw) {
-				drawer.addStart(yposition.getValue(), integerColored.getColor());
+				drawer.addStart(yposition.getValue(), integerColored.getColors());
 				pending = false;
 			} else if (pending == false && (it.hasNext() == false || level < levelToDraw)) {
 				drawer.doDrawing(ug, yposition);

@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -33,7 +33,13 @@ import java.util.zip.Inflater;
 public class CompressionZlib implements Compression {
 
 	public byte[] compress(byte[] in) {
+		if (in.length == 0) {
+			return null;
+		}
 		int len = in.length * 2;
+		if (len < 100) {
+			len = 100;
+		}
 		byte[] result = null;
 		while (result == null) {
 			result = tryCompress(in, len);

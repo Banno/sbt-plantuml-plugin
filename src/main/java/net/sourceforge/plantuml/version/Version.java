@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -31,7 +31,7 @@ import java.util.Date;
 public class Version {
 
 	public static int version() {
-		return 8026;
+		return 8047;
 	}
 
 	public static String versionString() {
@@ -54,8 +54,16 @@ public class Version {
 		return beta;
 	}
 
-	private static long compileTime() {
-		return 1433668749193L;
+	private static String int2shortString(int v) {
+		return Integer.toString(v % 36, 36);
+	}
+
+	public static String turningId() {
+		return int2shortString(version()) + int2shortString(beta());
+	}
+
+	public static long compileTime() {
+		return 1472140770579L;
 	}
 
 	public static String compileTimeString() {

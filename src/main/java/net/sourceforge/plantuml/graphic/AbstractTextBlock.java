@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -30,7 +30,6 @@ import java.awt.geom.Rectangle2D;
 public abstract class AbstractTextBlock implements TextBlock {
 
 	public Rectangle2D getInnerPosition(String member, StringBounder stringBounder) {
-		throw new UnsupportedOperationException(getClass().toString());
+		throw new UnsupportedOperationException("member=" + member + " " + getClass().toString());
 	}
-
 }

@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -41,6 +41,7 @@ import net.sourceforge.plantuml.code.Transcoder;
 import net.sourceforge.plantuml.code.TranscoderUtil;
 import net.sourceforge.plantuml.core.Diagram;
 import net.sourceforge.plantuml.preproc.Defines;
+import net.sourceforge.plantuml.preproc.FileWithSuffix;
 
 public class SourceFileReader2 implements ISourceFileReader {
 
@@ -61,7 +62,7 @@ public class SourceFileReader2 implements ISourceFileReader {
 		FileSystem.getInstance().setCurrentDir(file.getAbsoluteFile().getParentFile());
 
 		builder = new BlockUmlBuilder(config, charset, defines, getReader(charset), file.getAbsoluteFile()
-				.getParentFile());
+				.getParentFile(), file.getAbsolutePath());
 	}
 
 	public boolean hasError() {
@@ -86,7 +87,7 @@ public class SourceFileReader2 implements ISourceFileReader {
 
 			for (File f : PSystemUtils.exportDiagrams(system, suggested, fileFormatOption)) {
 				final String desc = "[" + file.getName() + "] " + system.getDescription();
-				final GeneratedImage generatedImage = new GeneratedImage(f, desc, blockUml);
+				final GeneratedImage generatedImage = new GeneratedImageImpl(f, desc, blockUml);
 				result.add(generatedImage);
 			}
 
@@ -121,7 +122,7 @@ public class SourceFileReader2 implements ISourceFileReader {
 		this.fileFormatOption = fileFormatOption;
 	}
 
-	public final Set<File> getIncludedFiles() {
+	public final Set<FileWithSuffix> getIncludedFiles2() {
 		return builder.getIncludedFiles();
 	}
 

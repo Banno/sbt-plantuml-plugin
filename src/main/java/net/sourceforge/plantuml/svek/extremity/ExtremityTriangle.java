@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -35,9 +35,17 @@ class ExtremityTriangle extends Extremity {
 
 	private UPolygon polygon = new UPolygon();
 	private final boolean fill;
+	private final Point2D contact;
+	
+	@Override
+	public Point2D somePoint() {
+		return contact;
+	}
+
 
 	public ExtremityTriangle(Point2D p1, double angle, boolean fill) {
 		this.fill = fill;
+		this.contact = new Point2D.Double(p1.getX(), p1.getY());
 		angle = manageround(angle);
 		polygon.addPoint(0, 0);
 		final int xAile = 8;

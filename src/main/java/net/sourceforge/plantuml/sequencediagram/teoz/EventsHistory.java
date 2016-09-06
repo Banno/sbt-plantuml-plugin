@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -30,7 +30,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import net.sourceforge.plantuml.graphic.HtmlColor;
+import net.sourceforge.plantuml.graphic.SymbolContext;
+import net.sourceforge.plantuml.sequencediagram.AbstractMessage;
 import net.sourceforge.plantuml.sequencediagram.Event;
 import net.sourceforge.plantuml.sequencediagram.LifeEvent;
 import net.sourceforge.plantuml.sequencediagram.Message;
@@ -77,11 +78,11 @@ public class EventsHistory {
 				}
 			}
 			if (event == current) {
-				if (current instanceof Message) {
+				if (current instanceof AbstractMessage) {
 					final Event next = nextButSkippingNotes(it);
 					if (next instanceof LifeEvent) {
 						final LifeEvent le = (LifeEvent) next;
-						final Message msg = (Message) current;
+						final AbstractMessage msg = (AbstractMessage) current;
 						if (mode != EventsHistoryMode.IGNORE_FUTURE_ACTIVATE && le.isActivate() && msg.dealWith(p)
 								&& le.getParticipant() == p) {
 							level++;
@@ -123,7 +124,7 @@ public class EventsHistory {
 		return false;
 	}
 
-	private HtmlColor getActivateColor(Event event) {
+	private SymbolContext getActivateColor(Event event) {
 		for (Iterator<Event> it = events.iterator(); it.hasNext();) {
 			final Event current = it.next();
 			if (event != current) {
@@ -134,7 +135,7 @@ public class EventsHistory {
 				if (next instanceof LifeEvent) {
 					final LifeEvent le = (LifeEvent) next;
 					if (le.isActivate()) {
-						return le.getSpecificBackColor();
+						return le.getSpecificColors();
 					}
 					return null;
 				}
@@ -158,7 +159,7 @@ public class EventsHistory {
 		}
 	}
 
-	public Stairs2 getStairs(double totalHeight) {
+	public Stairs2 getStairs(double createY, double totalHeight) {
 		// System.err.println("EventsHistory::getStairs totalHeight=" + totalHeight);
 		final Stairs2 result = new Stairs2();
 		int value = 0;
@@ -168,13 +169,34 @@ public class EventsHistory {
 			if (position != null) {
 				assert position <= totalHeight : "position=" + position + " totalHeight=" + totalHeight;
 				value = getLevelAt(event, EventsHistoryMode.CONSIDERE_FUTURE_DEACTIVATE);
-				result.addStep(new StairsPosition(position, isNextEventADestroy(event)), value, getActivateColor(event));
+				result.addStep(new StairsPosition(Math.max(createY, position), isNextEventADestroy(event)), value,
+						getActivateColor(event));
 			}
 		}
 		// System.err.println("EventsHistory::getStairs finishing totalHeight=" + totalHeight);
 		result.addStep(new StairsPosition(totalHeight, false), value, null);
 		// System.err.println("EventsHistory::getStairs " + p + " result=" + result);
 		return result;
+	}
+
+	public int getMaxValue() {
+		int max = 0;
+		int level = 0;
+		for (Event current : events) {
+			if (current instanceof LifeEvent) {
+				final LifeEvent le = (LifeEvent) current;
+				if (le.getParticipant() == p && le.isActivate()) {
+					level++;
+				}
+				if (level > max) {
+					max = level;
+				}
+				if (le.getParticipant() == p && le.isDeactivateOrDestroy()) {
+					level--;
+				}
+			}
+		}
+		return max;
 	}
 
 }

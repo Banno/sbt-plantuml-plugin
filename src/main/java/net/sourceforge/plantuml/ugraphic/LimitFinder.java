@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -113,6 +113,9 @@ public class LimitFinder implements UGraphic {
 			drawDotPath(x, y, (DotPath) shape);
 		} else if (shape instanceof UImage) {
 			drawImage(x, y, (UImage) shape);
+		} else if (shape instanceof UImageSvg) {
+			drawImageSvg(x, y, (UImageSvg) shape);
+		} else if (shape instanceof UComment) {
 		} else if (shape instanceof UEmpty) {
 			drawEmpty(x, y, (UEmpty) shape);
 		} else if (shape instanceof TextBlock) {
@@ -137,12 +140,14 @@ public class LimitFinder implements UGraphic {
 		addPoint(x + shape.getMaxX(), y + shape.getMaxY());
 	}
 
+	private final static double HACK_X_FOR_POLYGON = 10;
+
 	private void drawUPolygon(double x, double y, UPolygon shape) {
 		if (shape.getPoints().size() == 0) {
 			return;
 		}
-		addPoint(x + shape.getMinX(), y + shape.getMinY());
-		addPoint(x + shape.getMaxX(), y + shape.getMaxY());
+		addPoint(x + shape.getMinX() - HACK_X_FOR_POLYGON, y + shape.getMinY());
+		addPoint(x + shape.getMaxX() + HACK_X_FOR_POLYGON, y + shape.getMaxY());
 	}
 
 	private void drawULine(double x, double y, ULine shape) {
@@ -162,6 +167,11 @@ public class LimitFinder implements UGraphic {
 	}
 
 	private void drawImage(double x, double y, UImage shape) {
+		addPoint(x, y);
+		addPoint(x + shape.getWidth(), y + shape.getHeight());
+	}
+
+	private void drawImageSvg(double x, double y, UImageSvg shape) {
 		addPoint(x, y);
 		addPoint(x + shape.getWidth(), y + shape.getHeight());
 	}

@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -27,12 +27,9 @@ package net.sourceforge.plantuml.svek.extremity;
 
 import java.awt.geom.Point2D;
 
-import net.sourceforge.plantuml.graphic.HtmlColorUtils;
 import net.sourceforge.plantuml.svek.image.EntityImageLollipopInterfaceEye2;
-import net.sourceforge.plantuml.ugraphic.UChangeColor;
 import net.sourceforge.plantuml.ugraphic.UEllipse;
 import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.ULine;
 import net.sourceforge.plantuml.ugraphic.UTranslate;
 
 class ExtremityParenthesis2 extends Extremity {
@@ -53,6 +50,12 @@ class ExtremityParenthesis2 extends Extremity {
 		final double len = Math.round(distance1 + EntityImageLollipopInterfaceEye2.SIZE / 2);
 		this.center = new Point2D.Double(contact.getX() + dx / distance1 * len, contact.getY() + dy / distance1 * len);
 	}
+	
+	@Override
+	public Point2D somePoint() {
+		return contact;
+	}
+
 
 	public void drawU(UGraphic ug) {
 		final double deg = -ortho * 180 / Math.PI + 90 - ang;

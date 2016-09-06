@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -60,12 +60,20 @@ public class SourceStringReader {
 		this(defines, source, "UTF-8", config);
 	}
 
+	public SourceStringReader(String source, File newCurrentDir) {
+		this(new Defines(), source, "UTF-8", Collections.<String> emptyList(), newCurrentDir);
+	}
+
 	public SourceStringReader(Defines defines, String source, String charset, List<String> config) {
+		this(defines, source, charset, config, null);
+	}
+
+	public SourceStringReader(Defines defines, String source, String charset, List<String> config, File newCurrentDir) {
 		// WARNING GLOBAL LOCK HERE
 		synchronized (SourceStringReader.class) {
 			try {
 				final BlockUmlBuilder builder = new BlockUmlBuilder(config, charset, defines, new StringReader(source),
-						null);
+						newCurrentDir, null);
 				this.blocks = builder.getBlockUmls();
 			} catch (IOException e) {
 				Log.error("error " + e);
@@ -121,7 +129,7 @@ public class SourceStringReader {
 				fileFormatOption.isUseRedForError());
 		final ImageBuilder imageBuilder = new ImageBuilder(new ColorMapperIdentity(), 1.0, error.getBackcolor(), null,
 				null, 0, 0, null, false);
-		imageBuilder.addUDrawable(error);
+		imageBuilder.setUDrawable(error);
 		imageBuilder.writeImageTOBEMOVED(fileFormatOption, os);
 	}
 

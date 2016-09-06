@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -29,10 +29,13 @@ import java.util.Set;
 
 import net.sourceforge.plantuml.activitydiagram3.ftile.Ftile;
 import net.sourceforge.plantuml.activitydiagram3.ftile.FtileFactory;
+import net.sourceforge.plantuml.activitydiagram3.ftile.FtileKilled;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Swimlane;
 import net.sourceforge.plantuml.cucadiagram.Display;
 import net.sourceforge.plantuml.graphic.HtmlColor;
+import net.sourceforge.plantuml.graphic.color.Colors;
 import net.sourceforge.plantuml.sequencediagram.NotePosition;
+import net.sourceforge.plantuml.sequencediagram.NoteType;
 
 public class InstructionRepeat implements Instruction {
 
@@ -41,17 +44,22 @@ public class InstructionRepeat implements Instruction {
 	private final LinkRendering nextLinkRenderer;
 	private final Swimlane swimlane;
 	private final HtmlColor color;
+	private boolean killed = false;
 
-	private Display test;
-	private Display yes;
-	private Display out;
-	private LinkRendering endRepeatLinkRendering;
-	private LinkRendering backRepeatLinkRendering;
+	private Display test = Display.NULL;
+	private Display yes = Display.NULL;
+	private Display out = Display.NULL;
+	private boolean testCalled = false;
+	private LinkRendering endRepeatLinkRendering = LinkRendering.none();
+	private LinkRendering backRepeatLinkRendering = LinkRendering.none();
 
 	public InstructionRepeat(Swimlane swimlane, Instruction parent, LinkRendering nextLinkRenderer, HtmlColor color) {
 		this.parent = parent;
 		this.swimlane = swimlane;
 		this.nextLinkRenderer = nextLinkRenderer;
+		if (nextLinkRenderer == null) {
+			throw new IllegalArgumentException();
+		}
 		this.color = color;
 	}
 
@@ -60,23 +68,43 @@ public class InstructionRepeat implements Instruction {
 	}
 
 	public Ftile createFtile(FtileFactory factory) {
-		return factory.repeat(swimlane, factory.decorateOut(repeatList.createFtile(factory), endRepeatLinkRendering),
-				test, yes, out, color, backRepeatLinkRendering);
+		final Ftile result = factory.repeat(swimlane, repeatList.getSwimlaneOut(),
+				factory.decorateOut(repeatList.createFtile(factory), endRepeatLinkRendering), test, yes, out, color,
+				backRepeatLinkRendering);
+		if (killed) {
+			return new FtileKilled(result);
+		}
+		return result;
 	}
 
 	public Instruction getParent() {
 		return parent;
 	}
 
-	public void setTest(Display test, Display yes, Display out, LinkRendering endRepeatLinkRendering, LinkRendering backRepeatLinkRendering) {
+	public void setTest(Display test, Display yes, Display out, LinkRendering endRepeatLinkRendering,
+			LinkRendering backRepeatLinkRendering) {
 		this.test = test;
 		this.yes = yes;
 		this.out = out;
+		if (test == null) {
+			throw new IllegalArgumentException();
+		}
+		if (yes == null) {
+			throw new IllegalArgumentException();
+		}
+		if (out == null) {
+			throw new IllegalArgumentException();
+		}
 		this.endRepeatLinkRendering = endRepeatLinkRendering;
 		this.backRepeatLinkRendering = backRepeatLinkRendering;
+		this.testCalled = true;
 	}
 
 	final public boolean kill() {
+		if (testCalled) {
+			this.killed = true;
+			return true;
+		}
 		return repeatList.kill();
 	}
 
@@ -84,8 +112,8 @@ public class InstructionRepeat implements Instruction {
 		return nextLinkRenderer;
 	}
 
-	public void addNote(Display note, NotePosition position) {
-		repeatList.addNote(note, position);
+	public boolean addNote(Display note, NotePosition position, NoteType type, Colors colors) {
+		return repeatList.addNote(note, position, type, colors);
 	}
 
 	public Set<Swimlane> getSwimlanes() {
@@ -97,7 +125,7 @@ public class InstructionRepeat implements Instruction {
 	}
 
 	public Swimlane getSwimlaneOut() {
-		return repeatList.getSwimlaneOut();
+		return parent.getSwimlaneOut();
 	}
 
 }

@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -26,6 +26,7 @@
 package net.sourceforge.plantuml.activitydiagram.command;
 
 import net.sourceforge.plantuml.Direction;
+import net.sourceforge.plantuml.StringUtils;
 import net.sourceforge.plantuml.Url;
 import net.sourceforge.plantuml.UrlBuilder;
 import net.sourceforge.plantuml.UrlBuilder.ModeUrl;
@@ -48,8 +49,8 @@ import net.sourceforge.plantuml.cucadiagram.Link;
 import net.sourceforge.plantuml.cucadiagram.LinkDecor;
 import net.sourceforge.plantuml.cucadiagram.LinkType;
 import net.sourceforge.plantuml.cucadiagram.Stereotype;
-import net.sourceforge.plantuml.graphic.HtmlColorUtils;
-import net.sourceforge.plantuml.StringUtils;
+import net.sourceforge.plantuml.graphic.color.ColorParser;
+import net.sourceforge.plantuml.graphic.color.ColorType;
 
 public class CommandLinkActivity extends SingleLineCommand2<ActivityDiagram> {
 
@@ -68,16 +69,16 @@ public class CommandLinkActivity extends SingleLineCommand2<ActivityDiagram> {
 				new RegexLeaf("[%s]*"), //
 				new RegexLeaf("STEREOTYPE", "(\\<\\<.*\\>\\>)?"), //
 				new RegexLeaf("[%s]*"), //
-				new RegexLeaf("BACKCOLOR", "(" + HtmlColorUtils.COLOR_REGEXP + ")?"), //
+				ColorParser.exp2(), //
 				new RegexLeaf("[%s]*"), //
 				new RegexLeaf("URL", "(" + UrlBuilder.getRegexp() + ")?"), //
 
 				new RegexLeaf("ARROW_BODY1", "([-.]+)"), //
 				new RegexLeaf("ARROW_STYLE1",
-						"(?:\\[((?:#\\w+|dotted|dashed|bold|hidden)(?:,#\\w+|,dotted|,dashed|,bold|,hidden)*)\\])?"), //
+						"(?:\\[((?:#\\w+|dotted|dashed|plain|bold|hidden)(?:,#\\w+|,dotted|,dashed|,plain|,bold|,hidden)*)\\])?"), //
 				new RegexLeaf("ARROW_DIRECTION", "(\\*|left|right|up|down|le?|ri?|up?|do?)?"), //
 				new RegexLeaf("ARROW_STYLE2",
-						"(?:\\[((?:#\\w+|dotted|dashed|bold|hidden)(?:,#\\w+|,dotted|,dashed|,bold|,hidden)*)\\])?"), //
+						"(?:\\[((?:#\\w+|dotted|dashed|plain|bold|hidden)(?:,#\\w+|,dotted|,dashed|,plain|,bold|,hidden)*)\\])?"), //
 				new RegexLeaf("ARROW_BODY2", "([-.]*)\\>"), //
 
 				new RegexLeaf("[%s]*"), //
@@ -95,7 +96,7 @@ public class CommandLinkActivity extends SingleLineCommand2<ActivityDiagram> {
 				new RegexLeaf("[%s]*"), //
 				new RegexLeaf("PARTITION2", "(?:in[%s]+([%g][^%g]+[%g]|\\S+))?"), //
 				new RegexLeaf("[%s]*"), //
-				new RegexLeaf("BACKCOLOR2", "(" + HtmlColorUtils.COLOR_REGEXP + ")?"), //
+				ColorParser.exp3(), //
 				new RegexLeaf("$"));
 	}
 
@@ -109,7 +110,7 @@ public class CommandLinkActivity extends SingleLineCommand2<ActivityDiagram> {
 			entity1.setStereotype(new Stereotype(arg.get("STEREOTYPE", 0)));
 		}
 		if (arg.get("BACKCOLOR", 0) != null) {
-			entity1.setSpecificBackcolor(diagram.getSkinParam().getIHtmlColorSet()
+			entity1.setSpecificColorTOBEREMOVED(ColorType.BACK, diagram.getSkinParam().getIHtmlColorSet()
 					.getColorIfValid(arg.get("BACKCOLOR", 0)));
 		}
 
@@ -118,7 +119,7 @@ public class CommandLinkActivity extends SingleLineCommand2<ActivityDiagram> {
 			return CommandExecutionResult.error("No such activity");
 		}
 		if (arg.get("BACKCOLOR2", 0) != null) {
-			entity2.setSpecificBackcolor(diagram.getSkinParam().getIHtmlColorSet()
+			entity2.setSpecificColorTOBEREMOVED(ColorType.BACK, diagram.getSkinParam().getIHtmlColorSet()
 					.getColorIfValid(arg.get("BACKCOLOR2", 0)));
 		}
 		if (arg.get("STEREOTYPE2", 0) != null) {

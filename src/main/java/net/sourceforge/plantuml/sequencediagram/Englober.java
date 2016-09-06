@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -31,7 +31,7 @@ import java.util.List;
 import net.sourceforge.plantuml.Dimension2DDouble;
 import net.sourceforge.plantuml.ISkinParam;
 import net.sourceforge.plantuml.SkinParamBackcolored;
-import net.sourceforge.plantuml.graphic.TextBlockUtils;
+import net.sourceforge.plantuml.graphic.StringBounder;
 import net.sourceforge.plantuml.real.Real;
 import net.sourceforge.plantuml.real.RealUtils;
 import net.sourceforge.plantuml.sequencediagram.teoz.LivingSpace;
@@ -53,13 +53,13 @@ public class Englober {
 	final private Real core2;
 
 	@Deprecated
-	public Englober(ParticipantEnglober participantEnglober, Participant first, ISkinParam skinParam, Skin skin) {
-		this(participantEnglober, first, convertFunctionToBeRemoved(skinParam, skin));
+	public Englober(ParticipantEnglober participantEnglober, Participant first, ISkinParam skinParam, Skin skin,
+			StringBounder stringBounder) {
+		this(participantEnglober, first, convertFunctionToBeRemoved(skinParam, skin, stringBounder));
 	}
 
-	private static TileArguments convertFunctionToBeRemoved(ISkinParam skinParam, Skin skin) {
-		final TileArguments result = new TileArguments(TextBlockUtils.getDummyStringBounder(), null, null, skin,
-				skinParam, null);
+	private static TileArguments convertFunctionToBeRemoved(ISkinParam skinParam, Skin skin, StringBounder stringBounder) {
+		final TileArguments result = new TileArguments(stringBounder, null, skin, skinParam, null);
 		return result;
 	}
 
@@ -111,7 +111,8 @@ public class Englober {
 	private Real getPosZZ() {
 		final LivingSpace next = tileArguments.getLivingSpaces().next(getLastLivingSpace());
 		if (next == null) {
-			return tileArguments.getOmega();
+			// return tileArguments.getMaxAbsolute();
+			return null;
 		}
 		return next.getPosB();
 	}
@@ -179,11 +180,23 @@ public class Englober {
 
 	public void addInternalConstraints() {
 		getX1().ensureBiggerThan(getPosAA().addFixed(10));
-		getPosZZ().ensureBiggerThan(getX2().addFixed(10));
+		final Real posZZ = getPosZZ();
+		final Real limit = getX2().addFixed(10);
+		if (posZZ != null) {
+			posZZ.ensureBiggerThan(limit);
+		}
 	}
 
 	public void addConstraintAfter(Englober current) {
 		current.getX1().ensureBiggerThan(getX2().addFixed(10));
+	}
+
+	public Real getMinX(StringBounder stringBounder) {
+		return getX1();
+	}
+
+	public Real getMaxX(StringBounder stringBounder) {
+		return getX2().addFixed(10);
 	}
 
 }

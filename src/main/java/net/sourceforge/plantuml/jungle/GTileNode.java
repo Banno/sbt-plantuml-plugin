@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -30,7 +30,7 @@ import java.util.Arrays;
 
 import net.sourceforge.plantuml.FontParam;
 import net.sourceforge.plantuml.SkinParam;
-import net.sourceforge.plantuml.UmlDiagramType;
+import net.sourceforge.plantuml.creole.CreoleMode;
 import net.sourceforge.plantuml.creole.CreoleParser;
 import net.sourceforge.plantuml.creole.Sheet;
 import net.sourceforge.plantuml.creole.SheetBlock1;
@@ -58,18 +58,19 @@ public class GTileNode extends AbstractTextBlock implements GTile {
 		final SheetBlock1 sheetBlock1 = getTextBlock(display);
 
 		final SymbolContext symbolContext = new SymbolContext(HtmlColorUtils.MY_YELLOW, HtmlColorUtils.BLACK);
-		tb = USymbol.RECTANGLE.asSmall(sheetBlock1, TextBlockUtils.empty(0, 0), symbolContext);
+		tb = USymbol.RECTANGLE.asSmall(null, sheetBlock1, TextBlockUtils.empty(0, 0), symbolContext);
 	}
 
 	public static SheetBlock1 getTextBlock(final Display display) {
 		final Rose rose = new Rose();
 		final SkinParam skinParam = new SkinParam();
 		final HtmlColor fontColor = rose.getFontColor(skinParam, FontParam.NOTE);
-		final UFont fontNote = skinParam.getFont(FontParam.NOTE, null, false);
+		final UFont fontNote = skinParam.getFont(null, false, FontParam.NOTE);
 
-		final FontConfiguration fc = new FontConfiguration(fontNote, fontColor, skinParam.getHyperlinkColor(), skinParam.useUnderlineForHyperlink());
+		final FontConfiguration fc = new FontConfiguration(skinParam, FontParam.NOTE, null);
 
-		final Sheet sheet9 = new CreoleParser(fc, HorizontalAlignment.LEFT, skinParam, false).createSheet(display);
+		final Sheet sheet9 = new CreoleParser(fc, HorizontalAlignment.LEFT, skinParam, CreoleMode.FULL)
+				.createSheet(display);
 		final SheetBlock1 sheetBlock1 = new SheetBlock1(sheet9, 0, 0);
 		return sheetBlock1;
 	}

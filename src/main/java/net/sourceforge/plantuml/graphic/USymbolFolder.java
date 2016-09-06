@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -29,8 +29,10 @@ import java.awt.geom.Dimension2D;
 
 import net.sourceforge.plantuml.Dimension2DDouble;
 import net.sourceforge.plantuml.ugraphic.UGraphic;
+import net.sourceforge.plantuml.ugraphic.UGraphicStencil;
 import net.sourceforge.plantuml.ugraphic.ULine;
 import net.sourceforge.plantuml.ugraphic.UPolygon;
+import net.sourceforge.plantuml.ugraphic.UStroke;
 import net.sourceforge.plantuml.ugraphic.UTranslate;
 
 public class USymbolFolder extends USymbol {
@@ -93,23 +95,30 @@ public class USymbolFolder extends USymbol {
 		return new Margin(10, 10 + 10, 10 + 3, 10);
 	}
 
-	public TextBlock asSmall(final TextBlock label, final TextBlock stereotype, final SymbolContext symbolContext) {
+	public TextBlock asSmall(final TextBlock name, final TextBlock label, final TextBlock stereotype,
+			final SymbolContext symbolContext) {
+		if (name == null) {
+			throw new IllegalArgumentException();
+		}
 		return new AbstractTextBlock() {
 
 			public void drawU(UGraphic ug) {
 				final Dimension2D dim = calculateDimension(ug.getStringBounder());
+				ug = new UGraphicStencil(ug, getRectangleStencil(dim), new UStroke());
 				ug = symbolContext.apply(ug);
-				drawFolder(ug, dim.getWidth(), dim.getHeight(), new Dimension2DDouble(0, 0),
-						symbolContext.isShadowing());
+				final Dimension2D dimName = name.calculateDimension(ug.getStringBounder());
+				drawFolder(ug, dim.getWidth(), dim.getHeight(), dimName, symbolContext.isShadowing());
 				final Margin margin = getMargin();
 				final TextBlock tb = TextBlockUtils.mergeTB(stereotype, label, HorizontalAlignment.CENTER);
-				tb.drawU(ug.apply(new UTranslate(margin.getX1(), margin.getY1())));
+				name.drawU(ug.apply(new UTranslate(4, 3)));
+				tb.drawU(ug.apply(new UTranslate(margin.getX1(), margin.getY1() + dimName.getHeight())));
 			}
 
 			public Dimension2D calculateDimension(StringBounder stringBounder) {
+				final Dimension2D dimName = name.calculateDimension(stringBounder);
 				final Dimension2D dimLabel = label.calculateDimension(stringBounder);
 				final Dimension2D dimStereo = stereotype.calculateDimension(stringBounder);
-				return getMargin().addDimension(Dimension2DDouble.mergeTB(dimStereo, dimLabel));
+				return getMargin().addDimension(Dimension2DDouble.mergeTB(dimName, dimStereo, dimLabel));
 			}
 		};
 	}
@@ -137,5 +146,12 @@ public class USymbolFolder extends USymbol {
 
 		};
 	}
+	
+
+	@Override
+	public boolean manageHorizontalLine() {
+		return true;
+	}
+
 
 }

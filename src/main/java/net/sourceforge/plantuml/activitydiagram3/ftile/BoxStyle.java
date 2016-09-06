@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -80,7 +80,7 @@ public enum BoxStyle {
 			ug.apply(new UTranslate(width - PADDING, 0)).draw(vline);
 		}
 	},
-	SDL_SAVE('/') {
+	SDL_SAVE('\\') {
 		@Override
 		protected Shadowable getShape(double width, double height) {
 			final UPolygon result = new UPolygon();
@@ -88,6 +88,17 @@ public enum BoxStyle {
 			result.addPoint(width - DELTA_INPUT_OUTPUT, 0.0);
 			result.addPoint(width, height);
 			result.addPoint(DELTA_INPUT_OUTPUT, height);
+			return result;
+		}
+	},
+	SDL_ANTISAVE('/') {
+		@Override
+		protected Shadowable getShape(double width, double height) {
+			final UPolygon result = new UPolygon();
+			result.addPoint(DELTA_INPUT_OUTPUT, 0.0);
+			result.addPoint(width, 0.0);
+			result.addPoint(width - DELTA_INPUT_OUTPUT, height);
+			result.addPoint(0, height);
 			return result;
 		}
 	},

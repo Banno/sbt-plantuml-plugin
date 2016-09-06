@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -27,30 +27,31 @@ package net.sourceforge.plantuml.code;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
+import net.sourceforge.plantuml.CharSequence2;
 import net.sourceforge.plantuml.StringUtils;
+import net.sourceforge.plantuml.command.regex.Matcher2;
 import net.sourceforge.plantuml.command.regex.MyPattern;
+import net.sourceforge.plantuml.command.regex.Pattern2;
 import net.sourceforge.plantuml.preproc.ReadLine;
 import net.sourceforge.plantuml.preproc.ReadLineReader;
 import net.sourceforge.plantuml.preproc.UncommentReadLine;
 
 public class ArobaseStringCompressor implements StringCompressor {
 
-	private final static Pattern p = MyPattern.cmpile("(?s)(?i)^[%s]*(@startuml[^\\n\\r]*)?[%s]*(.*?)[%s]*(@enduml)?[%s]*$");
+	private final static Pattern2 p = MyPattern.cmpile("(?s)(?i)^[%s]*(@startuml[^\\n\\r]*)?[%s]*(.*?)[%s]*(@enduml)?[%s]*$");
 
 	public String compress(final String data) throws IOException {
-		final ReadLine r = new UncommentReadLine(new ReadLineReader(new StringReader(data)));
+		final ReadLine r = new UncommentReadLine(new ReadLineReader(new StringReader(data), "COMPRESS"));
 		final StringBuilder sb = new StringBuilder();
 		final StringBuilder full = new StringBuilder();
-		String s = null;
+		CharSequence2 s = null;
 		boolean startDone = false;
 		while ((s = r.readLine()) != null) {
 			append(full, s);
-			if (s.startsWith("@startuml")) {
+			if (s.toString2().startsWith("@startuml")) {
 				startDone = true;
-			} else if (s.startsWith("@enduml")) {
+			} else if (s.toString2().startsWith("@enduml")) {
 				return sb.toString();
 			} else if (startDone) {
 				append(sb, s);
@@ -62,15 +63,15 @@ public class ArobaseStringCompressor implements StringCompressor {
 		return sb.toString();
 	}
 
-	private void append(final StringBuilder sb, String s) {
+	private void append(final StringBuilder sb, CharSequence2 s) {
 		if (sb.length() > 0) {
 			sb.append('\n');
 		}
-		sb.append(s);
+		sb.append(s.toString2());
 	}
 
 	private String compressOld(String s) throws IOException {
-		final Matcher m = p.matcher(s);
+		final Matcher2 m = p.matcher(s);
 		if (m.find()) {
 			return clean(m.group(2));
 		}
@@ -100,7 +101,7 @@ public class ArobaseStringCompressor implements StringCompressor {
 	}
 
 	private String clean1(String s) {
-		final Matcher m = p.matcher(s);
+		final Matcher2 m = p.matcher(s);
 		if (m.matches()) {
 			return m.group(2);
 		}

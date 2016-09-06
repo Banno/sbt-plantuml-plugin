@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -28,8 +28,6 @@ package net.sourceforge.plantuml.activitydiagram3;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Ftile;
 import net.sourceforge.plantuml.activitydiagram3.ftile.FtileFactory;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Swimlane;
-import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.sequencediagram.NotePosition;
 
 public class InstructionStart extends MonoSwimable implements Instruction {
 
@@ -38,7 +36,9 @@ public class InstructionStart extends MonoSwimable implements Instruction {
 	}
 
 	public Ftile createFtile(FtileFactory factory) {
-		return factory.start(getSwimlaneIn());
+		Ftile result = factory.start(getSwimlaneIn());
+		result = eventuallyAddNote(factory, result, result.getSwimlaneIn());
+		return result;
 	}
 
 	public void add(Instruction other) {
@@ -50,11 +50,7 @@ public class InstructionStart extends MonoSwimable implements Instruction {
 	}
 
 	public LinkRendering getInLinkRendering() {
-		return null;
-	}
-
-	public void addNote(Display note, NotePosition position) {
-		throw new UnsupportedOperationException();
+		return LinkRendering.none();
 	}
 
 }

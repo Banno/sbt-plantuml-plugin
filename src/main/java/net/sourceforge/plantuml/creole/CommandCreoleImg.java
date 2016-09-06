@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -28,12 +28,15 @@ package net.sourceforge.plantuml.creole;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sourceforge.plantuml.StringUtils;
+import net.sourceforge.plantuml.command.regex.Matcher2;
 import net.sourceforge.plantuml.command.regex.MyPattern;
+import net.sourceforge.plantuml.command.regex.Pattern2;
 import net.sourceforge.plantuml.graphic.Splitter;
 
 public class CommandCreoleImg implements Command {
 
-	private final Pattern pattern;
+	private final Pattern2 pattern;
 
 	private CommandCreoleImg(String p) {
 		this.pattern = MyPattern.cmpile(p);
@@ -44,7 +47,7 @@ public class CommandCreoleImg implements Command {
 	}
 
 	public int matchingSize(String line) {
-		final Matcher m = pattern.matcher(line);
+		final Matcher2 m = pattern.matcher(line);
 		if (m.find() == false) {
 			return 0;
 		}
@@ -52,19 +55,30 @@ public class CommandCreoleImg implements Command {
 	}
 
 	public String executeAndGetRemaining(String line, StripeSimple stripe) {
-		final Matcher m = pattern.matcher(line);
+		final Matcher2 m = pattern.matcher(line);
 		if (m.find() == false) {
 			throw new IllegalStateException();
 		}
-		// final int size = Integer.parseInt(m.group(2));
-		// final FontConfiguration fc1 = stripe.getActualFontConfiguration();
-		// final FontConfiguration fc2 = fc1.changeSize(size);
-		// stripe.setActualFontConfiguration(fc2);
-		// stripe.analyzeAndAdd(m.group(3));
-		final String src = m.group(2);
-		stripe.addImage(src);
-		// stripe.setActualFontConfiguration(fc1);
+		String src = m.group(2);
+		final double scale = getScale(m.group(3));
+		if (src.toLowerCase().startsWith("src=")) {
+			src = src.substring(4);
+		}
+		src = StringUtils.eventuallyRemoveStartingAndEndingDoubleQuote(src, "\"");
+		stripe.addImage(src, scale);
 		return line.substring(m.group(1).length());
+	}
+
+	public static double getScale(String s) {
+		if (s == null) {
+			return 1;
+		}
+		final Pattern p = Pattern.compile("scale=([0-9.]+)");
+		final Matcher m = p.matcher(s);
+		if (m.find()) {
+			return Double.parseDouble(m.group(1));
+		}
+		return 1;
 	}
 
 }

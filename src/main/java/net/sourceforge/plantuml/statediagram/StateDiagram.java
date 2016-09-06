@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -34,11 +34,13 @@ import net.sourceforge.plantuml.cucadiagram.GroupType;
 import net.sourceforge.plantuml.cucadiagram.IEntity;
 import net.sourceforge.plantuml.cucadiagram.IGroup;
 import net.sourceforge.plantuml.cucadiagram.LeafType;
-import net.sourceforge.plantuml.cucadiagram.Rankdir;
+import net.sourceforge.plantuml.cucadiagram.Link;
 import net.sourceforge.plantuml.graphic.USymbol;
 import net.sourceforge.plantuml.utils.UniqueSequence;
 
 public class StateDiagram extends AbstractEntityDiagram {
+
+	private static final String CONCURRENT_PREFIX = "CONC";
 
 	public boolean checkConcurrentStateOk(Code code) {
 		if (leafExist(code) == false) {
@@ -113,12 +115,12 @@ public class StateDiagram extends AbstractEntityDiagram {
 			super.endGroup();
 		}
 		getCurrentGroup().setConcurrentSeparator(direction);
-		final IGroup conc1 = getOrCreateGroup(UniqueSequence.getCode("CONC"), Display.create(""),
+		final IGroup conc1 = getOrCreateGroup(UniqueSequence.getCode(CONCURRENT_PREFIX), Display.create(""),
 				GroupType.CONCURRENT_STATE, getCurrentGroup());
 		if (EntityUtils.groupRoot(cur) == false && cur.getGroupType() == GroupType.STATE) {
 			cur.moveEntitiesTo(conc1);
 			super.endGroup();
-			getOrCreateGroup(UniqueSequence.getCode("CONC"), Display.create(""), GroupType.CONCURRENT_STATE,
+			getOrCreateGroup(UniqueSequence.getCode(CONCURRENT_PREFIX), Display.create(""), GroupType.CONCURRENT_STATE,
 					getCurrentGroup());
 		}
 		// printlink("AFTER");
@@ -156,52 +158,41 @@ public class StateDiagram extends AbstractEntityDiagram {
 		return hideEmptyDescription;
 	}
 
-	// public Link isEntryPoint(IEntity ent) {
-	// final Stereotype stereotype = ent.getStereotype();
-	// if (stereotype == null) {
-	// return null;
-	// }
-	// final String label = stereotype.getLabel();
-	// if ("<<entrypoint>>".equalsIgnoreCase(label) == false) {
-	// return null;
-	// }
-	// Link inLink = null;
-	// Link outLink = null;
-	// for (Link link : getLinks()) {
-	// if (link.getEntity1() == ent) {
-	// if (outLink != null) {
-	// return null;
-	// }
-	// outLink = link;
-	// }
-	// if (link.getEntity2() == ent) {
-	// if (inLink != null) {
-	// return null;
-	// }
-	// inLink = link;
-	// }
-	// }
-	// if (inLink == null || outLink == null) {
-	// return null;
-	// }
-	// final Link result = Link.mergeForEntryPoint(inLink, outLink);
-	// result.setEntryPoint(ent.getContainer());
-	// return result;
-	// }
-	//
-	// public void manageExitAndEntryPoints() {
-	// for (IEntity ent : getEntities().values()) {
-	// final Link entryPointLink = isEntryPoint(ent);
-	// if (entryPointLink != null) {
-	// addLink(entryPointLink);
-	// for (Link link : new ArrayList<Link>(getLinks())) {
-	// if (link.contains(ent)) {
-	// removeLink(link);
-	// }
-	// }
-	// }
-	// }
-	//
-	// }
+	@Override
+	public String checkFinalError() {
+		for (Link link : this.getLinks()) {
+			final IGroup parent1 = getGroupParentIfItIsConcurrentState(link.getEntity1());
+			final IGroup parent2 = getGroupParentIfItIsConcurrentState(link.getEntity2());
+			if (isCompatible(parent1, parent2) == false) {
+				return "State within concurrent state cannot be linked out of this concurrent state (between "
+						+ link.getEntity1().getCode().getFullName() + " and "
+						+ link.getEntity2().getCode().getFullName() + ")";
+			}
+		}
+		return super.checkFinalError();
+	}
+
+	private static boolean isCompatible(IGroup parent1, IGroup parent2) {
+		if (parent1 == null && parent2 == null) {
+			return true;
+		}
+		if (parent1 != null ^ parent2 != null) {
+			return false;
+		}
+		assert parent1 != null && parent2 != null;
+		return parent1 == parent2;
+	}
+
+	private static IGroup getGroupParentIfItIsConcurrentState(IEntity ent) {
+		IGroup parent = ent.getParentContainer();
+		while (parent != null) {
+			if (parent.getGroupType() == GroupType.CONCURRENT_STATE) {
+				return parent;
+			}
+			parent = parent.getParentContainer();
+		}
+		return null;
+
+	}
 
 }

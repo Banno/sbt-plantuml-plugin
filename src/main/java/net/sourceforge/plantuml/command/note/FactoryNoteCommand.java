@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -25,9 +25,9 @@
  */
 package net.sourceforge.plantuml.command.note;
 
-import java.util.List;
-
+import net.sourceforge.plantuml.StringUtils;
 import net.sourceforge.plantuml.classdiagram.AbstractEntityDiagram;
+import net.sourceforge.plantuml.command.BlocLines;
 import net.sourceforge.plantuml.command.Command;
 import net.sourceforge.plantuml.command.CommandExecutionResult;
 import net.sourceforge.plantuml.command.CommandMultilines2;
@@ -37,29 +37,27 @@ import net.sourceforge.plantuml.command.regex.RegexConcat;
 import net.sourceforge.plantuml.command.regex.RegexLeaf;
 import net.sourceforge.plantuml.command.regex.RegexResult;
 import net.sourceforge.plantuml.cucadiagram.Code;
-import net.sourceforge.plantuml.cucadiagram.Display;
 import net.sourceforge.plantuml.cucadiagram.IEntity;
 import net.sourceforge.plantuml.cucadiagram.LeafType;
-import net.sourceforge.plantuml.graphic.HtmlColorSet;
-import net.sourceforge.plantuml.graphic.HtmlColorUtils;
-import net.sourceforge.plantuml.StringUtils;
+import net.sourceforge.plantuml.graphic.color.ColorParser;
+import net.sourceforge.plantuml.graphic.color.ColorType;
 
 public final class FactoryNoteCommand implements SingleMultiFactoryCommand<AbstractEntityDiagram> {
 
 	private RegexConcat getRegexConcatMultiLine() {
-		return new RegexConcat(new RegexLeaf("^(note)[%s]+"), //
+		return new RegexConcat(new RegexLeaf("^[%s]*(note)[%s]+"), //
 				new RegexLeaf("CODE", "as[%s]+([\\p{L}0-9_.]+)"), //
 				new RegexLeaf("[%s]*"), //
-				new RegexLeaf("COLOR", "(" + HtmlColorUtils.COLOR_REGEXP + ")?"), //
+				ColorParser.exp1(), //
 				new RegexLeaf("$") //
 		);
 	}
 
 	private RegexConcat getRegexConcatSingleLine() {
-		return new RegexConcat(new RegexLeaf("^note[%s]+"), //
+		return new RegexConcat(new RegexLeaf("^[%s]*note[%s]+"), //
 				new RegexLeaf("DISPLAY", "[%g]([^%g]+)[%g][%s]+as[%s]+"), //
 				new RegexLeaf("CODE", "([\\p{L}0-9_.]+)[%s]*"), //
-				new RegexLeaf("COLOR", "(" + HtmlColorUtils.COLOR_REGEXP + ")?"), //
+				ColorParser.exp1(), //
 				new RegexLeaf("$") //
 		);
 
@@ -71,41 +69,39 @@ public final class FactoryNoteCommand implements SingleMultiFactoryCommand<Abstr
 			@Override
 			protected CommandExecutionResult executeArg(final AbstractEntityDiagram system, RegexResult arg) {
 				final String display = arg.get("DISPLAY", 0);
-				return executeInternal(system, arg, StringUtils.getWithNewlines2(display));
+				return executeInternal(system, arg, BlocLines.getWithNewlines(display));
 			}
 
 		};
 	}
 
-	public Command<AbstractEntityDiagram> createMultiLine() {
+	public Command<AbstractEntityDiagram> createMultiLine(boolean withBracket) {
 		return new CommandMultilines2<AbstractEntityDiagram>(getRegexConcatMultiLine(),
 				MultilinesStrategy.KEEP_STARTING_QUOTE) {
 
 			@Override
 			public String getPatternEnd() {
-				return "(?i)^end[%s]?note$";
+				return "(?i)^[%s]*end[%s]?note$";
 			}
 
-			public CommandExecutionResult executeNow(final AbstractEntityDiagram system, List<String> lines) {
+			public CommandExecutionResult executeNow(final AbstractEntityDiagram system, BlocLines lines) {
 				// StringUtils.trim(lines, false);
-				final RegexResult line0 = getStartingPattern().matcher(StringUtils.trin(lines.get(0)));
-
-				final List<String> strings = StringUtils.removeEmptyColumns(lines.subList(1, lines.size() - 1));
-
-				return executeInternal(system, line0, strings);
+				final RegexResult line0 = getStartingPattern().matcher(StringUtils.trin(lines.getFirst499()));
+				lines = lines.subExtract(1, 1);
+				lines = lines.removeEmptyColumns();
+				return executeInternal(system, line0, lines);
 			}
 		};
 	}
 
-	private CommandExecutionResult executeInternal(AbstractEntityDiagram diagram, RegexResult arg,
-			final List<? extends CharSequence> display) {
+	private CommandExecutionResult executeInternal(AbstractEntityDiagram diagram, RegexResult arg, BlocLines display) {
 		final Code code = Code.of(arg.get("CODE", 0));
 		if (diagram.leafExist(code)) {
 			return CommandExecutionResult.error("Note already created: " + code.getFullName());
 		}
-		final IEntity entity = diagram.createLeaf(code, Display.create(display), LeafType.NOTE, null);
+		final IEntity entity = diagram.createLeaf(code, display.toDisplay(), LeafType.NOTE, null);
 		assert entity != null;
-		entity.setSpecificBackcolor(diagram.getSkinParam().getIHtmlColorSet().getColorIfValid(arg.get("COLOR", 0)));
+		entity.setSpecificColorTOBEREMOVED(ColorType.BACK, diagram.getSkinParam().getIHtmlColorSet().getColorIfValid(arg.get("COLOR", 0)));
 		return CommandExecutionResult.ok();
 	}
 

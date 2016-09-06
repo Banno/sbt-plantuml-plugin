@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -32,6 +32,7 @@ import net.sourceforge.plantuml.FontParam;
 import net.sourceforge.plantuml.SkinParam;
 import net.sourceforge.plantuml.SpriteContainerEmpty;
 import net.sourceforge.plantuml.cucadiagram.Display;
+import net.sourceforge.plantuml.graphic.FontConfiguration;
 import net.sourceforge.plantuml.graphic.HtmlColor;
 import net.sourceforge.plantuml.graphic.HtmlColorSetSimple;
 import net.sourceforge.plantuml.graphic.HtmlColorUtils;
@@ -102,10 +103,11 @@ public class PostIt {
 		final HtmlColor borderColor = HtmlColorUtils.MY_RED;
 
 		final SkinParam param = SkinParam.noShadowing();
-		final UFont fontNote = param.getFont(FontParam.NOTE, null, false);
+		final UFont fontNote = param.getFont(null, false, FontParam.NOTE);
+		final FontConfiguration font2 = fontNote.toFont2(HtmlColorUtils.BLACK, true, HtmlColorUtils.BLUE, 8);
 		final ComponentRoseNote note = new ComponentRoseNote(
-				new SymbolContext(noteBackgroundColor, borderColor).withStroke(new UStroke()), fontNote.toFont2(
-						HtmlColorUtils.BLACK, true, HtmlColorUtils.BLUE), text, 0, 0, new SpriteContainerEmpty());
+				new SymbolContext(noteBackgroundColor, borderColor).withStroke(new UStroke()), font2, text, 0, 0,
+				new SpriteContainerEmpty());
 		return note;
 	}
 }

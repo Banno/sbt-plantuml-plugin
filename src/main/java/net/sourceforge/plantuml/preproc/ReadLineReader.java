@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -29,34 +29,52 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 
+import net.sourceforge.plantuml.CharSequence2;
+import net.sourceforge.plantuml.CharSequence2Impl;
+import net.sourceforge.plantuml.LineLocation;
+import net.sourceforge.plantuml.LineLocationImpl;
+
 public class ReadLineReader implements ReadLine {
 
+	// private static final int LIMIT = 850;
 	private final BufferedReader br;
+	private LineLocationImpl location;
 
-	public ReadLineReader(Reader reader) {
+	public ReadLineReader(Reader reader, String desc, LineLocation parent) {
 		br = new BufferedReader(reader);
+		location = new LineLocationImpl(desc, parent);
 	}
 
-	public String readLine() throws IOException {
+	public ReadLineReader(Reader reader, String desc) {
+		this(reader, desc, null);
+	}
+
+	public CharSequence2 readLine() throws IOException {
 		String s = br.readLine();
-		if (s != null && s.startsWith("\uFEFF")) {
+		location = location.oneLineRead();
+		if (s == null) {
+			return null;
+		}
+		// if (s.length() > LIMIT) {
+		// Log.debug("Line truncated from " + s.length() + " to " + LIMIT);
+		// s = s.substring(0, LIMIT);
+		// }
+		if (s.startsWith("\uFEFF")) {
 			s = s.substring(1);
 		}
-		if (s != null) {
-			s = s.replace('\u2013', '-');
-			// s = s.replace('\u00A0', ' ');
-			// s = s.replace('\u201c', '\"');
-			// s = s.replace('\u201d', '\"');
-			// s = s.replace('\u00ab', '\"');
-			// s = s.replace('\u00bb', '\"');
-			// s = s.replace('\u2018', '\'');
-			// s = s.replace('\u2019', '\'');
-			// for (int i = 0; i < s.length(); i++) {
-			// char c = s.charAt(i);
-			// System.err.println("X " + Integer.toHexString((int) c) + " " + c);
-			// }
-		}
-		return s;
+		s = s.replace('\u2013', '-');
+		// s = s.replace('\u00A0', ' ');
+		// s = s.replace('\u201c', '\"');
+		// s = s.replace('\u201d', '\"');
+		// s = s.replace('\u00ab', '\"');
+		// s = s.replace('\u00bb', '\"');
+		// s = s.replace('\u2018', '\'');
+		// s = s.replace('\u2019', '\'');
+		// for (int i = 0; i < s.length(); i++) {
+		// char c = s.charAt(i);
+		// System.err.println("X " + Integer.toHexString((int) c) + " " + c);
+		// }
+		return new CharSequence2Impl(s, location);
 	}
 
 	public void close() throws IOException {

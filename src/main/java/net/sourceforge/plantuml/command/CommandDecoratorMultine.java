@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -25,34 +25,41 @@
  */
 package net.sourceforge.plantuml.command;
 
-import java.util.Collections;
-import java.util.List;
-
-import net.sourceforge.plantuml.StringUtils;
 import net.sourceforge.plantuml.core.Diagram;
 
 public class CommandDecoratorMultine<D extends Diagram> implements Command<D> {
 
 	private final SingleLineCommand2<D> cmd;
+	private final boolean removeEmptyColumn;
+	private final int nbMaxLines;
 
-	public CommandDecoratorMultine(SingleLineCommand2<D> cmd) {
+	public CommandDecoratorMultine(SingleLineCommand2<D> cmd, int nbMaxLines) {
+		this(cmd, false, nbMaxLines);
+	}
+
+	public CommandDecoratorMultine(SingleLineCommand2<D> cmd, boolean removeEmptyColumn, int nbMaxLines) {
 		this.cmd = cmd;
+		this.removeEmptyColumn = removeEmptyColumn;
+		this.nbMaxLines = nbMaxLines;
 	}
 
-	public CommandExecutionResult execute(D diagram, List<String> lines) {
-		final String concat = concat(lines);
-		return cmd.execute(diagram, Collections.singletonList(concat));
+	public CommandExecutionResult execute(D diagram, BlocLines lines) {
+		if (removeEmptyColumn) {
+			lines = lines.removeEmptyColumns();
+		}
+		lines = lines.concat2();
+		return cmd.execute(diagram, lines);
 	}
 
-	public CommandControl isValid(List<String> lines) {
+	public CommandControl isValid(BlocLines lines) {
 		if (cmd.isCommandForbidden()) {
 			return CommandControl.NOT_OK;
 		}
-		final String concat = concat(lines);
-		if (cmd.isForbidden(concat)) {
+		lines = lines.concat2();
+		if (cmd.isForbidden(lines.getFirst499())) {
 			return CommandControl.NOT_OK;
 		}
-		final CommandControl tmp = cmd.isValid(Collections.singletonList(concat));
+		final CommandControl tmp = cmd.isValid(lines);
 		if (tmp == CommandControl.OK_PARTIAL) {
 			throw new IllegalStateException();
 		}
@@ -62,17 +69,12 @@ public class CommandDecoratorMultine<D extends Diagram> implements Command<D> {
 		return CommandControl.OK_PARTIAL;
 	}
 
-	private String concat(List<String> lines) {
-		final StringBuilder sb = new StringBuilder();
-		for (String line : lines) {
-			sb.append(line);
-			sb.append(StringUtils.hiddenNewLine());
-		}
-		return sb.substring(0, sb.length() - 1);
-	}
-
 	public String[] getDescription() {
 		return cmd.getDescription();
+	}
+
+	public int getNbMaxLines() {
+		return nbMaxLines;
 	}
 
 }

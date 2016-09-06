@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -48,13 +48,17 @@ import net.sourceforge.plantuml.ugraphic.UTranslate;
 
 public class ComponentBlueModernArrow extends AbstractComponentBlueModernArrow {
 
-	public ComponentBlueModernArrow(HtmlColor foregroundColor, boolean useUnderlineForHyperlink, FontConfiguration font, Display stringsToDisplay, ArrowConfiguration arrowConfiguration,
+	public ComponentBlueModernArrow(HtmlColor foregroundColor, boolean useUnderlineForHyperlink,
+			FontConfiguration font, Display stringsToDisplay, ArrowConfiguration arrowConfiguration,
 			ISkinSimple spriteContainer) {
 		super(foregroundColor, font, stringsToDisplay, arrowConfiguration, spriteContainer);
 	}
 
 	@Override
 	protected void drawInternalU(UGraphic ug, Area area) {
+		if (getArrowConfiguration().isHidden()) {
+			return;
+		}
 		final Dimension2D dimensionToUse = area.getDimensionToUse();
 		final StringBounder stringBounder = ug.getStringBounder();
 		final int textHeight = (int) getTextHeight(stringBounder);
@@ -65,7 +69,7 @@ public class ComponentBlueModernArrow extends AbstractComponentBlueModernArrow {
 		final int x2 = (int) dimensionToUse.getWidth();
 
 		if (getArrowConfiguration().isDotted()) {
-			ug = stroke(ug, 5, 2);
+			ug = ArrowConfiguration.stroke(ug, 5, 2, 1);
 		} else {
 			ug = ug.apply(new UStroke(2));
 		}
@@ -80,21 +84,21 @@ public class ComponentBlueModernArrow extends AbstractComponentBlueModernArrow {
 			ug = ug.apply(new UStroke(1.5));
 			if (direction == 1) {
 				if (getArrowConfiguration().getPart() != ArrowPart.BOTTOM_PART) {
-					ug.apply(new UTranslate(x2 - getArrowDeltaX2(), textHeight - getArrowDeltaY2())).draw(new ULine(getArrowDeltaX2(),
-					getArrowDeltaY2()));
+					ug.apply(new UTranslate(x2 - getArrowDeltaX2(), textHeight - getArrowDeltaY2())).draw(
+							new ULine(getArrowDeltaX2(), getArrowDeltaY2()));
 				}
 				if (getArrowConfiguration().getPart() != ArrowPart.TOP_PART) {
-					ug.apply(new UTranslate(x2 - getArrowDeltaX2(), textHeight + getArrowDeltaY2())).draw(new ULine(getArrowDeltaX2(),
-					-getArrowDeltaY2()));
+					ug.apply(new UTranslate(x2 - getArrowDeltaX2(), textHeight + getArrowDeltaY2())).draw(
+							new ULine(getArrowDeltaX2(), -getArrowDeltaY2()));
 				}
 			} else {
 				if (getArrowConfiguration().getPart() != ArrowPart.BOTTOM_PART) {
-					ug.apply(new UTranslate(getArrowDeltaX2(), textHeight - getArrowDeltaY2())).draw(new ULine(-getArrowDeltaX2(),
-					getArrowDeltaY2()));
+					ug.apply(new UTranslate(getArrowDeltaX2(), textHeight - getArrowDeltaY2())).draw(
+							new ULine(-getArrowDeltaX2(), getArrowDeltaY2()));
 				}
 				if (getArrowConfiguration().getPart() != ArrowPart.TOP_PART) {
-					ug.apply(new UTranslate(getArrowDeltaX2(), textHeight + getArrowDeltaY2())).draw(new ULine(-getArrowDeltaX2(),
-					-getArrowDeltaY2()));
+					ug.apply(new UTranslate(getArrowDeltaX2(), textHeight + getArrowDeltaY2())).draw(
+							new ULine(-getArrowDeltaX2(), -getArrowDeltaY2()));
 				}
 			}
 			ug = ug.apply(new UStroke());

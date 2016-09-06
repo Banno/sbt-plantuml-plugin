@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -35,6 +35,7 @@ import java.util.List;
 import javax.imageio.ImageIO;
 
 import net.sourceforge.plantuml.BlockUml;
+import net.sourceforge.plantuml.CharSequence2;
 import net.sourceforge.plantuml.Dimension2DDouble;
 import net.sourceforge.plantuml.EmbededDiagram;
 import net.sourceforge.plantuml.FileFormat;
@@ -46,10 +47,10 @@ import net.sourceforge.plantuml.ugraphic.UShape;
 
 class EmbededSystemLine extends AbstractTextBlock implements Line {
 
-	final private List<? extends CharSequence> lines;
+	final private List<CharSequence2> lines2;
 
 	public EmbededSystemLine(EmbededDiagram sys) {
-		this.lines = sys.getLines().as();
+		this.lines2 = sys.getLines().as2();
 	}
 
 	public Dimension2D calculateDimension(StringBounder stringBounder) {
@@ -93,7 +94,7 @@ class EmbededSystemLine extends AbstractTextBlock implements Line {
 	}
 
 	private Diagram getSystem() throws IOException, InterruptedException {
-		final BlockUml blockUml = new BlockUml(lines, 0);
+		final BlockUml blockUml = new BlockUml(lines2, 0);
 		return blockUml.getDiagram();
 
 	}

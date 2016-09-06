@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -25,8 +25,10 @@
  */
 package net.sourceforge.plantuml.command.note.sequence;
 
-import java.util.List;
-
+import net.sourceforge.plantuml.ColorParam;
+import net.sourceforge.plantuml.FontParam;
+import net.sourceforge.plantuml.StringUtils;
+import net.sourceforge.plantuml.command.BlocLines;
 import net.sourceforge.plantuml.command.Command;
 import net.sourceforge.plantuml.command.CommandExecutionResult;
 import net.sourceforge.plantuml.command.CommandMultilines2;
@@ -36,15 +38,15 @@ import net.sourceforge.plantuml.command.note.SingleMultiFactoryCommand;
 import net.sourceforge.plantuml.command.regex.RegexConcat;
 import net.sourceforge.plantuml.command.regex.RegexLeaf;
 import net.sourceforge.plantuml.command.regex.RegexResult;
-import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.graphic.HtmlColorSet;
-import net.sourceforge.plantuml.graphic.HtmlColorUtils;
+import net.sourceforge.plantuml.cucadiagram.Stereotype;
+import net.sourceforge.plantuml.graphic.color.ColorParser;
+import net.sourceforge.plantuml.graphic.color.ColorType;
+import net.sourceforge.plantuml.graphic.color.Colors;
 import net.sourceforge.plantuml.sequencediagram.Note;
 import net.sourceforge.plantuml.sequencediagram.NotePosition;
 import net.sourceforge.plantuml.sequencediagram.NoteStyle;
 import net.sourceforge.plantuml.sequencediagram.Participant;
 import net.sourceforge.plantuml.sequencediagram.SequenceDiagram;
-import net.sourceforge.plantuml.StringUtils;
 
 public final class FactorySequenceNoteCommand implements SingleMultiFactoryCommand<SequenceDiagram> {
 
@@ -52,10 +54,13 @@ public final class FactorySequenceNoteCommand implements SingleMultiFactoryComma
 		return new RegexConcat(//
 				new RegexLeaf("^"), //
 				new RegexLeaf("VMERGE", "(/)?[%s]*"), //
-				new RegexLeaf("STYLE", "(note|hnote|rnote)[%s]+"), //
+				new RegexLeaf("STYLE", "(note|hnote|rnote)"), //
+				new RegexLeaf("[%s]*"), //
+				new RegexLeaf("STEREO", "(\\<{2}.*\\>{2})?"), //
+				new RegexLeaf("[%s]*"), //
 				new RegexLeaf("POSITION", "(right|left|over)[%s]+"), //
 				new RegexLeaf("PARTICIPANT", "(?:of[%s]+)?([\\p{L}0-9_.@]+|[%g][^%g]+[%g])[%s]*"), //
-				new RegexLeaf("COLOR", "(" + HtmlColorUtils.COLOR_REGEXP + ")?"), //
+				color().getRegex(), //
 				new RegexLeaf("$"));
 	}
 
@@ -63,16 +68,23 @@ public final class FactorySequenceNoteCommand implements SingleMultiFactoryComma
 		return new RegexConcat(//
 				new RegexLeaf("^"), //
 				new RegexLeaf("VMERGE", "(/)?[%s]*"), //
-				new RegexLeaf("STYLE", "(note|hnote|rnote)[%s]+"), //
+				new RegexLeaf("STYLE", "(note|hnote|rnote)"), //
+				new RegexLeaf("[%s]*"), //
+				new RegexLeaf("STEREO", "(\\<{2}.*\\>{2})?"), //
+				new RegexLeaf("[%s]*"), //
 				new RegexLeaf("POSITION", "(right|left|over)[%s]+"), //
 				new RegexLeaf("PARTICIPANT", "(?:of[%s])?([\\p{L}0-9_.@]+|[%g][^%g]+[%g])[%s]*"), //
-				new RegexLeaf("COLOR", "(" + HtmlColorUtils.COLOR_REGEXP + ")?"), //
+				color().getRegex(), //
 				new RegexLeaf("[%s]*:[%s]*"), //
 				new RegexLeaf("NOTE", "(.*)"), //
 				new RegexLeaf("$"));
 	}
 
-	public Command<SequenceDiagram> createMultiLine() {
+	private static ColorParser color() {
+		return ColorParser.simpleColor(ColorType.BACK);
+	}
+
+	public Command<SequenceDiagram> createMultiLine(boolean withBracket) {
 		return new CommandMultilines2<SequenceDiagram>(getRegexConcatMultiLine(),
 				MultilinesStrategy.KEEP_STARTING_QUOTE) {
 
@@ -81,10 +93,11 @@ public final class FactorySequenceNoteCommand implements SingleMultiFactoryComma
 				return "(?i)^end[%s]?(note|hnote|rnote)$";
 			}
 
-			public CommandExecutionResult executeNow(final SequenceDiagram system, List<String> lines) {
-				final RegexResult line0 = getStartingPattern().matcher(StringUtils.trin(lines.get(0)));
-				final List<String> strings = StringUtils.removeEmptyColumns(lines.subList(1, lines.size() - 1));
-				return executeInternal(system, line0, strings);
+			public CommandExecutionResult executeNow(final SequenceDiagram system, BlocLines lines) {
+				final RegexResult line0 = getStartingPattern().matcher(StringUtils.trin(lines.getFirst499()));
+				lines = lines.subExtract(1, 1);
+				lines = lines.removeEmptyColumns();
+				return executeInternal(system, line0, lines);
 			}
 		};
 	}
@@ -94,14 +107,13 @@ public final class FactorySequenceNoteCommand implements SingleMultiFactoryComma
 
 			@Override
 			protected CommandExecutionResult executeArg(final SequenceDiagram system, RegexResult arg) {
-				final List<String> strings = StringUtils.getWithNewlines2(arg.get("NOTE", 0));
-				return executeInternal(system, arg, strings);
+				return executeInternal(system, arg, BlocLines.getWithNewlines(arg.get("NOTE", 0)));
 			}
 
 		};
 	}
 
-	private CommandExecutionResult executeInternal(SequenceDiagram diagram, RegexResult arg, final List<String> strings) {
+	private CommandExecutionResult executeInternal(SequenceDiagram diagram, RegexResult arg, BlocLines strings) {
 		final Participant p = diagram.getOrCreateParticipant(StringUtils
 				.eventuallyRemoveStartingAndEndingDoubleQuote(arg.get("PARTICIPANT", 0)));
 
@@ -109,8 +121,16 @@ public final class FactorySequenceNoteCommand implements SingleMultiFactoryComma
 
 		if (strings.size() > 0) {
 			final boolean tryMerge = arg.get("VMERGE", 0) != null;
-			final Note note = new Note(p, position, Display.create(strings));
-			note.setSpecificBackcolor(diagram.getSkinParam().getIHtmlColorSet().getColorIfValid(arg.get("COLOR", 0)));
+			final Note note = new Note(p, position, strings.toDisplay());
+			Colors colors = color().getColor(arg, diagram.getSkinParam().getIHtmlColorSet());
+			final String stereotypeString = arg.get("STEREO", 0);
+			if (stereotypeString != null) {
+				final Stereotype stereotype = new Stereotype(stereotypeString);
+				note.setStereotype(stereotype);
+				colors = colors.applyStereotypeForNote(stereotype, diagram.getSkinParam(), FontParam.NOTE,
+						ColorParam.noteBackground, ColorParam.noteBorder);
+			}
+			note.setColors(colors);
 			note.setStyle(NoteStyle.getNoteStyle(arg.get("STYLE", 0)));
 			diagram.addNote(note, tryMerge);
 		}

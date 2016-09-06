@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -24,6 +24,9 @@
  * Original Author:  Arnaud Roques
  */
 package net.sourceforge.plantuml;
+
+import java.util.EnumMap;
+import java.util.Map;
 
 import net.sourceforge.plantuml.cucadiagram.Stereotype;
 import net.sourceforge.plantuml.graphic.HtmlColor;
@@ -54,6 +57,7 @@ public class SkinParamBackcolored extends SkinParamDelegator {
 		this.backColorGeneral = backColorGeneral;
 	}
 
+	@Override
 	public HtmlColor getBackgroundColor() {
 		if (backColorGeneral != null) {
 			return backColorGeneral;
@@ -61,6 +65,7 @@ public class SkinParamBackcolored extends SkinParamDelegator {
 		return super.getBackgroundColor();
 	}
 
+	@Override
 	public HtmlColor getHtmlColor(ColorParam param, Stereotype stereotype, boolean clickable) {
 		if (param.isBackground() && backColorElement != null) {
 			return backColorElement;
@@ -72,7 +77,17 @@ public class SkinParamBackcolored extends SkinParamDelegator {
 			}
 			// clickable = true;
 		}
+		final HtmlColor forcedColor = forced.get(param);
+		if (forcedColor != null) {
+			return forcedColor;
+		}
 		return super.getHtmlColor(param, stereotype, clickable);
+	}
+
+	private final Map<ColorParam, HtmlColor> forced = new EnumMap<ColorParam, HtmlColor>(ColorParam.class);
+
+	public void forceColor(ColorParam param, HtmlColor color) {
+		forced.put(param, color);
 	}
 
 }

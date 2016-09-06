@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -50,6 +50,8 @@ import net.sourceforge.plantuml.ugraphic.UTranslate;
 
 public class GroupingTile implements TileWithCallbackY {
 
+	private static final int EXTERNAL_MARGINX1 = 3;
+	private static final int EXTERNAL_MARGINX2 = 9;
 	private static final int MARGINX = 16;
 	private static final int MARGINY = 10;
 	private final List<Tile> tiles = new ArrayList<Tile>();
@@ -88,8 +90,7 @@ public class GroupingTile implements TileWithCallbackY {
 			if (ev instanceof GroupingLeaf && ((Grouping) ev).getType() == GroupingType.END) {
 				break;
 			}
-			final Tile tile = TileBuilder.buildOne(it, tileArgumentsOriginal, ev, this);
-			if (tile != null) {
+			for (Tile tile : TileBuilder.buildOne(it, tileArgumentsOriginal, ev, this)) {
 				tiles.add(tile);
 				bodyHeight += tile.getPreferredHeight(stringBounder);
 				if (ev instanceof GroupingLeaf && ((Grouping) ev).getType() == GroupingType.ELSE) {
@@ -98,7 +99,8 @@ public class GroupingTile implements TileWithCallbackY {
 				}
 				min2.add(tile.getMinX(stringBounder).addFixed(-MARGINX));
 				final Real m = tile.getMaxX(stringBounder);
-				max2.add(m == tileArgumentsOriginal.getOmega() ? m : m.addFixed(MARGINX));
+				// max2.add(m == tileArgumentsOriginal.getOmega() ? m : m.addFixed(MARGINX));
+				max2.add(m.addFixed(MARGINX));
 			}
 		}
 		final Dimension2D dim1 = getPreferredDimensionIfEmpty(stringBounder);
@@ -186,11 +188,11 @@ public class GroupingTile implements TileWithCallbackY {
 	}
 
 	public Real getMinX(StringBounder stringBounder) {
-		return min;
+		return min.addFixed(-EXTERNAL_MARGINX1);
 	}
 
 	public Real getMaxX(StringBounder stringBounder) {
-		return max;
+		return max.addFixed(EXTERNAL_MARGINX2);
 	}
 
 	private double y;

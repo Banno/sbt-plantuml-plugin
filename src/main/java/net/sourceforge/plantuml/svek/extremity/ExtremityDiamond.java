@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -27,6 +27,7 @@ package net.sourceforge.plantuml.svek.extremity;
 
 import java.awt.geom.Point2D;
 
+import net.sourceforge.plantuml.graphic.HtmlColor;
 import net.sourceforge.plantuml.ugraphic.UChangeBackColor;
 import net.sourceforge.plantuml.ugraphic.UGraphic;
 import net.sourceforge.plantuml.ugraphic.UPolygon;
@@ -35,9 +36,18 @@ class ExtremityDiamond extends Extremity {
 
 	private UPolygon polygon = new UPolygon();
 	private final boolean fill;
+	private final Point2D contact;
+	private final HtmlColor backgroundColor;
 
-	public ExtremityDiamond(Point2D p1, double angle, boolean fill) {
+	@Override
+	public Point2D somePoint() {
+		return contact;
+	}
+
+	public ExtremityDiamond(Point2D p1, double angle, boolean fill, HtmlColor backgroundColor) {
 		this.fill = fill;
+		this.backgroundColor = backgroundColor;
+		this.contact = new Point2D.Double(p1.getX(), p1.getY());
 		angle = manageround(angle);
 		polygon.addPoint(0, 0);
 		final int xAile = 6;
@@ -53,6 +63,8 @@ class ExtremityDiamond extends Extremity {
 	public void drawU(UGraphic ug) {
 		if (fill) {
 			ug = ug.apply(new UChangeBackColor(ug.getParam().getColor()));
+		} else {
+			ug = ug.apply(new UChangeBackColor(backgroundColor));
 		}
 		ug.draw(polygon);
 	}

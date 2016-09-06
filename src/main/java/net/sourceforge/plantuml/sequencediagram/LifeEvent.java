@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -25,15 +25,15 @@
  */
 package net.sourceforge.plantuml.sequencediagram;
 
-import net.sourceforge.plantuml.graphic.HtmlColor;
+import net.sourceforge.plantuml.graphic.SymbolContext;
 
 public class LifeEvent extends AbstractEvent implements Event {
 
 	private final Participant p;
 	private final LifeEventType type;
-	private final HtmlColor backcolor;
+	private final SymbolContext backcolor;
 
-	public LifeEvent(Participant p, LifeEventType type, HtmlColor backcolor) {
+	public LifeEvent(Participant p, LifeEventType type, SymbolContext backcolor) {
 		this.p = p;
 		this.type = type;
 		this.backcolor = backcolor;
@@ -52,7 +52,7 @@ public class LifeEvent extends AbstractEvent implements Event {
 		return type;
 	}
 
-	public HtmlColor getSpecificBackColor() {
+	public SymbolContext getSpecificColors() {
 		return backcolor;
 	}
 

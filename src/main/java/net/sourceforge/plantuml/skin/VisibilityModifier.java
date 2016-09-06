@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -26,6 +26,7 @@
 package net.sourceforge.plantuml.skin;
 
 import java.awt.geom.Dimension2D;
+import java.awt.geom.Rectangle2D;
 
 import net.sourceforge.plantuml.ColorParam;
 import net.sourceforge.plantuml.Dimension2DDouble;
@@ -54,6 +55,10 @@ public enum VisibilityModifier {
 	private final ColorParam foregroundParam;
 	private final ColorParam backgroundParam;
 
+	public static String regexForVisibilityCharacter() {
+		return "[-#+~]";
+	}
+
 	private VisibilityModifier(ColorParam foreground, ColorParam background) {
 		this.foregroundParam = foreground;
 		this.backgroundParam = background;
@@ -75,12 +80,13 @@ public enum VisibilityModifier {
 				return new Dimension2DDouble(size + 1, size + 1);
 			}
 
+			@Override
+			public Rectangle2D getInnerPosition(String member, StringBounder stringBounder) {
+				return null;
+			}
+
 			public void drawU(UGraphic ug) {
-				// final double tx = ug.getTranslateX();
-				// final double ty = ug.getTranslateY();
-				// ug.translate(x, y);F
 				drawInternal(ug, size, foregroundColor, backgoundColor, 0, 0);
-				// ug.setTranslate(tx, ty);
 			}
 		};
 	}

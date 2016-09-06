@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -28,6 +28,7 @@ package net.sourceforge.plantuml.activitydiagram3.ftile.vertical;
 import java.util.Collections;
 import java.util.Set;
 
+import net.sourceforge.plantuml.ISkinParam;
 import net.sourceforge.plantuml.activitydiagram3.ftile.AbstractFtile;
 import net.sourceforge.plantuml.activitydiagram3.ftile.FtileGeometry;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Swimlane;
@@ -49,8 +50,8 @@ public class FtileCircleEnd extends AbstractFtile {
 	private final HtmlColor backColor;
 	private final Swimlane swimlane;
 
-	public FtileCircleEnd(boolean shadowing, HtmlColor backColor, Swimlane swimlane) {
-		super(shadowing);
+	public FtileCircleEnd(ISkinParam skinParam, HtmlColor backColor, Swimlane swimlane) {
+		super(skinParam);
 		this.backColor = backColor;
 		this.swimlane = swimlane;
 	}
@@ -77,14 +78,14 @@ public class FtileCircleEnd extends AbstractFtile {
 		yTheoricalPosition = Math.round(yTheoricalPosition);
 
 		final UEllipse circle = new UEllipse(SIZE, SIZE);
-		if (shadowing()) {
+		if (skinParam().shadowing()) {
 			circle.setDeltaShadow(3);
 		}
 		ug = ug.apply(new UChangeColor(backColor));
-		ug.apply(new UChangeBackColor(HtmlColorUtils.WHITE))
+		final double thickness = 2.5;
+		ug.apply(new UChangeBackColor(HtmlColorUtils.WHITE)).apply(new UStroke(1.5))
 				.apply(new UTranslate(xTheoricalPosition, yTheoricalPosition)).draw(circle);
 
-		final double thickness = 2.5;
 		final double size2 = (SIZE - thickness) / Math.sqrt(2);
 		final double delta = (SIZE - size2) / 2;
 		ug = ug.apply(new UStroke(thickness));

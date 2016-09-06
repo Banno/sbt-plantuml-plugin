@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -28,10 +28,12 @@ package net.sourceforge.plantuml.svek;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sourceforge.plantuml.cucadiagram.Code;
 import net.sourceforge.plantuml.cucadiagram.IEntity;
 import net.sourceforge.plantuml.cucadiagram.IGroup;
 import net.sourceforge.plantuml.cucadiagram.ILeaf;
@@ -133,6 +135,17 @@ public class Bibliotekon {
 		return sb.length() == 0 ? "" : sb.toString();
 	}
 
+	public Map<Code, Double> getMaxX() {
+		final Map<Code, Double> result = new HashMap<Code, Double>();
+		for (Map.Entry<ILeaf, Shape> ent : shapeMap.entrySet()) {
+			final Shape sh = ent.getValue();
+			final double maxX = sh.getMinX() + sh.getWidth();
+			final IEntity entity = ent.getKey();
+			result.put(entity.getCode(), maxX);
+		}
+		return Collections.unmodifiableMap(result);
+	}
+
 	public List<Line> allLines() {
 		return Collections.unmodifiableList(allLines);
 	}
@@ -180,5 +193,14 @@ public class Bibliotekon {
 			}
 		}
 		return null;
+	}
+
+	public ILeaf getLeaf(Shape shape) {
+		for (Map.Entry<ILeaf, Shape> ent : shapeMap.entrySet()) {
+			if (ent.getValue() == shape) {
+				return ent.getKey();
+			}
+		}
+		throw new IllegalArgumentException();
 	}
 }

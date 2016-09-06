@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -26,7 +26,6 @@
 package net.sourceforge.plantuml.activitydiagram3.ftile.vcompact;
 
 import net.sourceforge.plantuml.ColorParam;
-import net.sourceforge.plantuml.ISkinParam;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Ftile;
 import net.sourceforge.plantuml.activitydiagram3.ftile.FtileFactory;
 import net.sourceforge.plantuml.activitydiagram3.ftile.FtileFactoryDelegator;
@@ -38,14 +37,15 @@ public class FtileFactoryDelegatorCreateGroup extends FtileFactoryDelegator {
 
 	private final Rose rose = new Rose();
 
-	public FtileFactoryDelegatorCreateGroup(FtileFactory factory, ISkinParam skinParam) {
-		super(factory, skinParam);
+	public FtileFactoryDelegatorCreateGroup(FtileFactory factory) {
+		super(factory);
 	}
 
 	@Override
-	public Ftile createGroup(Ftile list, Display name, HtmlColor backColor, HtmlColor titleColor, Display headerNote) {
-		final HtmlColor arrowColor = rose.getHtmlColor(getSkinParam(), ColorParam.activityArrow);
-		return new FtileGroup(list, name, headerNote, arrowColor, backColor, titleColor, getSkinParam());
+	public Ftile createGroup(Ftile list, Display name, HtmlColor backColor, HtmlColor titleColor, Display headerNote,
+			HtmlColor borderColor) {
+		final HtmlColor arrowColor = rose.getHtmlColor(skinParam(), ColorParam.activityArrow);
+		return new FtileGroup(list, name, headerNote, arrowColor, backColor, titleColor, skinParam(), borderColor);
 	}
 
 }

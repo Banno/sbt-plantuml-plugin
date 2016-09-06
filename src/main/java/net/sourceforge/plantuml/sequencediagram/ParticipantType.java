@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -33,7 +33,8 @@ public enum ParticipantType {
 	BOUNDARY(ColorParam.boundaryBackground), //
 	CONTROL(ColorParam.controlBackground), //
 	ENTITY(ColorParam.entityBackground), //
-	DATABASE(ColorParam.databaseBackground);
+	DATABASE(ColorParam.databaseBackground), //
+	COLLECTIONS(ColorParam.collectionsBackground);
 
 	private final ColorParam background;
 

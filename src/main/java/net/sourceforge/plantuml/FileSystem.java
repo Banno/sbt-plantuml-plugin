@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
-
 
 public class FileSystem {
 
@@ -84,10 +83,11 @@ public class FileSystem {
 
 	private List<File> getPath(String prop) {
 		final List<File> result = new ArrayList<File>();
-		final String paths = System.getProperty(prop);
+		String paths = System.getProperty(prop);
 		if (paths == null) {
 			return result;
 		}
+		paths = StringUtils.eventuallyRemoveStartingAndEndingDoubleQuote(paths);
 		final StringTokenizer st = new StringTokenizer(paths, System.getProperty("path.separator"));
 		while (st.hasMoreTokens()) {
 			final File f = new File(st.nextToken());

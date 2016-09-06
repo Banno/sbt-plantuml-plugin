@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -31,6 +31,7 @@ import java.io.OutputStream;
 import net.sourceforge.plantuml.FileFormatOption;
 import net.sourceforge.plantuml.UmlDiagramType;
 import net.sourceforge.plantuml.core.ImageData;
+import net.sourceforge.plantuml.creole.CreoleMode;
 import net.sourceforge.plantuml.cucadiagram.Code;
 import net.sourceforge.plantuml.cucadiagram.Display;
 import net.sourceforge.plantuml.cucadiagram.EntityUtils;
@@ -38,6 +39,7 @@ import net.sourceforge.plantuml.cucadiagram.GroupType;
 import net.sourceforge.plantuml.cucadiagram.IGroup;
 import net.sourceforge.plantuml.cucadiagram.ILeaf;
 import net.sourceforge.plantuml.cucadiagram.LeafType;
+import net.sourceforge.plantuml.cucadiagram.Link;
 import net.sourceforge.plantuml.graphic.HtmlColorUtils;
 import net.sourceforge.plantuml.graphic.TextBlock;
 import net.sourceforge.plantuml.graphic.USymbol;
@@ -130,9 +132,10 @@ public class ClassDiagram extends AbstractClassOrObjectDiagram {
 			group = getOrCreateNamespaceInternal(namespace2, Display.getWithNewlines(namespace), GroupType.PACKAGE,
 					getRootGroup());
 		}
-		return createLeafInternal(fullyCode,
-				display == null ? Display.getWithNewlines(fullyCode.getShortName(getLeafs())) : display, type, group,
-				symbol);
+		return createLeafInternal(
+				fullyCode,
+				Display.isNull(display) ? Display.getWithNewlines(fullyCode.getShortName(getLeafs())).withCreoleMode(
+						CreoleMode.SIMPLE_LINE) : display, type, group, symbol);
 	}
 
 	private final String getNamespace(Code fullyCode) {
@@ -204,7 +207,7 @@ public class ClassDiagram extends AbstractClassOrObjectDiagram {
 		}
 		final ImageBuilder imageBuilder = new ImageBuilder(getSkinParam().getColorMapper(), 1, HtmlColorUtils.WHITE,
 				null, null, 0, 10, null, getSkinParam().handwritten());
-		imageBuilder.addUDrawable(fullLayout);
+		imageBuilder.setUDrawable(fullLayout);
 		return imageBuilder.writeImageTOBEMOVED(fileFormatOption, os);
 	}
 
@@ -220,6 +223,23 @@ public class ClassDiagram extends AbstractClassOrObjectDiagram {
 
 	private TextBlock getEntityImageClass(ILeaf entity) {
 		return new EntityImageClass(null, entity, getSkinParam(), this);
+	}
+
+
+	@Override
+	public String checkFinalError() {
+		for (Link link : this.getLinks()) {
+			final int len = link.getLength();
+			if (len == 1) {
+				for (Link link2 : this.getLinks()) {
+					if (link2.sameConnections(link) && link2.getLength() != 1) {
+						link2.setLength(1);
+					}
+				}
+			}
+		}
+		this.applySingleStrategy();
+		return super.checkFinalError();
 	}
 
 }

@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -28,6 +28,7 @@ package net.sourceforge.plantuml.activitydiagram3.ftile.vertical;
 import java.util.Collections;
 import java.util.Set;
 
+import net.sourceforge.plantuml.ISkinParam;
 import net.sourceforge.plantuml.activitydiagram3.ftile.AbstractFtile;
 import net.sourceforge.plantuml.activitydiagram3.ftile.FtileGeometry;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Swimlane;
@@ -45,8 +46,8 @@ public class FtileBlackBlock extends AbstractFtile {
 	private final HtmlColor colorBar;
 	private final Swimlane swimlane;
 
-	public FtileBlackBlock(boolean shadowing, HtmlColor colorBar, Swimlane swimlane) {
-		super(shadowing);
+	public FtileBlackBlock(ISkinParam skinParam, HtmlColor colorBar, Swimlane swimlane) {
+		super(skinParam);
 		this.colorBar = colorBar;
 		this.swimlane = swimlane;
 	}
@@ -62,7 +63,7 @@ public class FtileBlackBlock extends AbstractFtile {
 
 	public void drawU(UGraphic ug) {
 		final URectangle rect = new URectangle(width, height, 5, 5);
-		if (shadowing()) {
+		if (skinParam().shadowing()) {
 			rect.setDeltaShadow(3);
 		}
 		ug.apply(new UChangeColor(colorBar)).apply(new UChangeBackColor(colorBar)).draw(rect);

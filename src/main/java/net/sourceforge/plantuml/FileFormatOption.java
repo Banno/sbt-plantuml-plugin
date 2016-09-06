@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -30,12 +30,14 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Dimension2D;
 import java.awt.image.BufferedImage;
+import java.io.Serializable;
 
 import net.sourceforge.plantuml.eps.EpsStrategy;
 import net.sourceforge.plantuml.graphic.HtmlColor;
 import net.sourceforge.plantuml.graphic.HtmlColorGradient;
 import net.sourceforge.plantuml.graphic.HtmlColorSimple;
 import net.sourceforge.plantuml.graphic.HtmlColorTransparent;
+import net.sourceforge.plantuml.graphic.StringBounder;
 import net.sourceforge.plantuml.ugraphic.ColorMapper;
 import net.sourceforge.plantuml.ugraphic.ColorMapperIdentity;
 import net.sourceforge.plantuml.ugraphic.UChangeBackColor;
@@ -47,7 +49,6 @@ import net.sourceforge.plantuml.ugraphic.html5.UGraphicHtml5;
 import net.sourceforge.plantuml.ugraphic.svg.UGraphicSvg;
 import net.sourceforge.plantuml.ugraphic.tikz.UGraphicTikz;
 import net.sourceforge.plantuml.ugraphic.visio.UGraphicVdx;
-import net.sourceforge.plantuml.StringUtils;
 
 /**
  * A FileFormat with some parameters.
@@ -56,7 +57,7 @@ import net.sourceforge.plantuml.StringUtils;
  * @author Arnaud Roques
  * 
  */
-public class FileFormatOption {
+public class FileFormatOption implements Serializable {
 
 	private final FileFormat fileFormat;
 	private final AffineTransform affineTransform;
@@ -65,9 +66,13 @@ public class FileFormatOption {
 	private final String svgLinkTarget;
 
 	public FileFormatOption(FileFormat fileFormat) {
-		this(fileFormat, null, true, false, "_top");
+		this(fileFormat, null, true, false, "_top", false);
 	}
-	
+
+	public StringBounder getDefaultStringBounder() {
+		return fileFormat.getDefaultStringBounder();
+	}
+
 	public String getSvgLinkTarget() {
 		return svgLinkTarget;
 	}
@@ -77,23 +82,25 @@ public class FileFormatOption {
 	}
 
 	public FileFormatOption(FileFormat fileFormat, boolean withMetadata) {
-		this(fileFormat, null, false, false, "_top");
+		this(fileFormat, null, false, false, "_top", false);
 	}
 
-	private FileFormatOption(FileFormat fileFormat, AffineTransform at, boolean withMetadata, boolean useRedForError, String svgLinkTarget) {
+	private FileFormatOption(FileFormat fileFormat, AffineTransform at, boolean withMetadata, boolean useRedForError,
+			String svgLinkTarget, boolean debugsvek) {
 		this.fileFormat = fileFormat;
 		this.affineTransform = at;
 		this.withMetadata = withMetadata;
 		this.useRedForError = useRedForError;
 		this.svgLinkTarget = svgLinkTarget;
+		this.debugsvek = debugsvek;
 	}
 
 	public FileFormatOption withUseRedForError() {
-		return new FileFormatOption(fileFormat, affineTransform, withMetadata, true, svgLinkTarget);
+		return new FileFormatOption(fileFormat, affineTransform, withMetadata, true, svgLinkTarget, debugsvek);
 	}
 
 	public FileFormatOption withSvgLinkTarget(String target) {
-		return new FileFormatOption(fileFormat, affineTransform, withMetadata, useRedForError, target);
+		return new FileFormatOption(fileFormat, affineTransform, withMetadata, useRedForError, target, debugsvek);
 	}
 
 	@Override
@@ -136,7 +143,9 @@ public class FileFormatOption {
 		case VDX:
 			return new UGraphicVdx(colorMapper);
 		case LATEX:
-			return new UGraphicTikz(colorMapper);
+			return new UGraphicTikz(colorMapper, true);
+		case LATEX_NO_PREAMBLE:
+			return new UGraphicTikz(colorMapper, false);
 		default:
 			throw new UnsupportedOperationException(fileFormat.toString());
 		}
@@ -199,6 +208,16 @@ public class FileFormatOption {
 
 	public final boolean isUseRedForError() {
 		return useRedForError;
+	}
+
+	private boolean debugsvek = false;
+
+	public void setDebugSvek(boolean debugsvek) {
+		this.debugsvek = debugsvek;
+	}
+
+	public boolean isDebugSvek() {
+		return debugsvek;
 	}
 
 }

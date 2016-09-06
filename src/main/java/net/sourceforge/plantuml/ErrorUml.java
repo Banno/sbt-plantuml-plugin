@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -34,14 +34,16 @@ public class ErrorUml {
 	private final int position;
 	private final ErrorUmlType type;
 	private SuggestEngineResult suggest;
+	private final LineLocation lineLocation;
 
-	public ErrorUml(ErrorUmlType type, String error, int position) {
+	public ErrorUml(ErrorUmlType type, String error, int position, LineLocation lineLocation) {
 		if (error == null || type == null || StringUtils.isEmpty(error)) {
 			throw new IllegalArgumentException();
 		}
 		this.error = error;
 		this.type = type;
 		this.position = position;
+		this.lineLocation = lineLocation;
 	}
 
 	@Override
@@ -72,6 +74,10 @@ public class ErrorUml {
 		return position;
 	}
 
+	public LineLocation getLineLocation() {
+		return lineLocation;
+	}
+
 	public final SuggestEngineResult getSuggest() {
 		return suggest;
 	}
@@ -83,5 +89,6 @@ public class ErrorUml {
 	public void setSuggest(SuggestEngineResult suggest) {
 		this.suggest = suggest;
 	}
+
 
 }

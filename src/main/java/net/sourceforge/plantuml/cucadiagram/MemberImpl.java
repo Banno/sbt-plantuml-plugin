@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -25,14 +25,13 @@
  */
 package net.sourceforge.plantuml.cucadiagram;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import net.sourceforge.plantuml.StringUtils;
 import net.sourceforge.plantuml.Url;
 import net.sourceforge.plantuml.UrlBuilder;
 import net.sourceforge.plantuml.UrlBuilder.ModeUrl;
+import net.sourceforge.plantuml.command.regex.Matcher2;
 import net.sourceforge.plantuml.command.regex.MyPattern;
+import net.sourceforge.plantuml.command.regex.Pattern2;
 import net.sourceforge.plantuml.skin.VisibilityModifier;
 
 public class MemberImpl implements Member {
@@ -46,13 +45,14 @@ public class MemberImpl implements Member {
 	private final VisibilityModifier visibilityModifier;
 
 	public MemberImpl(String tmpDisplay, boolean isMethod, boolean manageModifier, boolean manageUrl) {
+		tmpDisplay = tmpDisplay.replaceAll("(?i)\\{(method|field)\\}\\s*", "");
 		if (manageModifier) {
 			this.hasUrl = new UrlBuilder(null, ModeUrl.ANYWHERE).getUrl(tmpDisplay) != null;
-			final Pattern pstart = MyPattern.cmpile("^(" + UrlBuilder.getRegexp() + ")([^\\[\\]]+)$");
-			final Matcher mstart = pstart.matcher(tmpDisplay);
+			final Pattern2 pstart = MyPattern.cmpile("^(" + UrlBuilder.getRegexp() + ")([^\\[\\]]+)$");
+			final Matcher2 mstart = pstart.matcher(tmpDisplay);
 
 			if (mstart.matches()) {
-				if (mstart.groupCount() != 5) {
+				if (mstart.groupCount() != 4) {
 					throw new IllegalStateException();
 				}
 				final UrlBuilder urlBuilder = new UrlBuilder(null, ModeUrl.AT_START);
@@ -60,12 +60,12 @@ public class MemberImpl implements Member {
 				this.url.setMember(true);
 				tmpDisplay = /* mstart.group(1).trim() + */StringUtils.trin(mstart.group(mstart.groupCount()));
 			} else {
-				final Pattern pend = MyPattern.cmpile("^((?:[^\\[\\]]|\\[[^\\[\\]]*\\])+)(" + UrlBuilder.getRegexp()
+				final Pattern2 pend = MyPattern.cmpile("^((?:[^\\[\\]]|\\[[^\\[\\]]*\\])+)(" + UrlBuilder.getRegexp()
 						+ ")$");
-				final Matcher mend = pend.matcher(tmpDisplay);
+				final Matcher2 mend = pend.matcher(tmpDisplay);
 
 				if (mend.matches()) {
-					if (mend.groupCount() != 5) {
+					if (mend.groupCount() != 4) {
 						throw new IllegalStateException();
 					}
 					final UrlBuilder urlBuilder = new UrlBuilder(null, ModeUrl.AT_END);
@@ -92,7 +92,8 @@ public class MemberImpl implements Member {
 			}
 
 			if (VisibilityModifier.isVisibilityCharacter(displayClean.charAt(0))) {
-				visibilityModifier = VisibilityModifier.getVisibilityModifier(displayClean.charAt(0), isMethod == false);
+				visibilityModifier = VisibilityModifier
+						.getVisibilityModifier(displayClean.charAt(0), isMethod == false);
 				this.display = StringUtils.trin(StringUtils.manageGuillemet(displayClean.substring(1)));
 			} else {
 				this.display = StringUtils.manageGuillemet(displayClean);
@@ -114,7 +115,7 @@ public class MemberImpl implements Member {
 		return getDisplayWithoutVisibilityChar();
 	}
 
-	public String getDisplayWithoutVisibilityChar() {
+	private String getDisplayWithoutVisibilityChar() {
 		// assert display.length() == 0 || VisibilityModifier.isVisibilityCharacter(display.charAt(0)) == false;
 		return display;
 	}
@@ -184,6 +185,25 @@ public class MemberImpl implements Member {
 
 	public boolean hasUrl() {
 		return hasUrl;
+	}
+
+	public static boolean isMethod(String s) {
+		if (s.contains("{method}")) {
+			return true;
+		}
+		if (s.contains("{field}")) {
+			return false;
+		}
+		return s.contains("(") || s.contains(")");
+	}
+
+	public String getPort() {
+		final Pattern2 pattern = MyPattern.cmpile("([\\p{L}0-9_.]+)");
+		final Matcher2 matcher = pattern.matcher(display);
+		if (matcher.find() == false) {
+			return null;
+		}
+		return matcher.group(1);
 	}
 
 }

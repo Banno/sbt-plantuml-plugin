@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -25,28 +25,27 @@
  */
 package net.sourceforge.plantuml.graphic;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import net.sourceforge.plantuml.command.regex.Matcher2;
 import net.sourceforge.plantuml.command.regex.MyPattern;
+import net.sourceforge.plantuml.command.regex.Pattern2;
 
 class ColorAndSizeChange implements FontChange {
 
-	static final Pattern colorPattern = MyPattern.cmpile("(?i)color\\s*=\\s*[%g]?(#[0-9a-fA-F]{6}|\\w+)[%g]?");
+	static final Pattern2 colorPattern = MyPattern.cmpile("(?i)color\\s*=\\s*[%g]?(#[0-9a-fA-F]{6}|\\w+)[%g]?");
 
-	static final Pattern sizePattern = MyPattern.cmpile("(?i)size\\s*=\\s*[%g]?(\\d+)[%g]?");
+	static final Pattern2 sizePattern = MyPattern.cmpile("(?i)size\\s*=\\s*[%g]?(\\d+)[%g]?");
 
 	private final HtmlColor color;
 	private final Integer size;
 
 	ColorAndSizeChange(String s) {
-		final Matcher matcherColor = colorPattern.matcher(s);
+		final Matcher2 matcherColor = colorPattern.matcher(s);
 		if (matcherColor.find()) {
 			color = HtmlColorSet.getInstance().getColorIfValid(matcherColor.group(1));
 		} else {
 			color = null;
 		}
-		final Matcher matcherSize = sizePattern.matcher(s);
+		final Matcher2 matcherSize = sizePattern.matcher(s);
 		if (matcherSize.find()) {
 			size = new Integer(matcherSize.group(1));
 		} else {

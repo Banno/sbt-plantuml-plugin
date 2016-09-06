@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -34,7 +34,7 @@ public class Arrows {
 	final static private double delta2 = 4;
 
 	public static UPolygon asToUp() {
-		final UPolygon polygon = new UPolygon();
+		final UPolygon polygon = new UPolygon("asToUp");
 		polygon.addPoint(-delta2, delta1);
 		polygon.addPoint(0, 0);
 		polygon.addPoint(delta2, delta1);
@@ -43,7 +43,7 @@ public class Arrows {
 	}
 
 	public static UPolygon asToDown() {
-		final UPolygon polygon = new UPolygon();
+		final UPolygon polygon = new UPolygon("asToDown");
 		polygon.addPoint(-delta2, -delta1);
 		polygon.addPoint(0, 0);
 		polygon.addPoint(delta2, -delta1);
@@ -52,7 +52,7 @@ public class Arrows {
 	}
 
 	public static UPolygon asToRight() {
-		final UPolygon polygon = new UPolygon();
+		final UPolygon polygon = new UPolygon("asToRight");
 		polygon.addPoint(-delta1, -delta2);
 		polygon.addPoint(0, 0);
 		polygon.addPoint(-delta1, delta2);
@@ -61,7 +61,7 @@ public class Arrows {
 	}
 
 	public static UPolygon asToLeft() {
-		final UPolygon polygon = new UPolygon();
+		final UPolygon polygon = new UPolygon("asToLeft");
 		polygon.addPoint(delta1, -delta2);
 		polygon.addPoint(0, 0);
 		polygon.addPoint(delta1, delta2);

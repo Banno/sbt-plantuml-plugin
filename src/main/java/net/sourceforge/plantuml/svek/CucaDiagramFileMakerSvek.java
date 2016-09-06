@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -25,49 +25,30 @@
  */
 package net.sourceforge.plantuml.svek;
 
-import java.awt.Color;
 import java.awt.geom.Dimension2D;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sourceforge.plantuml.EmptyImageBuilder;
-import net.sourceforge.plantuml.FileFormat;
+import net.sourceforge.plantuml.AnnotatedWorker;
+import net.sourceforge.plantuml.BaseFile;
 import net.sourceforge.plantuml.FileFormatOption;
-import net.sourceforge.plantuml.FontParam;
-import net.sourceforge.plantuml.ISkinParam;
+import net.sourceforge.plantuml.NamedOutputStream;
 import net.sourceforge.plantuml.Scale;
 import net.sourceforge.plantuml.UmlDiagramType;
-import net.sourceforge.plantuml.activitydiagram3.ftile.EntityImageLegend;
 import net.sourceforge.plantuml.core.ImageData;
 import net.sourceforge.plantuml.cucadiagram.CucaDiagram;
-import net.sourceforge.plantuml.cucadiagram.Display;
 import net.sourceforge.plantuml.cucadiagram.Link;
-import net.sourceforge.plantuml.cucadiagram.Stereotype;
 import net.sourceforge.plantuml.cucadiagram.dot.CucaDiagramSimplifierActivity;
 import net.sourceforge.plantuml.cucadiagram.dot.CucaDiagramSimplifierState;
 import net.sourceforge.plantuml.cucadiagram.dot.DotData;
-import net.sourceforge.plantuml.graphic.FontConfiguration;
-import net.sourceforge.plantuml.graphic.HorizontalAlignment;
-import net.sourceforge.plantuml.graphic.HtmlColor;
 import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.graphic.StringBounderUtils;
-import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.graphic.TextBlockUtils;
 import net.sourceforge.plantuml.ugraphic.ImageBuilder;
-import net.sourceforge.plantuml.ugraphic.UFont;
 
 public final class CucaDiagramFileMakerSvek implements CucaDiagramFileMaker {
 
 	private final CucaDiagram diagram;
-
-	static private final StringBounder stringBounder;
-
-	static {
-		final EmptyImageBuilder builder = new EmptyImageBuilder(10, 10, Color.WHITE);
-		stringBounder = StringBounderUtils.asStringBounder(builder.getGraphics2D());
-	}
 
 	public CucaDiagramFileMakerSvek(CucaDiagram diagram) throws IOException {
 		this.diagram = diagram;
@@ -83,48 +64,50 @@ public final class CucaDiagramFileMakerSvek implements CucaDiagramFileMaker {
 		}
 	}
 
-	private CucaDiagramFileMakerSvek2 buildCucaDiagramFileMakerSvek2(DotMode dotMode) {
+	private DotDataImageBuilder createDotDataImageBuilder(DotMode dotMode, StringBounder stringBounder) {
 		final DotData dotData = new DotData(diagram.getEntityFactory().getRootGroup(), getOrderedLinks(),
 				diagram.getLeafsvalues(), diagram.getUmlDiagramType(), diagram.getSkinParam(), diagram, diagram,
 				diagram.getColorMapper(), diagram.getEntityFactory(), diagram.isHideEmptyDescriptionForState(),
 				dotMode, diagram.getNamespaceSeparator(), diagram.getPragma());
-		final CucaDiagramFileMakerSvek2 svek2 = new CucaDiagramFileMakerSvek2(dotData, diagram.getEntityFactory(),
-				diagram.getSource(), diagram.getPragma());
-		return svek2;
+		return new DotDataImageBuilder(dotData, diagram.getEntityFactory(), diagram.getSource(), diagram.getPragma(), stringBounder);
 
 	}
 
 	private ImageData createFileInternal(OutputStream os, List<String> dotStrings, FileFormatOption fileFormatOption)
 			throws IOException, InterruptedException {
 		if (diagram.getUmlDiagramType() == UmlDiagramType.ACTIVITY) {
-			new CucaDiagramSimplifierActivity(diagram, dotStrings);
+			new CucaDiagramSimplifierActivity(diagram, dotStrings, fileFormatOption.getDefaultStringBounder());
 		} else if (diagram.getUmlDiagramType() == UmlDiagramType.STATE) {
-			new CucaDiagramSimplifierState(diagram, dotStrings);
+			new CucaDiagramSimplifierState(diagram, dotStrings, fileFormatOption.getDefaultStringBounder());
 		}
 
-		CucaDiagramFileMakerSvek2 svek2 = buildCucaDiagramFileMakerSvek2(DotMode.NORMAL);
-		TextBlockBackcolored result = svek2.createFile(diagram.getDotStringSkek());
-		if (result instanceof GraphvizCrash) {
-			svek2 = buildCucaDiagramFileMakerSvek2(DotMode.NO_LEFT_RIGHT);
-			result = svek2.createFile(diagram.getDotStringSkek());
+		// System.err.println("FOO11 type=" + os.getClass());
+		DotDataImageBuilder svek2 = createDotDataImageBuilder(DotMode.NORMAL, fileFormatOption.getDefaultStringBounder());
+		BaseFile basefile = null;
+		if (fileFormatOption.isDebugSvek() && os instanceof NamedOutputStream) {
+			basefile = ((NamedOutputStream) os).getBasefile();
 		}
-		result = addLegend(result);
-		result = addTitle(result);
-		result = addHeaderAndFooter(result);
+		// System.err.println("FOO11 basefile=" + basefile);
+
+		TextBlockBackcolored result = svek2.buildImage(basefile, diagram.getDotStringSkek());
+		if (result instanceof GraphvizCrash) {
+			svek2 = createDotDataImageBuilder(DotMode.NO_LEFT_RIGHT, fileFormatOption.getDefaultStringBounder());
+			result = svek2.buildImage(basefile, diagram.getDotStringSkek());
+		}
+		result = new AnnotatedWorker(diagram, diagram.getSkinParam()).addAdd(result);
 
 		final String widthwarning = diagram.getSkinParam().getValue("widthwarning");
+		String warningOrError = null;
 		if (widthwarning != null && widthwarning.matches("\\d+")) {
-			this.warningOrError = svek2.getBibliotekon().getWarningOrError(Integer.parseInt(widthwarning));
-		} else {
-			this.warningOrError = null;
+			warningOrError = svek2.getWarningOrError(Integer.parseInt(widthwarning));
 		}
-		final Dimension2D dim = result.calculateDimension(stringBounder);
+		final Dimension2D dim = result.calculateDimension(fileFormatOption.getDefaultStringBounder());
 		final double scale = getScale(fileFormatOption, dim);
 
 		final ImageBuilder imageBuilder = new ImageBuilder(diagram.getSkinParam().getColorMapper(), scale,
 				result.getBackcolor(), fileFormatOption.isWithMetadata() ? diagram.getMetadata() : null,
 				warningOrError, 0, 10, diagram.getAnimation(), diagram.getSkinParam().handwritten());
-		imageBuilder.addUDrawable(result);
+		imageBuilder.setUDrawable(result);
 		return imageBuilder.writeImageTOBEMOVED(fileFormatOption, os);
 
 	}
@@ -153,64 +136,6 @@ public final class CucaDiagramFileMakerSvek implements CucaDiagramFileMaker {
 			}
 		}
 		result.add(link);
-	}
-
-	private String warningOrError;
-
-	private String getWarningOrError() {
-		return warningOrError;
-	}
-
-	private TextBlockBackcolored addHeaderAndFooter(TextBlockBackcolored original) {
-		final Display footer = diagram.getFooter();
-		final Display header = diagram.getHeader();
-		if (footer == null && header == null) {
-			return original;
-		}
-		final TextBlock textFooter = footer == null ? null : TextBlockUtils.create(footer, new FontConfiguration(
-				getFont(FontParam.FOOTER), getFontColor(FontParam.FOOTER, null), diagram.getSkinParam()
-						.getHyperlinkColor(), diagram.getSkinParam().useUnderlineForHyperlink()), diagram
-				.getFooterAlignment(), diagram.getSkinParam());
-		final TextBlock textHeader = header == null ? null : TextBlockUtils.create(header, new FontConfiguration(
-				getFont(FontParam.HEADER), getFontColor(FontParam.HEADER, null), diagram.getSkinParam()
-						.getHyperlinkColor(), diagram.getSkinParam().useUnderlineForHyperlink()), diagram
-				.getHeaderAlignment(), diagram.getSkinParam());
-
-		return new DecorateEntityImage(original, textHeader, diagram.getHeaderAlignment(), textFooter,
-				diagram.getFooterAlignment());
-	}
-
-	private TextBlockBackcolored addTitle(TextBlockBackcolored original) {
-		final Display title = diagram.getTitle();
-		if (title == null) {
-			return original;
-		}
-		final TextBlock text = TextBlockUtils.create(title, new FontConfiguration(getFont(FontParam.TITLE),
-				getFontColor(FontParam.TITLE, null), diagram.getSkinParam().getHyperlinkColor(), diagram.getSkinParam()
-						.useUnderlineForHyperlink()), HorizontalAlignment.CENTER, diagram.getSkinParam());
-
-		return DecorateEntityImage.addTop(original, text, HorizontalAlignment.CENTER);
-	}
-
-	private TextBlockBackcolored addLegend(TextBlockBackcolored original) {
-		final Display legend = diagram.getLegend();
-		if (legend == null) {
-			return original;
-		}
-		final TextBlock text = EntityImageLegend.create(legend, diagram.getSkinParam());
-
-		return DecorateEntityImage.add(original, text, diagram.getLegendAlignment(),
-				diagram.getLegendVerticalAlignment());
-	}
-
-	private final UFont getFont(FontParam fontParam) {
-		final ISkinParam skinParam = diagram.getSkinParam();
-		return skinParam.getFont(fontParam, null, false);
-	}
-
-	private final HtmlColor getFontColor(FontParam fontParam, Stereotype stereo) {
-		final ISkinParam skinParam = diagram.getSkinParam();
-		return skinParam.getFontHtmlColor(fontParam, stereo);
 	}
 
 	private double getScale(FileFormatOption fileFormatOption, final Dimension2D dim) {

@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -58,7 +58,7 @@ public final class SvekResult extends AbstractTextBlock implements IEntityImage,
 	public void drawU(UGraphic ug) {
 
 		for (Cluster cluster : dotStringFactory.getBibliotekon().allCluster()) {
-			cluster.drawU(ug, dotData, new UStroke(1.5));
+			cluster.drawU(ug, new UStroke(1.5), dotData.getUmlDiagramType(), dotData.getSkinParam());
 		}
 
 		final HtmlColor color = rose.getHtmlColor(dotData.getSkinParam(), getArrowColorParam(), null);

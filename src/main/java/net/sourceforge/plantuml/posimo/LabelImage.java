@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -27,16 +27,10 @@ package net.sourceforge.plantuml.posimo;
 
 import java.awt.geom.Dimension2D;
 
-import net.sourceforge.plantuml.FontParam;
 import net.sourceforge.plantuml.ISkinParam;
-import net.sourceforge.plantuml.SpriteContainerEmpty;
 import net.sourceforge.plantuml.cucadiagram.Link;
-import net.sourceforge.plantuml.graphic.FontConfiguration;
-import net.sourceforge.plantuml.graphic.HorizontalAlignment;
-import net.sourceforge.plantuml.graphic.HtmlColorUtils;
 import net.sourceforge.plantuml.graphic.StringBounder;
 import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.graphic.TextBlockUtils;
 import net.sourceforge.plantuml.skin.rose.Rose;
 import net.sourceforge.plantuml.ugraphic.UGraphic;
 import net.sourceforge.plantuml.ugraphic.UTranslate;
@@ -55,8 +49,11 @@ public class LabelImage {
 		// this.entity = entity;
 		this.param = param;
 		this.rose = rose;
-		this.name = TextBlockUtils.create(link.getLabel(),
-				new FontConfiguration(param.getFont(FontParam.CLASS, null, false), HtmlColorUtils.BLACK, param.getHyperlinkColor(), param.useUnderlineForHyperlink()), HorizontalAlignment.CENTER, new SpriteContainerEmpty());
+//		this.name = link.getLabel().create(
+//				new FontConfiguration(param.getFont(FontParam.CLASS, null, false), HtmlColorUtils.BLACK,
+//						param.getHyperlinkColor(), param.useUnderlineForHyperlink()), HorizontalAlignment.CENTER,
+//				new SpriteContainerEmpty());
+		throw new UnsupportedOperationException();
 	}
 
 	public Dimension2D getDimension(StringBounder stringBounder) {

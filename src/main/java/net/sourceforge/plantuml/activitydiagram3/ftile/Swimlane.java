@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -25,15 +25,17 @@
  */
 package net.sourceforge.plantuml.activitydiagram3.ftile;
 
+import net.sourceforge.plantuml.ISkinParam;
 import net.sourceforge.plantuml.SpecificBackcolorable;
 import net.sourceforge.plantuml.cucadiagram.Display;
 import net.sourceforge.plantuml.graphic.HtmlColor;
+import net.sourceforge.plantuml.graphic.color.ColorType;
+import net.sourceforge.plantuml.graphic.color.Colors;
 import net.sourceforge.plantuml.ugraphic.UTranslate;
 
 public class Swimlane implements SpecificBackcolorable {
 
 	private final String name;
-	private HtmlColor color;
 	private Display display;
 
 	private UTranslate translate = new UTranslate();
@@ -71,16 +73,24 @@ public class Swimlane implements SpecificBackcolorable {
 		this.totalWidth = totalWidth;
 	}
 
-	public HtmlColor getSpecificBackColor() {
-		return color;
+	public Colors getColors(ISkinParam skinParam) {
+		return colors;
 	}
 
-	public void setSpecificBackcolor(HtmlColor specificBackcolor) {
-		this.color = specificBackcolor;
+	public void setSpecificColorTOBEREMOVED(ColorType type, HtmlColor color) {
+		if (color != null) {
+			this.colors = colors.add(type, color);
+		}
 	}
+
+	private Colors colors = Colors.empty();
 
 	public final double getTotalWidth() {
 		return totalWidth;
+	}
+
+	public void setColors(Colors colors) {
+		this.colors = colors;
 	}
 
 }

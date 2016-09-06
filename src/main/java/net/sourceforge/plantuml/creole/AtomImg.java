@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -40,51 +40,70 @@ import javax.imageio.ImageIO;
 
 import net.sourceforge.plantuml.Dimension2DDouble;
 import net.sourceforge.plantuml.FileSystem;
+import net.sourceforge.plantuml.code.Base64Coder;
 import net.sourceforge.plantuml.graphic.FontConfiguration;
-import net.sourceforge.plantuml.graphic.HtmlColorUtils;
 import net.sourceforge.plantuml.graphic.ImgValign;
 import net.sourceforge.plantuml.graphic.StringBounder;
+import net.sourceforge.plantuml.graphic.TileImageSvg;
 import net.sourceforge.plantuml.ugraphic.UFont;
 import net.sourceforge.plantuml.ugraphic.UGraphic;
 import net.sourceforge.plantuml.ugraphic.UImage;
 
 public class AtomImg implements Atom {
 
+	private static final String DATA_IMAGE_PNG_BASE64 = "data:image/png;base64,";
 	private final BufferedImage image;
+	private final double scale;
 
-	private AtomImg(BufferedImage image) {
+	private AtomImg(BufferedImage image, double scale) {
 		this.image = image;
+		this.scale = scale;
 	}
 
-	public static Atom create(String src, final ImgValign valign, final int vspace) {
+	public static Atom create(String src, final ImgValign valign, final int vspace, final double scale) {
 		final UFont font = new UFont("Monospaced", Font.PLAIN, 14);
-		final FontConfiguration fc = new FontConfiguration(font, HtmlColorUtils.BLACK, HtmlColorUtils.BLUE, true);
+		final FontConfiguration fc = FontConfiguration.blackBlueTrue(font);
+
+		if (src.startsWith(DATA_IMAGE_PNG_BASE64)) {
+			final String data = src.substring(DATA_IMAGE_PNG_BASE64.length(), src.length());
+			try {
+				final byte bytes[] = Base64Coder.decode(data);
+				return build(src, fc, bytes, scale);
+			} catch (Exception e) {
+				return AtomText.create("ERROR " + e.toString(), fc);
+			}
+
+		}
 		try {
 			final File f = FileSystem.getInstance().getFile(src);
 			if (f.exists() == false) {
 				// Check if valid URL
 				if (src.startsWith("http:") || src.startsWith("https:")) {
 					final byte image[] = getFile(src);
-					final BufferedImage read = ImageIO.read(new ByteArrayInputStream(image));
-					if (read == null) {
-						return AtomText.create("(Cannot decode: " + src + ")", fc);
-					}
-					return new AtomImg(read);
+					return build(src, fc, image, scale);
 				}
 				return AtomText.create("(File not found: " + f + ")", fc);
 			}
 			if (f.getName().endsWith(".svg")) {
-				// return new AtomImg(new TileImageSvg(f));
-				throw new UnsupportedOperationException();
+				return new AtomImgSvg(new TileImageSvg(f));
 			}
 			final BufferedImage read = ImageIO.read(f);
 			if (read == null) {
 				return AtomText.create("(Cannot decode: " + f + ")", fc);
 			}
-			return new AtomImg(ImageIO.read(f));
+			return new AtomImg(ImageIO.read(f), scale);
 		} catch (IOException e) {
 			return AtomText.create("ERROR " + e.toString(), fc);
 		}
+	}
+
+	private static Atom build(String source, final FontConfiguration fc, final byte[] data, double scale)
+			throws IOException {
+		final BufferedImage read = ImageIO.read(new ByteArrayInputStream(data));
+		if (read == null) {
+			return AtomText.create("(Cannot decode: " + source + ")", fc);
+		}
+		return new AtomImg(read, scale);
 	}
 
 	// Added by Alain Corbiere
@@ -112,7 +131,7 @@ public class AtomImg implements Atom {
 	// End
 
 	public Dimension2D calculateDimension(StringBounder stringBounder) {
-		return new Dimension2DDouble(image.getWidth(), image.getHeight());
+		return new Dimension2DDouble(image.getWidth() * scale, image.getHeight() * scale);
 	}
 
 	public double getStartingAltitude(StringBounder stringBounder) {
@@ -121,7 +140,7 @@ public class AtomImg implements Atom {
 
 	public void drawU(UGraphic ug) {
 		// final double h = calculateDimension(ug.getStringBounder()).getHeight();
-		ug.draw(new UImage(image));
+		ug.draw(new UImage(image, scale));
 		// tileImage.drawU(ug.apply(new UTranslate(0, -h)));
 	}
 

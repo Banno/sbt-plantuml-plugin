@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -28,12 +28,11 @@ package net.sourceforge.plantuml.descdiagram;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sourceforge.plantuml.AbstractPSystem;
+import net.sourceforge.plantuml.classdiagram.command.CommandHideShowSpecificClass;
 import net.sourceforge.plantuml.classdiagram.command.CommandUrl;
 import net.sourceforge.plantuml.command.Command;
 import net.sourceforge.plantuml.command.CommandEndPackage;
 import net.sourceforge.plantuml.command.CommandFootboxIgnored;
-import net.sourceforge.plantuml.command.CommandPackage;
 import net.sourceforge.plantuml.command.CommandPage;
 import net.sourceforge.plantuml.command.CommandRankDir;
 import net.sourceforge.plantuml.command.UmlDiagramFactory;
@@ -70,12 +69,9 @@ public class DescriptionDiagramFactory extends UmlDiagramFactory {
 		cmds.add(new CommandLinkElement());
 		//
 		cmds.add(new CommandPackageWithUSymbol());
-		cmds.add(new CommandPackage());
 		cmds.add(new CommandEndPackage());
-		// addCommand(new CommandNamespace());
-		// addCommand(new CommandEndNamespace());
 		final FactoryNoteCommand factoryNoteCommand = new FactoryNoteCommand();
-		cmds.add(factoryNoteCommand.createMultiLine());
+		cmds.add(factoryNoteCommand.createMultiLine(false));
 
 		final FactoryNoteOnEntityCommand factoryNoteOnEntityCommand = new FactoryNoteOnEntityCommand(new RegexOr(
 				"ENTITY", //
@@ -91,29 +87,21 @@ public class DescriptionDiagramFactory extends UmlDiagramFactory {
 
 		cmds.add(factoryNoteCommand.createSingleLine());
 		cmds.add(new CommandUrl());
-		// addCommand(new CommandCreateComponent2());
 		cmds.add(new CommandCreateElementFull());
-		cmds.add(new CommandCreateElementMultilines());
-		// addCommand(new CommandCreateElementTyped());
-		// addCommand(new CommandCreateCircleInterface());
-		// addCommand(new CommandCreateActorInComponent());
+		cmds.add(new CommandCreateElementMultilines(0));
+		cmds.add(new CommandCreateElementMultilines(1));
 
-		cmds.add(factoryNoteOnEntityCommand.createMultiLine());
-		cmds.add(factoryNoteCommand.createMultiLine());
+		cmds.add(factoryNoteOnEntityCommand.createMultiLine(true));
+		cmds.add(factoryNoteOnEntityCommand.createMultiLine(false));
+		cmds.add(factoryNoteCommand.createMultiLine(false));
 
 		final FactoryNoteOnLinkCommand factoryNoteOnLinkCommand = new FactoryNoteOnLinkCommand();
 		cmds.add(factoryNoteOnLinkCommand.createSingleLine());
-		cmds.add(factoryNoteOnLinkCommand.createMultiLine());
+		cmds.add(factoryNoteOnLinkCommand.createMultiLine(false));
+
+		cmds.add(new CommandHideShowSpecificClass());
 
 		return cmds;
-	}
-
-	@Override
-	public String checkFinalError(AbstractPSystem system) {
-		if (system instanceof DescriptionDiagram) {
-			((DescriptionDiagram) system).applySingleStrategy();
-		}
-		return super.checkFinalError(system);
 	}
 
 }

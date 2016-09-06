@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -45,6 +45,9 @@ import net.sourceforge.plantuml.graphic.StringBounder;
 import net.sourceforge.plantuml.graphic.TextBlock;
 import net.sourceforge.plantuml.graphic.TextBlockGeneric;
 import net.sourceforge.plantuml.graphic.TextBlockUtils;
+import net.sourceforge.plantuml.graphic.VerticalAlignment;
+import net.sourceforge.plantuml.skin.VisibilityModifier;
+import net.sourceforge.plantuml.skin.rose.Rose;
 import net.sourceforge.plantuml.svek.AbstractEntityImage;
 import net.sourceforge.plantuml.svek.HeaderLayout;
 import net.sourceforge.plantuml.svek.ShapeType;
@@ -64,35 +67,43 @@ public class EntityImageClassHeader2 extends AbstractEntityImage {
 		final HtmlColor color = SkinParamUtils.getFontColor(getSkinParam(), FontParam.CLASS, getStereo());
 		final Stereotype stereotype = entity.getStereotype();
 		final String generic = entity.getGeneric();
-		FontConfiguration fontConfigurationName = new FontConfiguration(SkinParamUtils.getFont(getSkinParam(), FontParam.CLASS, stereotype),
-				color, getSkinParam().getHyperlinkColor(), getSkinParam().useUnderlineForHyperlink());
+		FontConfiguration fontConfigurationName = new FontConfiguration(getSkinParam(), FontParam.CLASS, stereotype);
 		if (italic) {
 			fontConfigurationName = fontConfigurationName.italic();
 		}
-		final TextBlock name = TextBlockUtils.withMargin(TextBlockUtils.create(entity.getDisplay(),
-				fontConfigurationName, HorizontalAlignment.CENTER, skinParam), 3, 3, 0, 0);
+		TextBlock name = entity.getDisplay().createWithNiceCreoleMode(fontConfigurationName,
+				HorizontalAlignment.CENTER, skinParam);
+		final VisibilityModifier modifier = entity.getVisibilityModifier();
+		if (modifier == null) {
+			name = TextBlockUtils.withMargin(name, 3, 3, 0, 0);
+		} else {
+			final Rose rose = new Rose();
+			final HtmlColor back = rose.getHtmlColor(skinParam, modifier.getBackground());
+			final HtmlColor fore = rose.getHtmlColor(skinParam, modifier.getForeground());
+
+			final TextBlock uBlock = modifier.getUBlock(skinParam.classAttributeIconSize(), fore, back);
+			name = TextBlockUtils.mergeLR(uBlock, name, VerticalAlignment.CENTER);
+			name = TextBlockUtils.withMargin(name, 3, 3, 0, 0);
+		}
 
 		final TextBlock stereo;
 		if (stereotype == null || stereotype.getLabel(false) == null
 				|| portionShower.showPortion(EntityPortion.STEREOTYPE, entity) == false) {
 			stereo = null;
 		} else {
-			stereo = TextBlockUtils.withMargin(TextBlockUtils.create(
-					Display.create(stereotype.getLabels(skinParam.useGuillemet())),
-					new FontConfiguration(SkinParamUtils.getFont(getSkinParam(),
-							FontParam.CLASS_STEREOTYPE, stereotype), SkinParamUtils.getFontColor(getSkinParam(),
-					FontParam.CLASS_STEREOTYPE, stereotype), getSkinParam().getHyperlinkColor(), getSkinParam().useUnderlineForHyperlink()), HorizontalAlignment.CENTER, skinParam), 1, 0);
+			stereo = TextBlockUtils.withMargin(
+					Display.create(stereotype.getLabels(skinParam.useGuillemet())).create(
+							new FontConfiguration(getSkinParam(), FontParam.CLASS_STEREOTYPE, stereotype),
+							HorizontalAlignment.CENTER, skinParam), 1, 0);
 		}
 
 		TextBlock genericBlock;
 		if (generic == null) {
 			genericBlock = null;
 		} else {
-			genericBlock = TextBlockUtils.create(
-					Display.getWithNewlines(generic),
-					new FontConfiguration(SkinParamUtils.getFont(getSkinParam(),
-							FontParam.CLASS_STEREOTYPE, stereotype), SkinParamUtils.getFontColor(getSkinParam(),
-					FontParam.CLASS_STEREOTYPE, stereotype), skinParam.getHyperlinkColor(), getSkinParam().useUnderlineForHyperlink()), HorizontalAlignment.CENTER, skinParam);
+			genericBlock = Display.getWithNewlines(generic).create(
+					new FontConfiguration(getSkinParam(), FontParam.CLASS_STEREOTYPE, stereotype),
+					HorizontalAlignment.CENTER, skinParam);
 			genericBlock = TextBlockUtils.withMargin(genericBlock, 1, 1);
 			final HtmlColor classBackground = SkinParamUtils
 					.getColor(getSkinParam(), ColorParam.background, stereotype);
@@ -115,7 +126,7 @@ public class EntityImageClassHeader2 extends AbstractEntityImage {
 	private TextBlock getCircledCharacter(ILeaf entity, ISkinParam skinParam) {
 		final Stereotype stereotype = entity.getStereotype();
 		if (stereotype != null && stereotype.getSprite() != null) {
-			return skinParam.getSprite(stereotype.getSprite()).asTextBlock(stereotype.getHtmlColor());
+			return skinParam.getSprite(stereotype.getSprite()).asTextBlock(stereotype.getHtmlColor(), 1);
 		}
 		final UFont font = SkinParamUtils.getFont(getSkinParam(), FontParam.CIRCLED_CHARACTER, null);
 		final HtmlColor classBorder = SkinParamUtils.getColor(getSkinParam(), ColorParam.classBorder, stereotype);

@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -29,6 +29,7 @@ import java.awt.geom.Dimension2D;
 
 import net.sourceforge.plantuml.FontParam;
 import net.sourceforge.plantuml.ISkinSimple;
+import net.sourceforge.plantuml.creole.CreoleMode;
 import net.sourceforge.plantuml.cucadiagram.BodyEnhanced2;
 import net.sourceforge.plantuml.cucadiagram.Display;
 import net.sourceforge.plantuml.graphic.FontConfiguration;
@@ -37,7 +38,6 @@ import net.sourceforge.plantuml.graphic.HtmlColor;
 import net.sourceforge.plantuml.graphic.StringBounder;
 import net.sourceforge.plantuml.graphic.TextBlock;
 import net.sourceforge.plantuml.graphic.TextBlockEmpty;
-import net.sourceforge.plantuml.graphic.TextBlockUtils;
 import net.sourceforge.plantuml.ugraphic.UFont;
 
 public abstract class AbstractTextualComponent extends AbstractComponent {
@@ -76,8 +76,8 @@ public abstract class AbstractTextualComponent extends AbstractComponent {
 		} else if (enhanced) {
 			textBlock = new BodyEnhanced2(strings, FontParam.NOTE, spriteContainer, HorizontalAlignment.LEFT, font);
 		} else {
-			textBlock = TextBlockUtils.create(strings, font, horizontalAlignment, spriteContainer, maxMessageSize,
-					false, fontForStereotype, htmlColorForStereotype);
+			textBlock = strings.create(font, horizontalAlignment, spriteContainer, maxMessageSize, CreoleMode.FULL,
+					fontForStereotype, htmlColorForStereotype);
 		}
 	}
 
@@ -85,7 +85,7 @@ public abstract class AbstractTextualComponent extends AbstractComponent {
 		return textBlock;
 	}
 
-	final protected double getPureTextWidth(StringBounder stringBounder) {
+	protected double getPureTextWidth(StringBounder stringBounder) {
 		final TextBlock textBlock = getTextBlock();
 		final Dimension2D size = textBlock.calculateDimension(stringBounder);
 		return size.getWidth();

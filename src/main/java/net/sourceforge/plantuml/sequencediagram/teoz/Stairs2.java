@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -31,7 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sourceforge.plantuml.graphic.HtmlColor;
+import net.sourceforge.plantuml.graphic.SymbolContext;
 
 public class Stairs2 {
 
@@ -44,7 +44,7 @@ public class Stairs2 {
 		return ys.toString() + " " + values;
 	}
 
-	public void addStep(StairsPosition position, int value, HtmlColor color) {
+	public void addStep(StairsPosition position, int value, SymbolContext color) {
 		if (value < 0) {
 			throw new IllegalArgumentException();
 		}
@@ -53,7 +53,8 @@ public class Stairs2 {
 		if (ys.size() > 0) {
 			final double lastY = ys.get(ys.size() - 1).getValue();
 			if (position.getValue() < lastY) {
-				throw new IllegalArgumentException();
+				// throw new IllegalArgumentException();
+				return;
 			}
 			if (lastY == position.getValue()) {
 				values.set(ys.size() - 1, new IntegerColored(value, color));

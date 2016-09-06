@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -26,6 +26,7 @@
 package net.sourceforge.plantuml.statediagram.command;
 
 import net.sourceforge.plantuml.Direction;
+import net.sourceforge.plantuml.StringUtils;
 import net.sourceforge.plantuml.classdiagram.command.CommandLinkClass;
 import net.sourceforge.plantuml.command.CommandExecutionResult;
 import net.sourceforge.plantuml.command.SingleLineCommand2;
@@ -40,8 +41,8 @@ import net.sourceforge.plantuml.cucadiagram.Link;
 import net.sourceforge.plantuml.cucadiagram.LinkDecor;
 import net.sourceforge.plantuml.cucadiagram.LinkType;
 import net.sourceforge.plantuml.cucadiagram.Stereotype;
+import net.sourceforge.plantuml.graphic.color.ColorType;
 import net.sourceforge.plantuml.statediagram.StateDiagram;
-import net.sourceforge.plantuml.StringUtils;
 
 public class CommandLinkState extends SingleLineCommand2<StateDiagram> {
 
@@ -58,17 +59,17 @@ public class CommandLinkState extends SingleLineCommand2<StateDiagram> {
 						new RegexLeaf("ARROW_CROSS_START", "(x)?"), //
 						new RegexLeaf("ARROW_BODY1", "(-+)"), //
 						new RegexLeaf("ARROW_STYLE1",
-								"(?:\\[((?:#\\w+|dotted|dashed|bold|hidden)(?:,#\\w+|,dotted|,dashed|,bold|,hidden)*)\\])?"), //
+								"(?:\\[((?:#\\w+|dotted|dashed|plain|bold|hidden)(?:,#\\w+|,dotted|,dashed|,plain|,bold|,hidden)*)\\])?"), //
 						new RegexLeaf("ARROW_DIRECTION", "(left|right|up|down|le?|ri?|up?|do?)?"), //
 						new RegexLeaf("ARROW_STYLE2",
-								"(?:\\[((?:#\\w+|dotted|dashed|bold|hidden)(?:,#\\w+|,dotted|,dashed|,bold|,hidden)*)\\])?"), //
+								"(?:\\[((?:#\\w+|dotted|dashed|plain|bold|hidden)(?:,#\\w+|,dotted|,dashed|,plain|,bold|,hidden)*)\\])?"), //
 						new RegexLeaf("ARROW_BODY2", "(-*)"), //
 						new RegexLeaf("\\>"), //
 						new RegexLeaf("ARROW_CIRCLE_END", "(o[%s]+)?")), //
 				new RegexLeaf("[%s]*"), //
 				getStatePattern("ENT2"), //
 				new RegexLeaf("[%s]*"), //
-				new RegexLeaf("LABEL", "(?::[%s]*([^%g]+))?"), //
+				new RegexLeaf("LABEL", "(?::[%s]*(.+))?"), //
 				new RegexLeaf("$"));
 	}
 
@@ -98,13 +99,13 @@ public class CommandLinkState extends SingleLineCommand2<StateDiagram> {
 			cl1.setStereotype(new Stereotype(arg.get("ENT1", 1)));
 		}
 		if (arg.get("ENT1", 2) != null) {
-			cl1.setSpecificBackcolor(diagram.getSkinParam().getIHtmlColorSet().getColorIfValid(arg.get("ENT1", 2)));
+			cl1.setSpecificColorTOBEREMOVED(ColorType.BACK, diagram.getSkinParam().getIHtmlColorSet().getColorIfValid(arg.get("ENT1", 2)));
 		}
 		if (arg.get("ENT2", 1) != null) {
 			cl2.setStereotype(new Stereotype(arg.get("ENT2", 1)));
 		}
 		if (arg.get("ENT2", 2) != null) {
-			cl2.setSpecificBackcolor(diagram.getSkinParam().getIHtmlColorSet().getColorIfValid(arg.get("ENT2", 2)));
+			cl2.setSpecificColorTOBEREMOVED(ColorType.BACK, diagram.getSkinParam().getIHtmlColorSet().getColorIfValid(arg.get("ENT2", 2)));
 		}
 
 		String queue = arg.get("ARROW_BODY1", 0) + arg.get("ARROW_BODY2", 0);

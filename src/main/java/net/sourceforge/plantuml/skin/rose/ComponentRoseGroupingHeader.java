@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -35,12 +35,10 @@ import net.sourceforge.plantuml.graphic.HtmlColor;
 import net.sourceforge.plantuml.graphic.StringBounder;
 import net.sourceforge.plantuml.graphic.SymbolContext;
 import net.sourceforge.plantuml.graphic.TextBlock;
-import net.sourceforge.plantuml.graphic.TextBlockUtils;
 import net.sourceforge.plantuml.skin.AbstractTextualComponent;
 import net.sourceforge.plantuml.skin.Area;
 import net.sourceforge.plantuml.ugraphic.UChangeBackColor;
 import net.sourceforge.plantuml.ugraphic.UChangeColor;
-import net.sourceforge.plantuml.ugraphic.UFont;
 import net.sourceforge.plantuml.ugraphic.UGraphic;
 import net.sourceforge.plantuml.ugraphic.UPolygon;
 import net.sourceforge.plantuml.ugraphic.URectangle;
@@ -57,8 +55,8 @@ public class ComponentRoseGroupingHeader extends AbstractTextualComponent {
 	private final HtmlColor background;
 	private final SymbolContext symbolContext;
 
-	public ComponentRoseGroupingHeader(HtmlColor background, SymbolContext symbolContext, FontConfiguration bigFont, UFont smallFont,
-			Display strings, ISkinSimple spriteContainer) {
+	public ComponentRoseGroupingHeader(HtmlColor background, SymbolContext symbolContext, FontConfiguration bigFont,
+			FontConfiguration smallFont2, Display strings, ISkinSimple spriteContainer) {
 		super(strings.get(0), bigFont, HorizontalAlignment.LEFT, 15, 30, 1, spriteContainer, 0, null, null);
 		this.symbolContext = symbolContext;
 		this.background = background;
@@ -66,15 +64,16 @@ public class ComponentRoseGroupingHeader extends AbstractTextualComponent {
 			this.commentTextBlock = null;
 		} else {
 			final Display display = Display.getWithNewlines("[" + strings.get(1) + "]");
-			this.commentTextBlock = TextBlockUtils.create(display, new FontConfiguration(smallFont, bigFont.getColor(),
-					bigFont.getHyperlinkColor(), bigFont.useUnderlineForHyperlink()), HorizontalAlignment.LEFT,
-					spriteContainer);
+			// final FontConfiguration smallFont2 = bigFont.forceFont(smallFont, null);
+			this.commentTextBlock = display.create(smallFont2, HorizontalAlignment.LEFT, spriteContainer);
 		}
 		if (this.background == null) {
 			throw new IllegalArgumentException();
 		}
-
 	}
+
+	// new FontConfiguration(smallFont, bigFont.getColor(), bigFont.getHyperlinkColor(),
+	// bigFont.useUnderlineForHyperlink());
 
 	private double getSuppHeightForComment(StringBounder stringBounder) {
 		if (commentTextBlock == null) {

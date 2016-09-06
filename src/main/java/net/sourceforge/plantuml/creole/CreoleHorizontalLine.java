@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -70,7 +70,7 @@ public class CreoleHorizontalLine implements Atom {
 		if (line.length() == 0) {
 			return TextBlockUtils.empty(0, 0);
 		}
-		final CreoleParser parser = new CreoleParser(fontConfiguration, HorizontalAlignment.LEFT, skinParam, false);
+		final CreoleParser parser = new CreoleParser(fontConfiguration, HorizontalAlignment.LEFT, skinParam, CreoleMode.FULL);
 		final Sheet sheet = parser.createSheet(Display.getWithNewlines(line));
 		final TextBlock tb = new SheetBlock1(sheet, 0, skinParam.getPadding());
 		return tb;
@@ -94,5 +94,5 @@ public class CreoleHorizontalLine implements Atom {
 	public double getStartingAltitude(StringBounder stringBounder) {
 		return 0;
 	}
-
+	
 }

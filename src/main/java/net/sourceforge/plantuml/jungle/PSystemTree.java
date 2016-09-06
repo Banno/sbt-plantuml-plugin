@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -38,7 +38,6 @@ import net.sourceforge.plantuml.core.DiagramDescriptionImpl;
 import net.sourceforge.plantuml.core.ImageData;
 import net.sourceforge.plantuml.cucadiagram.Display;
 import net.sourceforge.plantuml.graphic.HtmlColorUtils;
-import net.sourceforge.plantuml.graphic.TextBlockUtils;
 import net.sourceforge.plantuml.graphic.UDrawable;
 import net.sourceforge.plantuml.graphic.UDrawableUtils;
 import net.sourceforge.plantuml.ugraphic.ColorMapperIdentity;
@@ -60,12 +59,12 @@ public class PSystemTree extends AbstractPSystem {
 				5, 5, null, false);
 		if (rendering == Rendering.NEEDLE) {
 			final UDrawable tmp = Needle.getNeedle(root, 200, 0, 60);
-			final LimitFinder limitFinder = new LimitFinder(TextBlockUtils.getDummyStringBounder(), true);
+			final LimitFinder limitFinder = new LimitFinder(fileFormat.getDefaultStringBounder(), true);
 			tmp.drawU(limitFinder);
 			final double minY = limitFinder.getMinY();
-			builder.addUDrawable(UDrawableUtils.move(tmp, 0, -minY));
+			builder.setUDrawable(UDrawableUtils.move(tmp, 0, -minY));
 		} else {
-			builder.addUDrawable(new GTileOneLevelFactory().createGTile(root));
+			builder.setUDrawable(new GTileOneLevelFactory().createGTile(root));
 		}
 		return builder.writeImageTOBEMOVED(fileFormat, os);
 	}

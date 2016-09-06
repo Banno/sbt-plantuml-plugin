@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -81,7 +81,11 @@ class ArrowAndNoteBox extends Arrow implements InGroupable {
 	public double getPreferredWidth(StringBounder stringBounder) {
 		double w = arrow.getPreferredWidth(stringBounder);
 		w = Math.max(w, arrow.getActualWidth(stringBounder));
-		return w + noteBox.getPreferredWidth(stringBounder);
+		double result = w + noteBox.getPreferredWidth(stringBounder);
+		if (noteBox.getNotePosition() == NotePosition.RIGHT) {
+			result += noteBox.getRightShift(arrow.getStartingY());
+		}
+		return result;
 	}
 
 	@Override

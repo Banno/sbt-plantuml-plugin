@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -25,17 +25,18 @@
  */
 package net.sourceforge.plantuml;
 
-import java.util.Date;
-import java.util.List;
 import java.util.Properties;
 
+import net.sourceforge.plantuml.command.BlocLines;
 import net.sourceforge.plantuml.command.Command;
 import net.sourceforge.plantuml.command.CommandExecutionResult;
 import net.sourceforge.plantuml.command.ProtectedCommand;
 import net.sourceforge.plantuml.core.Diagram;
 import net.sourceforge.plantuml.core.UmlSource;
 import net.sourceforge.plantuml.cucadiagram.Display;
-import net.sourceforge.plantuml.graphic.AbstractTextBlock;
+import net.sourceforge.plantuml.cucadiagram.DisplayPositionned;
+import net.sourceforge.plantuml.graphic.HorizontalAlignment;
+import net.sourceforge.plantuml.graphic.VerticalAlignment;
 import net.sourceforge.plantuml.version.License;
 import net.sourceforge.plantuml.version.Version;
 
@@ -80,16 +81,21 @@ public abstract class AbstractPSystem implements Diagram {
 		return 1;
 	}
 
-	public Display getTitle() {
+	public DisplayPositionned getTitle() {
 		if (source == null) {
-			return Display.empty();
+			return new DisplayPositionned(Display.empty(), HorizontalAlignment.CENTER, VerticalAlignment.TOP);
 		}
-		return source.getTitle();
+		return new DisplayPositionned(source.getTitle(), HorizontalAlignment.CENTER, VerticalAlignment.TOP);
 	}
 
 	public String getWarningOrError() {
 		return null;
 	}
+	
+	public String checkFinalError() {
+		return null;
+	}
+
 
 	public void makeDiagramReady() {
 	}
@@ -98,11 +104,11 @@ public abstract class AbstractPSystem implements Diagram {
 		return true;
 	}
 
-	public CommandExecutionResult executeCommand(Command cmd, List<String> lines) {
+	public CommandExecutionResult executeCommand(Command cmd, BlocLines lines) {
 		cmd = new ProtectedCommand(cmd);
 		return cmd.execute(this, lines);
 	}
-	
+
 	public boolean hasUrl() {
 		return false;
 	}

@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -27,8 +27,6 @@ package net.sourceforge.plantuml.graphic;
 
 
 public class HtmlColorUtils {
-
-	public static final String COLOR_REGEXP = "#\\w+[-\\\\|/]?\\w+";
 
 	public static final HtmlColor BLACK;
 	public static final HtmlColor WHITE;

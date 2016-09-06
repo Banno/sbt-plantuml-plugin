@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -33,7 +33,7 @@ import net.sourceforge.plantuml.command.regex.RegexLeaf;
 import net.sourceforge.plantuml.command.regex.RegexResult;
 import net.sourceforge.plantuml.cucadiagram.Display;
 import net.sourceforge.plantuml.graphic.HtmlColor;
-import net.sourceforge.plantuml.graphic.HtmlColorUtils;
+import net.sourceforge.plantuml.graphic.color.ColorParser;
 
 public class CommandSwimlane extends SingleLineCommand2<ActivityDiagram3> {
 
@@ -44,7 +44,7 @@ public class CommandSwimlane extends SingleLineCommand2<ActivityDiagram3> {
 	static RegexConcat getRegexConcat() {
 		return new RegexConcat(new RegexLeaf("^"), //
 				new RegexLeaf("\\|"), //
-				new RegexLeaf("COLOR", "(?:(" + HtmlColorUtils.COLOR_REGEXP + ")\\|)?"), //
+				ColorParser.exp6(), //
 				new RegexLeaf("SWIMLANE", "([^|]+)"), //
 				new RegexLeaf("\\|"), //
 				new RegexLeaf("LABEL", "([^|]+)?"), //

@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -26,16 +26,17 @@
 package net.sourceforge.plantuml.preproc;
 
 import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
+import net.sourceforge.plantuml.CharSequence2;
+import net.sourceforge.plantuml.command.regex.Matcher2;
 import net.sourceforge.plantuml.command.regex.MyPattern;
+import net.sourceforge.plantuml.command.regex.Pattern2;
 
 class IfManager implements ReadLine {
 
-	protected static final Pattern ifdefPattern = MyPattern.cmpile("^[%s]*!if(n)?def[%s]+([A-Za-z_][A-Za-z_0-9]*)$");
-	protected static final Pattern elsePattern = MyPattern.cmpile("^[%s]*!else$");
-	protected static final Pattern endifPattern = MyPattern.cmpile("^[%s]*!endif$");
+	protected static final Pattern2 ifdefPattern = MyPattern.cmpile("^[%s]*!if(n)?def[%s]+([A-Za-z_][A-Za-z_0-9]*)$");
+	protected static final Pattern2 elsePattern = MyPattern.cmpile("^[%s]*!else$");
+	protected static final Pattern2 endifPattern = MyPattern.cmpile("^[%s]*!endif$");
 
 	private final Defines defines;
 	private final ReadLine source;
@@ -47,9 +48,9 @@ class IfManager implements ReadLine {
 		this.source = source;
 	}
 
-	final public String readLine() throws IOException {
+	final public CharSequence2	 readLine() throws IOException {
 		if (child != null) {
-			final String s = child.readLine();
+			final CharSequence2 s = child.readLine();
 			if (s != null) {
 				return s;
 			}
@@ -59,13 +60,13 @@ class IfManager implements ReadLine {
 		return readLineInternal();
 	}
 
-	protected String readLineInternal() throws IOException {
-		final String s = source.readLine();
+	protected CharSequence2 readLineInternal() throws IOException {
+		final CharSequence2 s = source.readLine();
 		if (s == null) {
 			return null;
 		}
 
-		final Matcher m = ifdefPattern.matcher(s);
+		final Matcher2 m = ifdefPattern.matcher(s);
 		if (m.find()) {
 			boolean ok = defines.isDefine(m.group(2));
 			if (m.group(1) != null) {

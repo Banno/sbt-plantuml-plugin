@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -36,20 +36,14 @@ import net.sourceforge.plantuml.activitydiagram3.ftile.FtileEmpty;
 import net.sourceforge.plantuml.activitydiagram3.ftile.FtileFactory;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Swimlane;
 import net.sourceforge.plantuml.cucadiagram.Display;
+import net.sourceforge.plantuml.graphic.color.Colors;
 import net.sourceforge.plantuml.sequencediagram.NotePosition;
+import net.sourceforge.plantuml.sequencediagram.NoteType;
 
-public class InstructionList implements Instruction {
+public class InstructionList extends WithNote implements Instruction, InstructionCollection {
 
 	private final List<Instruction> all = new ArrayList<Instruction>();
 	private final Swimlane defaultSwimlane;
-
-	public boolean isOnlySingleStop() {
-		if (all.size() == 1) {
-			final Instruction last = getLast();
-			return last instanceof InstructionStop;
-		}
-		return false;
-	}
 
 	public InstructionList() {
 		this(null);
@@ -57,6 +51,10 @@ public class InstructionList implements Instruction {
 
 	public boolean isEmpty() {
 		return all.isEmpty();
+	}
+
+	public boolean isOnlySingleStop() {
+		return all.size() == 1 && getLast() instanceof InstructionStop;
 	}
 
 	public InstructionList(Swimlane defaultSwimlane) {
@@ -69,14 +67,15 @@ public class InstructionList implements Instruction {
 
 	public Ftile createFtile(FtileFactory factory) {
 		if (all.size() == 0) {
-			return new FtileEmpty(factory.shadowing(), defaultSwimlane);
+			return new FtileEmpty(factory.skinParam(), defaultSwimlane);
 		}
-		Ftile result = null;
+		Ftile result = eventuallyAddNote(factory, null, getSwimlaneIn());
 		for (Instruction ins : all) {
 			Ftile cur = ins.createFtile(factory);
-			if (ins.getInLinkRendering() != null) {
+			if (ins.getInLinkRendering().isNone() == false) {
 				cur = factory.decorateIn(cur, ins.getInLinkRendering());
 			}
+
 			if (result == null) {
 				result = cur;
 			} else {
@@ -110,8 +109,11 @@ public class InstructionList implements Instruction {
 		return all.get(all.size() - 1);
 	}
 
-	public void addNote(Display note, NotePosition position) {
-		getLast().addNote(note, position);
+	public boolean addNote(Display note, NotePosition position, NoteType type, Colors colors) {
+		if (getLast() == null) {
+			return super.addNote(note, position, type, colors);
+		}
+		return getLast().addNote(note, position, type, colors);
 	}
 
 	public Set<Swimlane> getSwimlanes() {

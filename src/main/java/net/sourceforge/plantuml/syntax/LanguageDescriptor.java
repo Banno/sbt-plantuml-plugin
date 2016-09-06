@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -70,6 +70,7 @@ public class LanguageDescriptor {
 		keyword.add("as");
 		keyword.add("also");
 		keyword.add("autonumber");
+		keyword.add("caption");
 		keyword.add("title");
 		keyword.add("newpage");
 		keyword.add("box");
@@ -81,6 +82,9 @@ public class LanguageDescriptor {
 		keyword.add("break");
 		keyword.add("critical");
 		keyword.add("note");
+		keyword.add("rnote");
+		keyword.add("hnote");
+		keyword.add("legend");
 		keyword.add("group");
 		keyword.add("left");
 		keyword.add("right");

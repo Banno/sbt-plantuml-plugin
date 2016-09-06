@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -25,7 +25,6 @@
  */
 package net.sourceforge.plantuml.activitydiagram3.command;
 
-import net.sourceforge.plantuml.StringUtils;
 import net.sourceforge.plantuml.activitydiagram3.ActivityDiagram3;
 import net.sourceforge.plantuml.command.CommandExecutionResult;
 import net.sourceforge.plantuml.command.SingleLineCommand2;
@@ -33,18 +32,29 @@ import net.sourceforge.plantuml.command.regex.RegexConcat;
 import net.sourceforge.plantuml.command.regex.RegexLeaf;
 import net.sourceforge.plantuml.command.regex.RegexResult;
 import net.sourceforge.plantuml.cucadiagram.Display;
+import net.sourceforge.plantuml.graphic.color.ColorParser;
+import net.sourceforge.plantuml.graphic.color.ColorType;
+import net.sourceforge.plantuml.graphic.color.Colors;
 import net.sourceforge.plantuml.sequencediagram.NotePosition;
+import net.sourceforge.plantuml.sequencediagram.NoteType;
 
 public class CommandNote3 extends SingleLineCommand2<ActivityDiagram3> {
 
 	public CommandNote3() {
 		super(getRegexConcat());
 	}
+	
+	private static ColorParser color() {
+		return ColorParser.simpleColor(ColorType.BACK);
+	}
+
 
 	static RegexConcat getRegexConcat() {
 		return new RegexConcat(new RegexLeaf("^"), //
-				new RegexLeaf("note"), //
+				new RegexLeaf("TYPE", "(note|floating note)"), //
 				new RegexLeaf("POSITION", "[%s]*(left|right)?"), //
+				new RegexLeaf("[%s]*"), //
+				color().getRegex(), //
 				new RegexLeaf("[%s]*:[%s]*"), //
 				new RegexLeaf("NOTE", "(.*)"), //
 				new RegexLeaf("$"));
@@ -52,16 +62,11 @@ public class CommandNote3 extends SingleLineCommand2<ActivityDiagram3> {
 
 	@Override
 	protected CommandExecutionResult executeArg(ActivityDiagram3 diagram, RegexResult arg) {
+		final Colors colors = color().getColor(arg, diagram.getSkinParam().getIHtmlColorSet());
 		final Display note = Display.getWithNewlines(arg.get("NOTE", 0));
-		final NotePosition position = getPosition(arg.get("POSITION", 0));
-		return diagram.addNote(note, position);
-	}
-
-	private NotePosition getPosition(String s) {
-		if (s == null) {
-			return NotePosition.LEFT;
-		}
-		return NotePosition.valueOf(StringUtils.goUpperCase(s));
+		final NotePosition position = NotePosition.defaultLeft(arg.get("POSITION", 0));
+		final NoteType type = NoteType.defaultType(arg.get("TYPE", 0));
+		return diagram.addNote(note, position, type, colors);
 	}
 
 }

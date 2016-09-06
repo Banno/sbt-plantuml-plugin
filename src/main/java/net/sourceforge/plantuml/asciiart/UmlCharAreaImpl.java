@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -26,8 +26,6 @@
 package net.sourceforge.plantuml.asciiart;
 
 import java.util.Collection;
-
-import net.sourceforge.plantuml.ugraphic.ClipContainer;
 
 public class UmlCharAreaImpl extends BasicCharAreaImpl implements UmlCharArea {
 
@@ -76,6 +74,9 @@ public class UmlCharAreaImpl extends BasicCharAreaImpl implements UmlCharArea {
 
 	public void drawStringsLR(Collection<? extends CharSequence> strings, int x, int y) {
 		int i = 0;
+		if (x < 0) {
+			x = 0;
+		}
 		for (CharSequence s : strings) {
 			this.drawStringLR(s.toString(), x, y + i);
 			i++;

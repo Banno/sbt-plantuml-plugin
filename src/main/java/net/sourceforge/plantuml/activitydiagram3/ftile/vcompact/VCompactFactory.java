@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -26,6 +26,7 @@
 package net.sourceforge.plantuml.activitydiagram3.ftile.vcompact;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import net.sourceforge.plantuml.ColorParam;
@@ -34,6 +35,7 @@ import net.sourceforge.plantuml.ISkinParam;
 import net.sourceforge.plantuml.Url;
 import net.sourceforge.plantuml.activitydiagram3.Branch;
 import net.sourceforge.plantuml.activitydiagram3.LinkRendering;
+import net.sourceforge.plantuml.activitydiagram3.PositionedNote;
 import net.sourceforge.plantuml.activitydiagram3.ftile.BoxStyle;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Ftile;
 import net.sourceforge.plantuml.activitydiagram3.ftile.FtileAssemblySimple;
@@ -48,9 +50,8 @@ import net.sourceforge.plantuml.activitydiagram3.ftile.vertical.FtileDecorateOut
 import net.sourceforge.plantuml.cucadiagram.Display;
 import net.sourceforge.plantuml.graphic.HtmlColor;
 import net.sourceforge.plantuml.graphic.StringBounder;
-import net.sourceforge.plantuml.sequencediagram.NotePosition;
+import net.sourceforge.plantuml.graphic.color.Colors;
 import net.sourceforge.plantuml.skin.rose.Rose;
-import net.sourceforge.plantuml.ugraphic.Sprite;
 import net.sourceforge.plantuml.ugraphic.UFont;
 
 public class VCompactFactory implements FtileFactory {
@@ -70,28 +71,28 @@ public class VCompactFactory implements FtileFactory {
 
 	public Ftile start(Swimlane swimlane) {
 		final HtmlColor color = rose.getHtmlColor(skinParam, ColorParam.activityStart);
-		return new FtileCircleStart(shadowing(), color, swimlane);
+		return new FtileCircleStart(skinParam(), color, swimlane);
 	}
 
 	public Ftile stop(Swimlane swimlane) {
 		final HtmlColor color = rose.getHtmlColor(skinParam, ColorParam.activityEnd);
-		return new FtileCircleStop(shadowing(), color, swimlane);
+		return new FtileCircleStop(skinParam(), color, swimlane);
 	}
 
 	public Ftile end(Swimlane swimlane) {
 		final HtmlColor color = rose.getHtmlColor(skinParam, ColorParam.activityEnd);
-		return new FtileCircleEnd(shadowing(), color, swimlane);
+		return new FtileCircleEnd(skinParam(), color, swimlane);
 	}
 
-	public Ftile activity(Display label, final HtmlColor color, Swimlane swimlane, BoxStyle style) {
-		final HtmlColor borderColor = rose.getHtmlColor(skinParam, ColorParam.activityBorder);
-		final HtmlColor backColor = color == null ? rose.getHtmlColor(skinParam, ColorParam.activityBackground) : color;
-		final UFont font = skinParam.getFont(FontParam.ACTIVITY, null, false);
-		final HtmlColor arrowColor = rose.getHtmlColor(skinParam, ColorParam.activityArrow);
-		return new FtileBox(shadowing(), label, borderColor, backColor, font, arrowColor, swimlane, style, skinParam);
+	public Ftile activity(Display label, Swimlane swimlane, BoxStyle style, Colors colors) {
+		// final HtmlColor borderColor = rose.getHtmlColor(skinParam, ColorParam.activityBorder);
+		// final HtmlColor backColor = color == null ? rose.getHtmlColor(skinParam, ColorParam.activityBackground) :
+		// color;
+		final UFont font = skinParam.getFont(null, false, FontParam.ACTIVITY);
+		return new FtileBox(colors.mute(skinParam), label, font, swimlane, style);
 	}
 
-	public Ftile addNote(Ftile ftile, Display note, NotePosition notePosition) {
+	public Ftile addNote(Ftile ftile, Swimlane swimlane, Collection<PositionedNote> notes) {
 		return ftile;
 	}
 
@@ -103,8 +104,8 @@ public class VCompactFactory implements FtileFactory {
 		return new FtileAssemblySimple(tile1, tile2);
 	}
 
-	public Ftile repeat(Swimlane swimlane, Ftile repeat, Display test, Display yes, Display out, HtmlColor color,
-			LinkRendering backRepeatLinkRendering) {
+	public Ftile repeat(Swimlane swimlane, Swimlane swimlaneOut, Ftile repeat, Display test, Display yes, Display out,
+			HtmlColor color, LinkRendering backRepeatLinkRendering) {
 		return repeat;
 	}
 
@@ -113,7 +114,8 @@ public class VCompactFactory implements FtileFactory {
 		return whileBlock;
 	}
 
-	public Ftile createIf(Swimlane swimlane, List<Branch> thens, Branch elseBranch) {
+	public Ftile createIf(Swimlane swimlane, List<Branch> thens, Branch elseBranch, LinkRendering afterEndwhile,
+			LinkRendering topInlinkRendering) {
 		final List<Ftile> ftiles = new ArrayList<Ftile>();
 		for (Branch branch : thens) {
 			ftiles.add(branch.getFtile());
@@ -130,7 +132,8 @@ public class VCompactFactory implements FtileFactory {
 		return new FtileForkInner(all);
 	}
 
-	public Ftile createGroup(Ftile list, Display name, HtmlColor backColor, HtmlColor titleColor, Display headerNote) {
+	public Ftile createGroup(Ftile list, Display name, HtmlColor backColor, HtmlColor titleColor, Display headerNote,
+			HtmlColor borderColor) {
 		return list;
 	}
 
@@ -148,24 +151,8 @@ public class VCompactFactory implements FtileFactory {
 		return new FtileDecorateOut(ftile, linkRendering);
 	}
 
-	public boolean shadowing() {
-		return skinParam.shadowing();
-	}
-
-	public Sprite getSprite(String name) {
-		return skinParam.getSprite(name);
-	}
-
-	public String getValue(String key) {
-		return skinParam.getValue(key);
-	}
-
-	public double getPadding() {
-		return skinParam.getPadding();
-	}
-
-	public boolean useGuillemet() {
-		return skinParam.useGuillemet();
+	public ISkinParam skinParam() {
+		return skinParam;
 	}
 
 }

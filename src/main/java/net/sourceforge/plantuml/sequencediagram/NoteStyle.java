@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -25,6 +25,8 @@
  */
 package net.sourceforge.plantuml.sequencediagram;
 
+import net.sourceforge.plantuml.skin.ComponentType;
+
 public enum NoteStyle {
 
 	NORMAL, HEXAGONAL, BOX;
@@ -37,5 +39,16 @@ public enum NoteStyle {
 		}
 		return NoteStyle.NORMAL;
 	}
+	
+	public ComponentType getNoteComponentType() {
+		if (this == NoteStyle.HEXAGONAL) {
+			return ComponentType.NOTE_HEXAGONAL;
+		}
+		if (this == NoteStyle.BOX) {
+			return ComponentType.NOTE_BOX;
+		}
+		return ComponentType.NOTE;
+	}
+
 
 }

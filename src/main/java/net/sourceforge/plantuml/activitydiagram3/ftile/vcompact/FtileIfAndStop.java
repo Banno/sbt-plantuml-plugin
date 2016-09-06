@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -49,6 +49,7 @@ import net.sourceforge.plantuml.activitydiagram3.ftile.Snake;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Swimlane;
 import net.sourceforge.plantuml.activitydiagram3.ftile.vertical.FtileDiamond;
 import net.sourceforge.plantuml.activitydiagram3.ftile.vertical.FtileDiamondInside;
+import net.sourceforge.plantuml.creole.CreoleMode;
 import net.sourceforge.plantuml.creole.CreoleParser;
 import net.sourceforge.plantuml.creole.Sheet;
 import net.sourceforge.plantuml.creole.SheetBlock1;
@@ -57,13 +58,11 @@ import net.sourceforge.plantuml.cucadiagram.Display;
 import net.sourceforge.plantuml.graphic.FontConfiguration;
 import net.sourceforge.plantuml.graphic.HorizontalAlignment;
 import net.sourceforge.plantuml.graphic.HtmlColor;
-import net.sourceforge.plantuml.graphic.HtmlColorUtils;
+import net.sourceforge.plantuml.graphic.Rainbow;
 import net.sourceforge.plantuml.graphic.StringBounder;
 import net.sourceforge.plantuml.graphic.TextBlock;
 import net.sourceforge.plantuml.svek.ConditionStyle;
-import net.sourceforge.plantuml.ugraphic.UFont;
 import net.sourceforge.plantuml.ugraphic.UGraphic;
-import net.sourceforge.plantuml.ugraphic.UStroke;
 import net.sourceforge.plantuml.ugraphic.UTranslate;
 
 class FtileIfAndStop extends AbstractFtile {
@@ -72,10 +71,10 @@ class FtileIfAndStop extends AbstractFtile {
 	private final Ftile diamond1;
 	private final Ftile stop2;
 
-	private final HtmlColor arrowColor;
+	private final Rainbow arrowColor;
 
-	private FtileIfAndStop(Ftile diamond1, Ftile tile1, HtmlColor arrowColor, Ftile stopFtile) {
-		super(tile1.shadowing());
+	private FtileIfAndStop(Ftile diamond1, Ftile tile1, Rainbow arrowColor, Ftile stopFtile) {
+		super(tile1.skinParam());
 		this.diamond1 = diamond1;
 		this.tile1 = tile1;
 		this.stop2 = stopFtile;
@@ -101,39 +100,36 @@ class FtileIfAndStop extends AbstractFtile {
 		return getSwimlaneIn();
 	}
 
-	static Ftile create(Swimlane swimlane, HtmlColor borderColor, HtmlColor backColor, UFont fontArrow, UFont fontTest,
-			HtmlColor arrowColor, FtileFactory ftileFactory, ConditionStyle conditionStyle, Branch nonStop,
-			ISkinParam skinParam, StringBounder stringBounder, Display labelTest) {
+	static Ftile create(Swimlane swimlane, HtmlColor borderColor, HtmlColor backColor, Rainbow arrowColor,
+			FtileFactory ftileFactory, ConditionStyle conditionStyle, Branch nonStop, ISkinParam skinParam,
+			StringBounder stringBounder, Display labelTest) {
 
-		backColor = HtmlColorUtils.BLUE;
+		// backColor = HtmlColorUtils.BLUE;
 
 		// final Ftile tileNonStop = new FtileMinWidth(nonStop.getFtile(), 30);
 		final Ftile tileNonStop = nonStop.getFtile();
 
-		final HtmlColor fontColor = skinParam.getFontHtmlColor(FontParam.ACTIVITY_DIAMOND, null);
-
-		final FontConfiguration fcArrow = new FontConfiguration(fontArrow, fontColor, skinParam.getHyperlinkColor(),
-				skinParam.useUnderlineForHyperlink());
-		final FontConfiguration fcTest = new FontConfiguration(fontTest, fontColor, skinParam.getHyperlinkColor(),
-				skinParam.useUnderlineForHyperlink());
+		final FontConfiguration fcTest = new FontConfiguration(skinParam, FontParam.ACTIVITY_DIAMOND, null);
 
 		final Ftile stopFtile = ftileFactory.stop(swimlane);
 
-		// final TextBlock tb1 = TextBlockUtils.create(branch1.getLabelPositive(), fcArrow, HorizontalAlignment.LEFT,
+		// final TextBlock tb1 = Display.create(branch1.getLabelPositive(), fcArrow, HorizontalAlignment.LEFT,
 		// ftileFactory);
-		// final TextBlock tb2 = TextBlockUtils.create(branch2.getLabelPositive(), fcArrow, HorizontalAlignment.LEFT,
+		// final TextBlock tb2 = Display.create(branch2.getLabelPositive(), fcArrow, HorizontalAlignment.LEFT,
 		// ftileFactory);
 
-		final Sheet sheet = new CreoleParser(fcTest, HorizontalAlignment.LEFT, skinParam, false).createSheet(labelTest);
+		final Sheet sheet = new CreoleParser(fcTest, skinParam.getDefaultTextAlignment(HorizontalAlignment.LEFT),
+				skinParam, CreoleMode.FULL).createSheet(labelTest);
 		final SheetBlock1 sheetBlock1 = new SheetBlock1(sheet, 0, skinParam.getPadding());
-		final TextBlock tbTest = new SheetBlock2(sheetBlock1, Diamond.asStencil(sheetBlock1), new UStroke(1.5));
+		final TextBlock tbTest = new SheetBlock2(sheetBlock1, Diamond.asStencil(sheetBlock1),
+				tileNonStop.getThickness());
 
 		final Ftile diamond1;
 		if (conditionStyle == ConditionStyle.INSIDE) {
-			diamond1 = new FtileDiamondInside(tileNonStop.shadowing(), backColor, borderColor, swimlane, tbTest);
+			diamond1 = new FtileDiamondInside(tileNonStop.skinParam(), backColor, borderColor, swimlane, tbTest);
 			// .withWest(tb1).withEast(tb2);
 		} else if (conditionStyle == ConditionStyle.DIAMOND) {
-			diamond1 = new FtileDiamond(tileNonStop.shadowing(), backColor, borderColor, swimlane).withNorth(tbTest);
+			diamond1 = new FtileDiamond(tileNonStop.skinParam(), backColor, borderColor, swimlane).withNorth(tbTest);
 			// .withWest(tb1).withEast(tb2).withNorth(tbTest);
 		} else {
 			throw new IllegalStateException();
@@ -206,9 +202,9 @@ class FtileIfAndStop extends AbstractFtile {
 
 	class ConnectionHorizontal extends AbstractConnection {
 
-		private final HtmlColor color;
+		private final Rainbow color;
 
-		public ConnectionHorizontal(HtmlColor color) {
+		public ConnectionHorizontal(Rainbow color) {
 			super(diamond1, stop2);
 			this.color = color;
 		}

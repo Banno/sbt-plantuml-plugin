@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import net.sourceforge.plantuml.cucadiagram.Display;
 import net.sourceforge.plantuml.cucadiagram.IEntity;
 import net.sourceforge.plantuml.cucadiagram.ILeaf;
 import net.sourceforge.plantuml.cucadiagram.Link;
@@ -55,11 +56,11 @@ public enum SingleStrategy {
 			final Link link;
 			if (dist == branch) {
 				final IEntity ent1 = standalones.get(headBranch);
-				link = new Link(ent1, ent2, linkType, null, 2);
+				link = new Link(ent1, ent2, linkType, Display.NULL, 2);
 				headBranch = i;
 			} else {
 				final IEntity ent1 = standalones.get(i - 1);
-				link = new Link(ent1, ent2, linkType, null, 1);
+				link = new Link(ent1, ent2, linkType, Display.NULL, 1);
 			}
 			result.add(link);
 		}

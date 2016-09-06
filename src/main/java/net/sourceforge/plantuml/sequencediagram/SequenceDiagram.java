@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -25,6 +25,7 @@
  */
 package net.sourceforge.plantuml.sequencediagram;
 
+import java.awt.geom.Dimension2D;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.DecimalFormat;
@@ -36,16 +37,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import net.sourceforge.plantuml.ColorParam;
 import net.sourceforge.plantuml.FileFormat;
 import net.sourceforge.plantuml.FileFormatOption;
 import net.sourceforge.plantuml.OptionFlags;
+import net.sourceforge.plantuml.Scale;
 import net.sourceforge.plantuml.UmlDiagram;
 import net.sourceforge.plantuml.UmlDiagramType;
 import net.sourceforge.plantuml.core.DiagramDescription;
 import net.sourceforge.plantuml.core.DiagramDescriptionImpl;
 import net.sourceforge.plantuml.core.ImageData;
 import net.sourceforge.plantuml.cucadiagram.Display;
+import net.sourceforge.plantuml.cucadiagram.DisplayPositionned;
 import net.sourceforge.plantuml.graphic.HtmlColor;
+import net.sourceforge.plantuml.graphic.SymbolContext;
 import net.sourceforge.plantuml.sequencediagram.graphic.FileMaker;
 import net.sourceforge.plantuml.sequencediagram.graphic.SequenceDiagramFileMakerPuma2;
 import net.sourceforge.plantuml.sequencediagram.graphic.SequenceDiagramTxtMaker;
@@ -91,7 +96,7 @@ public class SequenceDiagram extends UmlDiagram {
 		if (participants.containsKey(code)) {
 			throw new IllegalArgumentException();
 		}
-		if (display == null) {
+		if (Display.isNull(display)) {
 			// display = Arrays.asList(code);
 			display = Display.getWithNewlines(code);
 		}
@@ -120,6 +125,7 @@ public class SequenceDiagram extends UmlDiagram {
 	}
 
 	public void addNote(Note n, boolean tryMerge) {
+		// this.lastEventWithDeactivate = null;
 		if (tryMerge && events.size() > 0) {
 			final Event last = events.get(events.size() - 1);
 			if (last instanceof Note) {
@@ -221,10 +227,14 @@ public class SequenceDiagram extends UmlDiagram {
 	private LifeEvent pendingCreate = null;
 
 	public String activate(Participant p, LifeEventType lifeEventType, HtmlColor backcolor) {
+		return activate(p, lifeEventType, backcolor, null);
+	}
+
+	public String activate(Participant p, LifeEventType lifeEventType, HtmlColor backcolor, HtmlColor linecolor) {
 		if (lastDelay != null) {
 			return "You cannot Activate/Deactivate just after a ...";
 		}
-		final LifeEvent lifeEvent = new LifeEvent(p, lifeEventType, backcolor);
+		final LifeEvent lifeEvent = new LifeEvent(p, lifeEventType, new SymbolContext(backcolor, linecolor));
 		events.add(lifeEvent);
 		if (lifeEventType == LifeEventType.CREATE) {
 			pendingCreate = lifeEvent;
@@ -232,7 +242,7 @@ public class SequenceDiagram extends UmlDiagram {
 		}
 		if (lastEventWithDeactivate == null) {
 			if (lifeEventType == LifeEventType.ACTIVATE) {
-				p.incInitialLife(backcolor);
+				p.incInitialLife(new SymbolContext(backcolor, linecolor));
 				return null;
 			}
 			return "Only activate command can occur before message are send";
@@ -258,6 +268,9 @@ public class SequenceDiagram extends UmlDiagram {
 			HtmlColor backColorElement) {
 		if (type != GroupingType.START && openGroupings.size() == 0) {
 			return false;
+		}
+		if (backColorGeneral == null) {
+			backColorGeneral = getSkinParam().getHtmlColor(ColorParam.sequenceGroupBodyBackground, null, false);
 		}
 
 		final GroupingStart top = openGroupings.size() > 0 ? openGroupings.get(0) : null;
@@ -298,22 +311,43 @@ public class SequenceDiagram extends UmlDiagram {
 		return skin2;
 	}
 
-	private Integer messageNumber = null;
+	private boolean autonumber = false;
+	private int messageNumber;
 	private int incrementMessageNumber;
 
 	private DecimalFormat decimalFormat;
 
-	public final void goAutonumber(int startingNumber, int increment, DecimalFormat decimalFormat) {
+	public final void autonumberGo(int startingNumber, int increment, DecimalFormat decimalFormat) {
+		this.autonumber = true;
 		this.messageNumber = startingNumber;
 		this.incrementMessageNumber = increment;
 		this.decimalFormat = decimalFormat;
 	}
 
+	public final void autonumberStop() {
+		this.autonumber = false;
+	}
+
+	public final void autonumberResume(DecimalFormat decimalFormat) {
+		this.autonumber = true;
+		if (decimalFormat != null) {
+			this.decimalFormat = decimalFormat;
+		}
+	}
+
+	public final void autonumberResume(int increment, DecimalFormat decimalFormat) {
+		this.autonumber = true;
+		this.incrementMessageNumber = increment;
+		if (decimalFormat != null) {
+			this.decimalFormat = decimalFormat;
+		}
+	}
+
 	public String getNextMessageNumber() {
-		if (messageNumber == null) {
+		if (autonumber == false) {
 			return null;
 		}
-		final Integer result = messageNumber;
+		final int result = messageNumber;
 		messageNumber += incrementMessageNumber;
 		return decimalFormat.format(result);
 	}
@@ -434,7 +468,7 @@ public class SequenceDiagram extends UmlDiagram {
 				return true;
 			}
 		}
-		if (getLegend() != null && getLegend().hasUrl()) {
+		if (DisplayPositionned.isNull(getLegend()) == false && getLegend().hasUrl()) {
 			return true;
 		}
 		return false;
@@ -451,5 +485,26 @@ public class SequenceDiagram extends UmlDiagram {
 		}
 		return true;
 	}
+
+	public double getDpiFactor(FileFormatOption fileFormatOption, Dimension2D dim) {
+		final double dpiFactor;
+		final Scale scale = getScale();
+		if (scale == null) {
+			dpiFactor = getDpiFactor(fileFormatOption);
+		} else {
+			dpiFactor = scale.getScale(dim.getWidth(), dim.getHeight());
+		}
+		return dpiFactor;
+	}
+	
+	
+	@Override
+	public String checkFinalError() {
+		if (this.isHideUnlinkedData()) {
+			this.removeHiddenParticipants();
+		}
+		return super.checkFinalError();
+	}
+
 
 }

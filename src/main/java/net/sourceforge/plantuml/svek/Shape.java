@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -28,16 +28,18 @@ package net.sourceforge.plantuml.svek;
 import java.awt.geom.Dimension2D;
 import java.awt.geom.Point2D;
 import java.util.List;
+import java.util.Map;
 
 import net.sourceforge.plantuml.Dimension2DDouble;
 import net.sourceforge.plantuml.Hideable;
+import net.sourceforge.plantuml.StringUtils;
 import net.sourceforge.plantuml.cucadiagram.EntityPosition;
 import net.sourceforge.plantuml.graphic.StringBounder;
 import net.sourceforge.plantuml.posimo.Positionable;
+import net.sourceforge.plantuml.svek.image.EntityImageDescription;
 import net.sourceforge.plantuml.svek.image.EntityImageStateBorder;
 import net.sourceforge.plantuml.ugraphic.Shadowable;
 import net.sourceforge.plantuml.ugraphic.UPolygon;
-import net.sourceforge.plantuml.StringUtils;
 
 public class Shape implements Positionable, IShapePseudo, Hideable {
 
@@ -71,6 +73,11 @@ public class Shape implements Positionable, IShapePseudo, Hideable {
 		this.cluster = cluster;
 	}
 
+	@Override
+	public String toString() {
+		return super.toString() + " " + image + " " + type;
+	}
+
 	public Shape(IEntityImage image, ShapeType type, double width, double height, ColorSequence colorSequence,
 			boolean top, int shield, EntityPosition entityPosition) {
 		this.entityPosition = entityPosition;
@@ -82,7 +89,7 @@ public class Shape implements Positionable, IShapePseudo, Hideable {
 		this.color = colorSequence.getValue();
 		this.uid = String.format("sh%04d", color);
 		this.shield = shield;
-		if (shield > 0 && type != ShapeType.RECTANGLE) {
+		if (shield > 0 && type != ShapeType.RECTANGLE && type != ShapeType.RECTANGLE_HTML_FOR_PORTS) {
 			throw new IllegalArgumentException();
 		}
 	}
@@ -99,7 +106,11 @@ public class Shape implements Positionable, IShapePseudo, Hideable {
 		return height;
 	}
 
-	public void appendShape(StringBuilder sb) {
+	public void appendShape(StringBuilder sb, StringBounder stringBounder) {
+		if (type == ShapeType.RECTANGLE_HTML_FOR_PORTS) {
+			appendLabelHtmlSpecialForLink(sb, stringBounder);
+			return;
+		}
 		if (type == ShapeType.RECTANGLE && shield > 0) {
 			appendHtml(sb);
 			return;
@@ -155,6 +166,47 @@ public class Shape implements Positionable, IShapePseudo, Hideable {
 		sb.append("</TABLE>");
 	}
 
+	private void appendLabelHtmlSpecialForLink(StringBuilder sb, StringBounder stringBounder) {
+		final Ports ports = ((WithPorts) this.image).getPorts(stringBounder);
+
+		sb.append(uid);
+		sb.append(" [");
+		sb.append("shape=plaintext,");
+		// sb.append("color=\"" + StringUtils.getAsHtml(color) + "\",");
+		sb.append("label=<");
+		sb.append("<TABLE BGCOLOR=\"" + StringUtils.getAsHtml(color)
+				+ "\" BORDER=\"0\" CELLBORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"0\">");
+		double position = 0;
+		for (Map.Entry<String, PortGeometry> ent : ports.getAll().entrySet()) {
+			final String portName = ent.getKey();
+			final PortGeometry geom = ent.getValue();
+			final double missing = geom.getPosition() - position;
+			appendTr(sb, null, missing);
+			appendTr(sb, portName, geom.getHeight());
+			position = geom.getLastY();
+		}
+		appendTr(sb, null, getHeight() - position);
+		sb.append("</TABLE>");
+		sb.append(">");
+		sb.append("];");
+		SvekUtils.println(sb);
+	}
+
+	private void appendTr(StringBuilder sb, final String portName, final double height) {
+		if (height <= 0) {
+			return;
+		}
+		sb.append("<TR>");
+		sb.append("<TD ");
+		sb.append(" FIXEDSIZE=\"TRUE\" WIDTH=\"" + getWidth() + "\" HEIGHT=\"" + height + "\"");
+		if (portName != null) {
+			sb.append(" PORT=\"" + portName + "\"");
+		}
+		sb.append(">");
+		sb.append("</TD>");
+		sb.append("</TR>");
+	}
+
 	private void appendTd(StringBuilder sb, int w, int h) {
 		sb.append("<TD");
 		sb.append(" FIXEDSIZE=\"TRUE\" WIDTH=\"" + w + "\" HEIGHT=\"" + h + "\"");
@@ -170,8 +222,10 @@ public class Shape implements Positionable, IShapePseudo, Hideable {
 	private void appendShapeInternal(StringBuilder sb) {
 		if (type == ShapeType.RECTANGLE && shield > 0) {
 			throw new UnsupportedOperationException();
-		} else if (type == ShapeType.RECTANGLE) {
+		} else if (type == ShapeType.RECTANGLE || type == ShapeType.FOLDER) {
 			sb.append("shape=rect");
+		} else if (type == ShapeType.RECTANGLE_HTML_FOR_PORTS) {
+			throw new UnsupportedOperationException();
 		} else if (type == ShapeType.OCTAGON) {
 			sb.append("shape=octagon");
 		} else if (type == ShapeType.DIAMOND) {
@@ -256,4 +310,18 @@ public class Shape implements Positionable, IShapePseudo, Hideable {
 		return new Point2D.Double(minX + x, minY + y);
 	}
 
+	public Point2D projection(Point2D pt, StringBounder stringBounder) {
+		if (getType() != ShapeType.FOLDER) {
+			return pt;
+		}
+		final ClusterPosition clusterPosition = new ClusterPosition(minX, minY, minX + width, minY + height);
+		if (clusterPosition.isPointJustUpper(pt)) {
+			final Dimension2D dimName = ((EntityImageDescription) image).getNameDimension(stringBounder);
+			if (pt.getX() < minX + dimName.getWidth()) {
+				return pt;
+			}
+			return new Point2D.Double(pt.getX(), pt.getY() + dimName.getHeight() + 4);
+		}
+		return pt;
+	}
 }

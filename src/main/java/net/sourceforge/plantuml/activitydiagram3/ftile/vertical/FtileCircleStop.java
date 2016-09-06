@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -28,6 +28,7 @@ package net.sourceforge.plantuml.activitydiagram3.ftile.vertical;
 import java.util.Collections;
 import java.util.Set;
 
+import net.sourceforge.plantuml.ISkinParam;
 import net.sourceforge.plantuml.activitydiagram3.ftile.AbstractFtile;
 import net.sourceforge.plantuml.activitydiagram3.ftile.FtileGeometry;
 import net.sourceforge.plantuml.activitydiagram3.ftile.Swimlane;
@@ -46,8 +47,8 @@ public class FtileCircleStop extends AbstractFtile {
 	private final HtmlColor backColor;
 	private final Swimlane swimlane;
 
-	public FtileCircleStop(boolean shadowing, HtmlColor backColor, Swimlane swimlane) {
-		super(shadowing);
+	public FtileCircleStop(ISkinParam skinParam, HtmlColor backColor, Swimlane swimlane) {
+		super(skinParam);
 		this.backColor = backColor;
 		this.swimlane = swimlane;
 	}
@@ -74,7 +75,7 @@ public class FtileCircleStop extends AbstractFtile {
 		yTheoricalPosition = Math.round(yTheoricalPosition);
 
 		final UEllipse circle = new UEllipse(SIZE, SIZE);
-		if (shadowing()) {
+		if (skinParam().shadowing()) {
 			circle.setDeltaShadow(3);
 		}
 		ug.apply(new UChangeColor(backColor)).apply(new UChangeBackColor(null))
@@ -82,7 +83,7 @@ public class FtileCircleStop extends AbstractFtile {
 
 		final double delta = 4;
 		final UEllipse circleSmall = new UEllipse(SIZE - delta * 2, SIZE - delta * 2);
-		if (shadowing()) {
+		if (skinParam().shadowing()) {
 			circleSmall.setDeltaShadow(3);
 		}
 		ug.apply(new UChangeColor(null)).apply(new UChangeBackColor(backColor))

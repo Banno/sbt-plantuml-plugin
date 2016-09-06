@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -35,9 +35,12 @@ import net.sourceforge.plantuml.FontParam;
 import net.sourceforge.plantuml.ISkinParam;
 import net.sourceforge.plantuml.Url;
 import net.sourceforge.plantuml.cucadiagram.entity.EntityFactory;
+import net.sourceforge.plantuml.graphic.FontConfiguration;
 import net.sourceforge.plantuml.graphic.HtmlColor;
 import net.sourceforge.plantuml.graphic.TextBlock;
 import net.sourceforge.plantuml.graphic.USymbol;
+import net.sourceforge.plantuml.graphic.color.ColorType;
+import net.sourceforge.plantuml.graphic.color.Colors;
 import net.sourceforge.plantuml.svek.IEntityImage;
 import net.sourceforge.plantuml.svek.PackageStyle;
 import net.sourceforge.plantuml.svek.SingleStrategy;
@@ -118,16 +121,6 @@ public class GroupRoot implements IGroup {
 
 	}
 
-	public HtmlColor getSpecificBackColor() {
-		throw new UnsupportedOperationException();
-
-	}
-
-	public void setSpecificBackcolor(HtmlColor specificBackcolor) {
-		throw new UnsupportedOperationException();
-
-	}
-
 	public IGroup getParentContainer() {
 		return null;
 	}
@@ -164,16 +157,6 @@ public class GroupRoot implements IGroup {
 
 	}
 
-	public boolean isAutonom() {
-		throw new UnsupportedOperationException();
-
-	}
-
-	public void setAutonom(boolean autonom) {
-		throw new UnsupportedOperationException();
-
-	}
-
 	public PackageStyle getPackageStyle() {
 		throw new UnsupportedOperationException();
 
@@ -204,22 +187,6 @@ public class GroupRoot implements IGroup {
 		return false;
 	}
 
-	public HtmlColor getSpecificLineColor() {
-		return null;
-	}
-
-	public void setSpecificLineColor(HtmlColor specificLinecolor) {
-		throw new UnsupportedOperationException();
-	}
-
-	public UStroke getSpecificLineStroke() {
-		return null;
-	}
-
-	public void setSpecificLineStroke(UStroke specificLineStoke) {
-		throw new UnsupportedOperationException();
-	}
-
 	public boolean hasUrl() {
 		return false;
 	}
@@ -232,10 +199,6 @@ public class GroupRoot implements IGroup {
 		throw new UnsupportedOperationException();
 	}
 
-	public FontParam getTitleFontParam() {
-		throw new UnsupportedOperationException();
-	}
-
 	public int getRawLayout() {
 		throw new UnsupportedOperationException();
 	}
@@ -245,7 +208,7 @@ public class GroupRoot implements IGroup {
 	}
 
 	public void setConcurrentSeparator(char separator) {
-		throw new UnsupportedOperationException();
+		// throw new UnsupportedOperationException();
 	}
 
 	public void putTip(String member, Display display) {
@@ -260,4 +223,27 @@ public class GroupRoot implements IGroup {
 		throw new UnsupportedOperationException();
 	}
 
+	public Colors getColors(ISkinParam skinParam) {
+		return Colors.empty();
+	}
+
+	public void setColors(Colors colors) {
+		throw new UnsupportedOperationException();
+	}
+
+	public void setSpecificColorTOBEREMOVED(ColorType type, HtmlColor color) {
+		throw new UnsupportedOperationException();
+	}
+
+	public void setSpecificLineStroke(UStroke specificLineStroke) {
+		throw new UnsupportedOperationException();
+	}
+
+	public FontConfiguration getFontConfigurationForTitle(ISkinParam skinParam) {
+		throw new UnsupportedOperationException();
+	}
+
+	public void setRemoved(boolean removed) {
+		throw new UnsupportedOperationException();
+	}
 }

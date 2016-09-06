@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -27,6 +27,7 @@ package net.sourceforge.plantuml.anim;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -36,14 +37,14 @@ public class AnimationDecoder {
 
 	private final List<String> result = new ArrayList<String>();
 
-	public AnimationDecoder(List<String> data) throws ScriptException {
-		for (int i = 0; i < data.size(); i++) {
-			String line = data.get(i);
+	public AnimationDecoder(Iterable<CharSequence> data) throws ScriptException {
+		
+		for (final Iterator<CharSequence> it = data.iterator(); it.hasNext();) {
+			String line = it.next().toString();
 			if (line.matches("^\\s*\\[script\\]\\s*$")) {
 				final StringBuilder scriptText = new StringBuilder();
 				while (true) {
-					i++;
-					line = data.get(i);
+					line = it.next().toString();
 					if (line.matches("^\\s*\\[/script\\]\\s*$")) {
 						final AnimationScript script = new AnimationScript();
 						final String out = script.eval(scriptText.toString());

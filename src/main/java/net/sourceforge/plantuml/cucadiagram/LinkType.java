@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -42,6 +42,14 @@ public class LinkType {
 
 	public LinkType(LinkHat hat1, LinkDecor decor1, LinkDecor decor2, LinkHat hat2) {
 		this(hat1, decor1, LinkStyle.NORMAL, LinkMiddleDecor.NONE, decor2, hat2);
+	}
+
+	public LinkType withoutDecors1() {
+		return new LinkType(hat1, LinkDecor.NONE, style, middleDecor, decor2, hat2);
+	}
+
+	public LinkType withoutDecors2() {
+		return new LinkType(hat1, decor1, style, middleDecor, LinkDecor.NONE, hat2);
 	}
 
 	// public boolean contains(LinkDecor decors) {

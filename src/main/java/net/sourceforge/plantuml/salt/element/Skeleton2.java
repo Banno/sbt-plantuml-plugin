@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -43,7 +43,7 @@ public class Skeleton2 {
 		private final double ypos;
 
 		Entry(int level, double y) {
-			System.err.println("level=" + level);
+			// System.err.println("level=" + level);
 			this.level = level;
 			this.ypos = y;
 		}
@@ -55,7 +55,7 @@ public class Skeleton2 {
 		}
 
 		public void drawVline(UGraphic ug, double lastY) {
-			System.err.println("ypos=" + ypos);
+			// System.err.println("ypos=" + ypos);
 			final double xpos = getXStartForLevel(level);
 			ug.apply(new UTranslate(xpos, lastY)).draw(new ULine(0, ypos - lastY));
 		}

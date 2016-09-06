@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -50,13 +50,13 @@ import net.sourceforge.plantuml.version.PSystemVersion;
 
 public class PSystemDonors extends AbstractPSystem {
 
-	public static final String DONORS = "UDfTaijIwp0CXlTw2gypmqE4XYcJbikqm8ATceX6rBMAxHIIfpygXzHkjR96j--NLThYpyZ3CqNofdHH76C3BrGaapqi9Ra-G3cLuWRcFeLeW3LjC4H6PnwbSr2wLhoP2yMHJi-F3ysOqj714hD1BaB5ayCMojHQZh3k4y80SoukpGdK4sKVO1tfq94pCv63wgkcEHHWiRyg5GypiUpCIlf0KFTNyU9JLCZa71WUCchSvwwEAYtze6jrdREEjUiM_Q1ALsVPRWkFENqSuSdoKGigRdPAVewmWxjmRkqoY8AEK8rxZdumI-oaHQXFIt_lKDjdUGNPz5rgkq7Nv31gdl8fL_qVddONgbnxuVvMiZQoMlRa8uzmdyAjm0Ct7LbpYso7N84TSvWGhj5gGdTJO_FLKp1Ll_6eNskJ_3VvZDHqPk4nO4BQabvize7VfqFJ5BEG8-Ttytivhqa_8wooMpwD-0UUmSRE";
+	public static final String DONORS = "UDfTKyjosp0ClEChUDQa7w5OYLlvaOoTfZEvmH9YqQ88bPIKoj_MMt-iK5gPj7aYXdZiBfQfIVuVSl1C7JcLsewjnW9UA0c76rXp29s7T2x50onTUA8HzdH0tscqQikLXTIMxDIIgJlJT7r_bumv7IsiCHfaEyZq76W3QMZD0-px0664fKwkZsN8PvIzXtr7RKLMBPXRuPVDSyZ3ghafPGSBDjgg7VUU8EzltfCJ2v4vQ3Li8jJOnA6CIWtzGbkAd8jAIzSZkb6OxYwqxH6sCVhk34z63rAGwQ8Mv9SNRU71NrhR24H20sJdHdTkL6kik4J89z7VAfJsKLv29gnBJZsAJ1OxoHDyWYl_1vxgArQsbD0LeiaZ7jnOyuUljJGoKlRaEds6ho6xPDZeeYAZxb6RCMPWpZ4Oxs-XvOJsIux5pvwyolg3Grcj2VHV-THHKQcLGuy1uP74iT42FoQZIOfQyQ1ZttmwvtlWhn5saPUd4J7jv2JLRUGohYUXxjcXHTFUgJVga5iFE-6BhbGhFMqQ7WsxIVxDdz_6V7eW-CD4NXLthI_kSZYBFvcWkcRa8yDCGZtZx9sTleAV6gtsYANyAtSazOFiaToTsgGlt_Pfy7t25fPqzPzY7MmX_cdKgt38nD6haEbeMhlyf3KHR4CDDV0mn9zaGFWBXv0VcW00";
 
 	public ImageData exportDiagram(OutputStream os, int num, FileFormatOption fileFormat) throws IOException {
 		final GraphicStrings result = getGraphicStrings();
 		final ImageBuilder imageBuilder = new ImageBuilder(new ColorMapperIdentity(), 1.0, result.getBackcolor(),
 				getMetadata(), null, 0, 0, null, false);
-		imageBuilder.addUDrawable(result);
+		imageBuilder.setUDrawable(result);
 		return imageBuilder.writeImageTOBEMOVED(fileFormat, os);
 	}
 

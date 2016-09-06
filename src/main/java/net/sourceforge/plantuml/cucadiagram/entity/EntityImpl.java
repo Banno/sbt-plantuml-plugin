@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.plantuml.FontParam;
+import net.sourceforge.plantuml.ISkinParam;
 import net.sourceforge.plantuml.StringUtils;
 import net.sourceforge.plantuml.Url;
 import net.sourceforge.plantuml.cucadiagram.Bodier;
@@ -49,12 +50,17 @@ import net.sourceforge.plantuml.cucadiagram.Link;
 import net.sourceforge.plantuml.cucadiagram.LongCode;
 import net.sourceforge.plantuml.cucadiagram.Stereotype;
 import net.sourceforge.plantuml.cucadiagram.dot.Neighborhood;
+import net.sourceforge.plantuml.graphic.FontConfiguration;
+import net.sourceforge.plantuml.graphic.HorizontalAlignment;
 import net.sourceforge.plantuml.graphic.HtmlColor;
 import net.sourceforge.plantuml.graphic.USymbol;
+import net.sourceforge.plantuml.graphic.color.ColorType;
+import net.sourceforge.plantuml.graphic.color.Colors;
+import net.sourceforge.plantuml.skin.VisibilityModifier;
 import net.sourceforge.plantuml.svek.IEntityImage;
 import net.sourceforge.plantuml.svek.PackageStyle;
 import net.sourceforge.plantuml.svek.SingleStrategy;
-import net.sourceforge.plantuml.ugraphic.UStroke;
+import net.sourceforge.plantuml.ugraphic.UFont;
 import net.sourceforge.plantuml.utils.UniqueSequence;
 
 final class EntityImpl implements ILeaf, IGroup {
@@ -83,18 +89,13 @@ final class EntityImpl implements ILeaf, IGroup {
 
 	private GroupType groupType;
 
-	private boolean autonom = true;
-
 	// Other
-
-	private HtmlColor specificBackcolor;
 	private boolean nearDecoration = false;
+	private boolean hasPort = false;
 	private int xposition;
 	private IEntityImage svekImage;
 
 	private boolean removed = false;
-	private HtmlColor specificLineColor;
-	private UStroke specificStroke;
 	private USymbol symbol;
 	private final int rawLayout;
 	private char concurrentSeparator;
@@ -159,9 +160,12 @@ final class EntityImpl implements ILeaf, IGroup {
 				throw new IllegalArgumentException("type=" + leafType);
 			}
 			if (newType != LeafType.ANNOTATION && newType != LeafType.ABSTRACT_CLASS && newType != LeafType.CLASS
-					&& newType != LeafType.ENUM && newType != LeafType.INTERFACE) {
+					&& newType != LeafType.ENUM && newType != LeafType.INTERFACE && newType != LeafType.OBJECT) {
 				throw new IllegalArgumentException("newtype=" + newType);
 			}
+		}
+		if (leafType == LeafType.CLASS && newType == LeafType.OBJECT) {
+			bodier.muteClassToObject();
 		}
 		this.leafType = newType;
 		this.symbol = newSymbol;
@@ -203,20 +207,12 @@ final class EntityImpl implements ILeaf, IGroup {
 		return code + " " + display + "(" + leafType + ") " + xposition + " " + getUid();
 	}
 
-	public HtmlColor getSpecificBackColor() {
-		return specificBackcolor;
-	}
-
-	public void setSpecificBackcolor(HtmlColor color) {
-		this.specificBackcolor = color;
-	}
-
 	public final Url getUrl99() {
 		return url;
 	}
 
 	public boolean hasUrl() {
-		if (display != null && display.hasUrl()) {
+		if (Display.isNull(display) == false && display.hasUrl()) {
 			return true;
 		}
 		if (bodier.hasUrl()) {
@@ -285,14 +281,7 @@ final class EntityImpl implements ILeaf, IGroup {
 		if (stereotype == null) {
 			return EntityPosition.NORMAL;
 		}
-		final String label = stereotype.getLabel(false);
-		if ("<<entrypoint>>".equalsIgnoreCase(label)) {
-			return EntityPosition.ENTRY_POINT;
-		}
-		if ("<<exitpoint>>".equalsIgnoreCase(label)) {
-			return EntityPosition.EXIT_POINT;
-		}
-		return EntityPosition.NORMAL;
+		return EntityPosition.fromStereotype(stereotype.getLabel(false));
 
 	}
 
@@ -391,16 +380,6 @@ final class EntityImpl implements ILeaf, IGroup {
 		return namespace2;
 	}
 
-	public boolean isAutonom() {
-		checkGroup();
-		return autonom;
-	}
-
-	public void setAutonom(boolean autonom) {
-		this.autonom = autonom;
-
-	}
-
 	public PackageStyle getPackageStyle() {
 		checkGroup();
 		if (stereotype == null) {
@@ -459,7 +438,7 @@ final class EntityImpl implements ILeaf, IGroup {
 	}
 
 	public boolean isHidden() {
-		if (entityFactory.isHidden(leafType)) {
+		if (entityFactory.isHidden(this)) {
 			return true;
 		}
 		if (stereotype != null) {
@@ -469,6 +448,9 @@ final class EntityImpl implements ILeaf, IGroup {
 	}
 
 	public USymbol getUSymbol() {
+		if (symbol != null && stereotype != null && stereotype.getSprite() != null) {
+			return symbol.withStereoAlignment(HorizontalAlignment.RIGHT);
+		}
 		return symbol;
 	}
 
@@ -482,6 +464,9 @@ final class EntityImpl implements ILeaf, IGroup {
 
 	public boolean isRemoved() {
 		if (isGroup()) {
+			if (removed) {
+				return true;
+			}
 			if (getLeafsDirect().size() == 0) {
 				return false;
 			}
@@ -504,22 +489,6 @@ final class EntityImpl implements ILeaf, IGroup {
 		this.removed = removed;
 	}
 
-	public HtmlColor getSpecificLineColor() {
-		return specificLineColor;
-	}
-
-	public void setSpecificLineColor(HtmlColor specificLinecolor) {
-		this.specificLineColor = specificLinecolor;
-	}
-
-	public UStroke getSpecificLineStroke() {
-		return specificStroke;
-	}
-
-	public void setSpecificLineStroke(UStroke specificLineStroke) {
-		this.specificStroke = specificLineStroke;
-	}
-
 	private int layer;
 
 	public int getHectorLayer() {
@@ -537,11 +506,20 @@ final class EntityImpl implements ILeaf, IGroup {
 		return longCode;
 	}
 
-	public FontParam getTitleFontParam() {
+	private FontParam getTitleFontParam() {
 		if (symbol != null) {
 			return symbol.getFontParam();
 		}
 		return getGroupType() == GroupType.STATE ? FontParam.STATE : FontParam.PACKAGE;
+	}
+
+	public FontConfiguration getFontConfigurationForTitle(final ISkinParam skinParam) {
+		final FontParam fontParam = getTitleFontParam();
+		final HtmlColor fontHtmlColor = skinParam.getFontHtmlColor(getStereotype(), fontParam, FontParam.PACKAGE);
+		final UFont font = skinParam.getFont(getStereotype(), true, fontParam, FontParam.PACKAGE);
+		final FontConfiguration fontConfiguration = new FontConfiguration(font, fontHtmlColor,
+				skinParam.getHyperlinkColor(), skinParam.useUnderlineForHyperlink(), skinParam.getTabSize());
+		return fontConfiguration;
 	}
 
 	public final int getRawLayout() {
@@ -576,4 +554,43 @@ final class EntityImpl implements ILeaf, IGroup {
 		return Collections.unmodifiableMap(tips);
 	}
 
+	private Colors colors = Colors.empty();
+
+	public Colors getColors(ISkinParam skinParam) {
+		return colors;
+	}
+
+	public void setColors(Colors colors) {
+		this.colors = colors;
+	}
+
+	public void setSpecificColorTOBEREMOVED(ColorType type, HtmlColor color) {
+		if (color != null) {
+			this.colors = colors.add(type, color);
+		}
+	}
+
+	// public void setSpecificLineStroke(UStroke specificLineStroke) {
+	// colors = colors.addSpecificLineStroke(specificLineStroke);
+	// }
+
+	public boolean hasPort() {
+		checkNotGroup();
+		return hasPort;
+	}
+
+	public void setHasPort(boolean hasPort) {
+		this.hasPort = hasPort;
+	}
+
+	private VisibilityModifier visibility;
+
+	public void setVisibilityModifier(VisibilityModifier visibility) {
+		this.visibility = visibility;
+
+	}
+
+	public VisibilityModifier getVisibilityModifier() {
+		return visibility;
+	}
 }

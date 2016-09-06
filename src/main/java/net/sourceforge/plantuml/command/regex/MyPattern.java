@@ -2,9 +2,9 @@
  * PlantUML : a free UML diagram generator
  * ========================================================================
  *
- * (C) Copyright 2009-2014, Arnaud Roques
+ * (C) Copyright 2009-2017, Arnaud Roques
  *
- * Project Info:  http://plantuml.sourceforge.net
+ * Project Info:  http://plantuml.com
  * 
  * This file is part of PlantUML.
  *
@@ -30,24 +30,24 @@ import java.util.regex.Pattern;
 // Splitter.java to be finished
 public abstract class MyPattern {
 
-	public static Pattern cmpile(String p) {
+	public static Pattern2 cmpile(String p) {
 		p = transformAndCheck(p);
-		return Pattern.compile(p);
+		return new Pattern2(Pattern.compile(p));
 	}
 
-	public static Pattern cmpileNockeck(String p) {
+	public static Pattern2 cmpileNockeck(String p) {
 		p = transform(p);
-		return Pattern.compile(p);
+		return new Pattern2(Pattern.compile(p));
 	}
 
-	public static Pattern cmpile(String p, int type) {
+	public static Pattern2 cmpile(String p, int type) {
 		p = transformAndCheck(p);
-		return Pattern.compile(p, type);
+		return new Pattern2(Pattern.compile(p, type));
 	}
 
-	public static Pattern cmpileNockeck(String p, int type) {
+	public static Pattern2 cmpileNockeck(String p, int type) {
 		p = transform(p);
-		return Pattern.compile(p, type);
+		return new Pattern2(Pattern.compile(p, type));
 	}
 
 	private static String transformAndCheck(String p) {
@@ -83,8 +83,16 @@ public abstract class MyPattern {
 		return p;
 	}
 
-	public static boolean mtches(String input, String regex) {
+	// public static boolean mtches(String input, String regex) {
+	// return cmpile(regex).matcher(input).matches();
+	// }
+	//
+	public static boolean mtches(CharSequence input, String regex) {
 		return cmpile(regex).matcher(input).matches();
+	}
+
+	public static CharSequence removeAll(CharSequence src, String regex) {
+		return src.toString().replaceAll(transform(regex), "");
 	}
 
 }
