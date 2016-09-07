@@ -32,6 +32,7 @@ class SeqDiagramGeneratorSpec extends Specification {
 
   def cleanUp(name: String) = {
     val output = new File(name)
+    output.exists() must beTrue
     output.delete()
   }
 
