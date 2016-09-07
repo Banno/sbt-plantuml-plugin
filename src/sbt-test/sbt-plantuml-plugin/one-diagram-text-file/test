@@ -1,0 +1,3 @@
+> compile
+$ exists src/main/resources/sequence-diagrams/simple.utxt
+$ exec cat src/main/resources/sequence-diagrams/simple.utxt

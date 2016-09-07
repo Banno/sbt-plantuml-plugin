@@ -1,18 +1,44 @@
-package com.banno.plantuml.sbt
+package com.banno.plantuml
 
 import org.specs2.mutable.Specification
-import net.sourceforge.plantuml.SourceStringReader
 import java.io.File
 
-class SeqDiagramGeneratorSpec extends Specification {
-  "Should be able to generate a png" in {
-    val output = new File("output.png")
-    val src = """@startuml
-Bob -> Alice : hello
-@enduml"""
+import net.sourceforge.plantuml.FileFormat
 
-    val rdr  = new SourceStringReader(src)
-    val desc = rdr.generateImage(output)
-    desc must not(beNull)
+class SeqDiagramGeneratorSpec extends Specification {
+
+  val pngFileName = "output.png"
+  test(pngFileName)
+  val svgFileName = "output.svg"
+  test(svgFileName)
+  val txtFileName = "output.utxt"
+  test(txtFileName)
+
+  def test(fileName: String) = {
+    s"Should be able to generate a $fileName" in {
+      val output = new File(fileName)
+      val src = """@startuml
+                  |Bob -> Alice : hello
+                  |@enduml""".stripMargin
+
+      val desc = PlantUMLPlugin.renderDiagramToFile(src, output, FileFormat.UTXT)
+      desc must not(beNull)
+    }
+    step {
+      printDiagram(fileName)
+      cleanUp(fileName)
+    }
+  }
+
+  def cleanUp(name: String) = {
+    val output = new File(name)
+    output.delete()
+  }
+
+  def printDiagram(fileName: String) = {
+    if(fileName.endsWith("txt")) {
+      val source = scala.io.Source.fromFile(fileName)
+      try println(source.mkString) finally source.close()
+    }
   }
 }
