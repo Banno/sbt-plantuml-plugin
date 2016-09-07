@@ -1,4 +1,9 @@
-# 1.2.0 (Unreleased)
+# 1.1.1 (Unreleased)
+
+IMPROVEMENTS
+
+- There is a `sequenceDiagramsOutputFormat` setting now for various output formats.
+  - Options include: PNG, SVG, EPS, UTXT, PDF, ANIMATED_GIF, HTML, HTML5, BASE64, BRAILLE_PNG (More can be found in `net.sourceforge.plantuml.FileFormat`
 
 VERSION CHANGES
 
