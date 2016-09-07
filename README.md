@@ -19,7 +19,7 @@ With the following added to your `project/plugins.sbt`
 ```scala
 resolvers += Resolver.url("bintray-banno-oss-releases", url("https://dl.bintray.com/banno/oss"))(Resolver.ivyStylePatterns)
 
-addSbtPlugin("com.banno" % "sbt-plantuml-plugin" % "1.1.0")
+addSbtPlugin("com.banno" % "sbt-plantuml-plugin" % "1.1.1")
 ```
 
 #### Custom input/output directories and file extension
