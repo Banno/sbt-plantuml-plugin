@@ -1,5 +1,3 @@
-import bintray.Keys._
-
 name := "sbt-plantuml-plugin"
 
 organization := "com.banno"
@@ -27,11 +25,11 @@ publishTo <<= (version) { v =>
 credentials += Credentials(Path.userHome / ".ivy2" / ".banno_credentials")
 
 // bintray
-bintrayPublishSettings
+bintrayOrganization := Some("banno")
 
-bintrayOrganization in bintray := Some("banno")
+bintrayRepository := "oss"
 
-repository in bintray := "oss"
+bintrayPackageLabels := Seq("sbt")
 
 licenses ++= Seq(("Apache-2.0", url("http://www.apache.org/licenses/LICENSE-2.0.html")))
 
