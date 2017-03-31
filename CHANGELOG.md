@@ -1,3 +1,9 @@
+# 1.1.2
+
+CHANGES:
+
+- Remove PSystemMemorial
+
 # 1.1.1
 
 IMPROVEMENTS
