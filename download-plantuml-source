@@ -23,6 +23,12 @@ rm README
 rm build.xml
 rm plantuml-asl-$PLANTUML_VERSION.tar.gz
 rm src/main/java/net/sourceforge/plantuml/ant/PlantUmlTask.java
+
+# https://github.com/Banno/sbt-plantuml-plugin/issues/7
+rm src/main/java/net/sourceforge/plantuml/eggs/PSystemMemorial.java
+rm src/main/java/net/sourceforge/plantuml/eggs/PSystemMemorialFactory.java
+sed -i '' '/PSystemMemorialFactory/d' src/main/java/net/sourceforge/plantuml/PSystemBuilder.java
+
 rm -rf src/sprites
 
 echo "Converting dos line endings to linux"

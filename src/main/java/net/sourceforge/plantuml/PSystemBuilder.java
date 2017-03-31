@@ -46,7 +46,6 @@ import net.sourceforge.plantuml.eggs.PSystemAppleTwoFactory;
 import net.sourceforge.plantuml.eggs.PSystemCharlieFactory;
 import net.sourceforge.plantuml.eggs.PSystemEggFactory;
 import net.sourceforge.plantuml.eggs.PSystemLostFactory;
-import net.sourceforge.plantuml.eggs.PSystemMemorialFactory;
 import net.sourceforge.plantuml.eggs.PSystemPathFactory;
 import net.sourceforge.plantuml.eggs.PSystemRIPFactory;
 import net.sourceforge.plantuml.flowdiagram.FlowDiagramFactory;
@@ -129,7 +128,6 @@ public class PSystemBuilder {
 		factories.add(new PSystemPathFactory());
 		factories.add(new PSystemOregonFactory());
 		factories.add(new PSystemCharlieFactory());
-		factories.add(new PSystemMemorialFactory());
 		factories.add(new PSystemProjectFactory2());
 		factories.add(new FlowDiagramFactory());
 		factories.add(new PSystemTreeFactory(DiagramType.JUNGLE));
