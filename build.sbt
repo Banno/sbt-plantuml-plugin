@@ -2,7 +2,7 @@ name := "sbt-plantuml-plugin"
 
 organization := "com.banno"
 
-version := "1.1.2"
+version := "1.1.3-SNAPSHOT"
 
 scalaVersion := "2.10.6"
 
