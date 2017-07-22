@@ -14,26 +14,28 @@ object PlantUMLPlugin extends AutoPlugin {
     lazy val diagramExtension = SettingKey[String]("diagram-extension")
     lazy val diagramsSource = SettingKey[File]("diagrams-source")
     lazy val diagramsTarget = SettingKey[File]("diagrams-target")
-    lazy val diagramsFormat = SettingKey[FileFormat]("diagrams-format")
+    lazy val diagramFormat = SettingKey[FileFormat]("diagrams-format")
 
     lazy val generateDiagrams = TaskKey[Seq[File]]("generate-diagrams")
   }
 
   import autoImport._
 
+  private val DefaultExtension = ".puml"
   private val DefaultSource = "src/main/resources/diagrams/"
   private val DefaultTarget = DefaultSource
+  private val DefaultFormat = FileFormat.PNG
 
   override lazy val projectSettings = Seq(
-    diagramExtension := ".puml",
+    diagramExtension := DefaultExtension,
     diagramsSource := baseDirectory.value / DefaultSource,
     diagramsTarget := baseDirectory.value / DefaultTarget,
-    diagramsFormat := FileFormat.PNG,
+    diagramFormat := DefaultFormat,
     generateDiagrams := {
       val extension = diagramExtension.value
       val source = diagramsSource.value
       val target = diagramsTarget.value
-      val format = diagramsFormat.value
+      val format = diagramFormat.value
 
       if (!source.exists) {
         Seq.empty
