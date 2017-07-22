@@ -1,0 +1,11 @@
+> compile
+$ exists src/main/resources/diagrams/simple-seq.png
+$ exists src/main/resources/diagrams/simple-usecase.png
+$ exists src/main/resources/diagrams/simple-class.png
+$ exists src/main/resources/diagrams/simple-activity.png
+$ exists src/main/resources/diagrams/simple-component.png
+$ exists src/main/resources/diagrams/simple-state.png
+$ exists src/main/resources/diagrams/simple-object.png
+$ exists src/main/resources/diagrams/simple-deployment.png
+$ exists src/main/resources/diagrams/simple-timing.png
+$ exists src/main/resources/diagrams/simple-gantt.png
