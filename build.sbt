@@ -4,7 +4,7 @@ organization := "com.banno"
 
 version := "1.1.3-SNAPSHOT"
 
-scalaVersion := "2.10.6"
+scalaVersion := "2.12.2"
 
 sbtPlugin := true
 
