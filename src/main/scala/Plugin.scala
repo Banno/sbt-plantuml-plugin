@@ -1,5 +1,7 @@
 package com.banno.plantuml
+
 import java.io.FileOutputStream
+import java.nio.charset.Charset
 
 import sbt._
 import Keys._
@@ -9,48 +11,52 @@ import net.sourceforge.plantuml.{FileFormat, FileFormatOption, SourceStringReade
 object PlantUMLPlugin extends AutoPlugin {
 
   object autoImport {
-    lazy val sequenceDiagramExtension = SettingKey[String]("sequence-diagram-extension")
-    lazy val sequenceDiagramsLocation = SettingKey[File]("sequence-diagrams-locations")
-    lazy val sequenceDiagramsOutput = SettingKey[File]("sequence-diagrams-output")
-    lazy val sequenceDiagramsOutputFormat = SettingKey[FileFormat]("sequence-diagrams-output-format")
+    lazy val diagramExtension = SettingKey[String]("diagram-extension")
+    lazy val diagramsSource = SettingKey[File]("diagrams-source")
+    lazy val diagramsTarget = SettingKey[File]("diagrams-target")
+    lazy val diagramsFormat = SettingKey[FileFormat]("diagrams-format")
 
-    lazy val generateSequenceDiagrams = TaskKey[Seq[File]]("generate-sequence-diagrams")
+    lazy val generateDiagrams = TaskKey[Seq[File]]("generate-diagrams")
   }
+
   import autoImport._
 
-  override lazy val projectSettings = Seq(
-    sequenceDiagramExtension := ".diag",
-    sequenceDiagramsLocation := baseDirectory.value / "src/main/resources/sequence-diagrams/",
-    sequenceDiagramsOutput := baseDirectory.value / "src/main/resources/sequence-diagrams/",
-    sequenceDiagramsOutputFormat := FileFormat.PNG,
-    generateSequenceDiagrams := {
-      val diagramExtension = sequenceDiagramExtension.value
-      val diagramsInputLocation = sequenceDiagramsLocation.value
-      val diagramsOutputLocation = sequenceDiagramsOutput.value
-      val diagramsOutputFormat = sequenceDiagramsOutputFormat.value
+  private val DefaultSource = "src/main/resources/diagrams/"
+  private val DefaultTarget = DefaultSource
 
-      if (diagramsInputLocation.exists) {
-        if (!diagramsOutputLocation.exists) {
-          diagramsOutputLocation.mkdirs()
+  override lazy val projectSettings = Seq(
+    diagramExtension := ".puml",
+    diagramsSource := baseDirectory.value / DefaultSource,
+    diagramsTarget := baseDirectory.value / DefaultTarget,
+    diagramsFormat := FileFormat.PNG,
+    generateDiagrams := {
+      val extension = diagramExtension.value
+      val source = diagramsSource.value
+      val target = diagramsTarget.value
+      val format = diagramsFormat.value
+
+      if (!source.exists) {
+        Seq.empty
+      } else {
+        if (!target.exists) {
+          target.mkdirs()
         }
 
-        val sequenceDiagrams = diagramsInputLocation.listFiles().toList
+        val diagrams = source.listFiles().toList
 
-        sequenceDiagrams.filter(_.getName().endsWith(diagramExtension)) map { sequenceDiagramFile =>
-          val baseDirectory = ensurePathEndsInSlash(diagramsOutputLocation.getAbsolutePath)
-          val filename = dropDiagramFileExtension(diagramExtension, sequenceDiagramFile.getName) + diagramsOutputFormat.getFileSuffix
+        diagrams.filter(_.getName().endsWith(extension)).map { diagramFile => {
+          val baseDirectory = ensurePathEndsInSlash(target.getAbsolutePath)
+          val filename = dropDiagramFileExtension(extension, diagramFile.getName) + format.getFileSuffix
           val output = new File(baseDirectory + filename)
 
-          val diagramText = FileUtils.readFileToString(sequenceDiagramFile)
+          val diagramText = FileUtils.readFileToString(diagramFile, Charset.defaultCharset())
 
-          renderDiagramToFile(diagramText, output, diagramsOutputFormat)
+          renderDiagramToFile(diagramText, output, format)
           output
-        }
-      } else {
-        Seq.empty
+        }}
       }
     },
-    generateSequenceDiagrams <<= generateSequenceDiagrams triggeredBy (compile in Compile)
+    generateDiagrams := (generateDiagrams triggeredBy (compile in Compile)).value
   )
 
   private[plantuml] def renderDiagramToFile(source: String, output: File, format: FileFormat) = {
@@ -60,6 +66,7 @@ object PlantUMLPlugin extends AutoPlugin {
     fos.close()
     desc
   }
+
   private[this] def ensurePathEndsInSlash(path: String) = if (path.endsWith("/")) path else s"${path}/"
   private[this] def dropDiagramFileExtension(extension: String, filename: String) = filename.replaceAll(extension, "")
 }

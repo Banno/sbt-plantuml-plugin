@@ -9,4 +9,4 @@ scalaVersion := "2.10.5"
 
 enablePlugins(PlantUMLPlugin)
 
-sequenceDiagramsOutputFormat := FileFormat.UTXT
+diagramsFormat := FileFormat.UTXT

@@ -1,2 +1,2 @@
 > compile
--$ exists src/main/resources/sequence-diagrams/*.png
+-$ exists src/main/resources/diagrams/*.png
