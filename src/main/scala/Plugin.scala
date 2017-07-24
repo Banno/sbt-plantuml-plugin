@@ -5,6 +5,7 @@ import java.nio.charset.Charset
 
 import sbt._
 import Keys._
+import net.sourceforge.plantuml.core.DiagramDescription
 import org.apache.commons.io.FileUtils
 import net.sourceforge.plantuml.{FileFormat, FileFormatOption, SourceStringReader}
 
@@ -53,7 +54,7 @@ object PlantUMLPlugin extends AutoPlugin {
 
           val diagramText = FileUtils.readFileToString(diagramFile, Charset.defaultCharset())
 
-          renderDiagramToFile(diagramText, output, format)
+          val diagramDescription = renderDiagramToFile(diagramText, output, format)
           output
         }}
       }
@@ -61,10 +62,10 @@ object PlantUMLPlugin extends AutoPlugin {
     generateDiagrams := (generateDiagrams triggeredBy (compile in Compile)).value
   )
 
-  private[plantuml] def renderDiagramToFile(source: String, output: File, format: FileFormat) = {
+  private[plantuml] def renderDiagramToFile(source: String, output: File, format: FileFormat): DiagramDescription = {
     val fos = new FileOutputStream(output)
     val reader = new SourceStringReader(source)
-    val desc = reader.generateImage(fos, new FileFormatOption(format))
+    val desc = reader.outputImage(fos, new FileFormatOption(format))
     fos.close()
     desc
   }

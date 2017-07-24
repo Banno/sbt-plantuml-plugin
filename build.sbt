@@ -51,13 +51,5 @@ scriptedLaunchOpts += (version { "-Dplugin.version=" + _ }).value
 publishArtifact in (Compile, packageSrc) := false
 
 publishArtifact in (Compile, packageDoc) := false
-/*
-// depend on plantuml github repo
-lazy val puml_latest = "master"
-lazy val puml_v1_2017_15 = "1a5ca5cf483d450821a0a21209773014d374fdde"
-lazy val puml_version = puml_latest
 
-lazy val puml_project = ProjectRef(uri(s"https://github.com/plantuml/plantuml.git#${puml_version}"), "plantuml")
-lazy val root = project in file(".") dependsOn(puml_project)
-*/
-libraryDependencies += "net.sourceforge.plantuml" % "plantuml" % "8059"
+libraryDependencies += "net.sourceforge.plantuml" % "plantuml" % "1.2017.15"
